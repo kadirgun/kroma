@@ -1,0 +1,12 @@
+diff --git a/chrome/renderer/chrome_content_renderer_client.cc b/chrome/renderer/chrome_content_renderer_client.cc
+index a2e75788a6..1f946c9985 100644
+--- a/chrome/renderer/chrome_content_renderer_client.cc
++++ b/chrome/renderer/chrome_content_renderer_client.cc
+@@ -114,7 +114,6 @@
+ #include "components/pdf/common/pdf_util.h"
+ #include "components/permissions/features.h"
+ #include "components/safe_browsing/buildflags.h"
+-#include "components/safe_browsing/content/renderer/threat_dom_details.h"
+ #include "components/sampling_profiler/process_type.h"
+ #include "components/sampling_profiler/thread_profiler.h"
+ #include "components/security_interstitials/content/renderer/security_interstitial_page_controller_delegate_impl.h"

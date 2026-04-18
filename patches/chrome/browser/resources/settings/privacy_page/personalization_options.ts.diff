@@ -1,0 +1,15 @@
+diff --git a/chrome/browser/resources/settings/privacy_page/personalization_options.ts b/chrome/browser/resources/settings/privacy_page/personalization_options.ts
+index d347ad0355..bf880e3a8a 100644
+--- a/chrome/browser/resources/settings/privacy_page/personalization_options.ts
++++ b/chrome/browser/resources/settings/privacy_page/personalization_options.ts
+@@ -199,10 +199,6 @@ export class SettingsPersonalizationOptionsElement extends
+         'chrome-signin-user-choice-info-change',
+         this.setChromeSigninUserChoiceInfo_.bind(this));
+     // </if>
+-
+-    this.registerHelpBubble(
+-        ANONYMIZED_URL_COLLECTION_ID,
+-        this.$.urlCollectionToggle.getBubbleAnchor(), {anchorPaddingTop: 10});
+   }
+ 
+   // <if expr="is_chromeos">

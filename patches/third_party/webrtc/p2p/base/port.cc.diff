@@ -1,0 +1,59 @@
+diff --git a/p2p/base/port.cc b/p2p/base/port.cc
+index c7c1de2..caa704e 100644
+--- a/p2p/base/port.cc
++++ b/p2p/base/port.cc
+@@ -53,6 +53,8 @@
+ #include "rtc_base/string_encode.h"
+ #include "rtc_base/string_utils.h"
+ #include "rtc_base/strings/string_builder.h"
++#include "base/command_line.h"
++#include "base/environment.h"
+ #include "rtc_base/trace_event.h"
+ #include "rtc_base/weak_ptr.h"
+ 
+@@ -303,15 +305,41 @@ bool Port::MaybeObfuscateAddress(const Candidate& c, bool is_final) {
+       weak_ptr->FinishAddingAddress(copy, is_final);
+     }
+   };
++  // Schedule mDNS name creation for local addresses. (No diagnostic log.)
+   set_mdns_name_registration_status(MdnsNameRegistrationStatus::kInProgress);
+-  network_->GetMdnsResponder()->CreateNameForAddress(copy.address().ipaddr(),
+-                                                     callback);
++  network_->GetMdnsResponder()->CreateNameForAddress(
++      copy.address().ipaddr(), std::move(callback));
+   return true;
+ }
+ 
+ void Port::FinishAddingAddress(const Candidate& c, bool is_final) {
+-  candidates_.push_back(c);
+-  SendCandidateReady(c);
++  Candidate c_to_add = c;
++
++  base::CommandLine* cmd = base::CommandLine::ForCurrentProcess();
++  // Diagnostic: log whether the visitor-ip switch is visible in this process
++  // and what its value is. When present, use it to override candidate
++  // addresses. Do NOT force an inline value here — that was only for
++  // temporary testing.
++  bool visitor_switch_present = false;
++  std::string visitor_switch_value;
++  if (cmd) {
++    visitor_switch_present = cmd->HasSwitch("visitor-ip");
++    if (visitor_switch_present)
++      visitor_switch_value = cmd->GetSwitchValueASCII("visitor-ip");
++  }
++  // Visitor switch presence/value logged only at higher-level diagnostics.
++
++  if (visitor_switch_present &&
++      (c_to_add.is_local() || c_to_add.type() == IceCandidateType::kSrflx)) {
++    std::string visitor_ip = visitor_switch_value;
++    int port = c_to_add.address().port();
++    SocketAddress new_addr(visitor_ip, port);
++  // Override candidate IP with visitor IP; preserve port.
++    c_to_add.set_address(new_addr);
++  }
++
++  candidates_.push_back(c_to_add);
++  SendCandidateReady(c_to_add);
+ 
+   PostAddAddress(is_final);
+ }

@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/safe_browsing/advanced_protection_status_manager_unittest.cc b/chrome/browser/safe_browsing/advanced_protection_status_manager_unittest.cc
+index 58126e410f..687ef1de08 100644
+--- a/chrome/browser/safe_browsing/advanced_protection_status_manager_unittest.cc
++++ b/chrome/browser/safe_browsing/advanced_protection_status_manager_unittest.cc
+@@ -8,7 +8,6 @@
+ #include "base/test/task_environment.h"
+ #include "build/build_config.h"
+ #include "components/prefs/pref_service.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ #include "components/safe_browsing/core/common/safebrowsing_switches.h"
+ #include "components/signin/public/identity_manager/account_info.h"
+ #include "components/signin/public/identity_manager/identity_test_environment.h"

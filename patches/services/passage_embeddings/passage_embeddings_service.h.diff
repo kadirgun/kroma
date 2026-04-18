@@ -1,0 +1,12 @@
+diff --git a/services/passage_embeddings/passage_embeddings_service.h b/services/passage_embeddings/passage_embeddings_service.h
+index bfa711afea..e9db12660f 100644
+--- a/services/passage_embeddings/passage_embeddings_service.h
++++ b/services/passage_embeddings/passage_embeddings_service.h
+@@ -11,7 +11,6 @@
+ 
+ namespace passage_embeddings {
+ 
+-class PassageEmbedder;
+ 
+ // Class implementation of the passage embeddings service mojo interface.
+ class PassageEmbeddingsService : public mojom::PassageEmbeddingsService {

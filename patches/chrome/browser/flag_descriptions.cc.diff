@@ -1,0 +1,15 @@
+diff --git a/chrome/browser/flag_descriptions.cc b/chrome/browser/flag_descriptions.cc
+index f6c138f5e2..b08155d702 100644
+--- a/chrome/browser/flag_descriptions.cc
++++ b/chrome/browser/flag_descriptions.cc
+@@ -2654,6 +2654,10 @@ const char kLogJsConsoleMessagesDescription[] =
+     "Enable logging JS console messages in system logs, please note that they "
+     "may contain PII.";
+ 
++const char kMaxConnectionsPerHostName[] = "Maximum connections per host";
++const char kMaxConnectionsPerHostDescription[] =
++     "Customize maximum allowed connections per host. ungoogled-chromium flag, Bromite feature.";
++
+ const char kMediaRouterCastAllowAllIPsName[] =
+     "Connect to Cast devices on all IP addresses";
+ const char kMediaRouterCastAllowAllIPsDescription[] =

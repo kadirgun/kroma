@@ -1,0 +1,14 @@
+diff --git a/chrome/browser/safe_browsing/chrome_safe_browsing_blocking_page_factory.cc b/chrome/browser/safe_browsing/chrome_safe_browsing_blocking_page_factory.cc
+index 05e86f1848..d37575f9f1 100644
+--- a/chrome/browser/safe_browsing/chrome_safe_browsing_blocking_page_factory.cc
++++ b/chrome/browser/safe_browsing/chrome_safe_browsing_blocking_page_factory.cc
+@@ -64,8 +64,7 @@ ChromeSafeBrowsingBlockingPageFactory::CreateSafeBrowsingPage(
+       Profile::FromBrowserContext(web_contents->GetBrowserContext());
+   // Create appropriate display options for this blocking page.
+   PrefService* prefs = profile->GetPrefs();
+-  bool is_extended_reporting_opt_in_allowed =
+-      IsExtendedReportingOptInAllowed(*prefs);
++  bool is_extended_reporting_opt_in_allowed = false;
+   bool is_proceed_anyway_disabled = IsSafeBrowsingProceedAnywayDisabled(*prefs);
+ 
+   // Determine if any prefs need to be updated prior to showing the security

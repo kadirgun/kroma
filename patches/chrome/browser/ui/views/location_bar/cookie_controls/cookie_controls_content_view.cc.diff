@@ -1,0 +1,19 @@
+diff --git a/chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_content_view.cc b/chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_content_view.cc
+index 4ef6bd81da..5efec23a3e 100644
+--- a/chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_content_view.cc
++++ b/chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_content_view.cc
+@@ -188,14 +188,7 @@ void CookieControlsContentView::SetEnforcedIconVisible(bool visible) {
+ }
+ 
+ void CookieControlsContentView::SetFeedbackSectionVisibility(bool visible) {
+-  if (visible && base::FeatureList::IsEnabled(
+-                     content_settings::features::kUserBypassFeedback)) {
+-    feedback_section_->SetVisible(true);
+-    // Ensure that the feedback row is always below ACT feature rows.
+-    ReorderChildView(feedback_section_, children().size());
+-  } else {
+     feedback_section_->SetVisible(false);
+-  }
+ }
+ 
+ void CookieControlsContentView::SetCookiesRowVisible(bool visible) {

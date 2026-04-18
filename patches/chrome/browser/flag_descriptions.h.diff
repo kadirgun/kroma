@@ -1,0 +1,14 @@
+diff --git a/chrome/browser/flag_descriptions.h b/chrome/browser/flag_descriptions.h
+index 2af42da341..774b8b8651 100644
+--- a/chrome/browser/flag_descriptions.h
++++ b/chrome/browser/flag_descriptions.h
+@@ -1555,6 +1555,9 @@ extern const char kLockTopControlsOnLargeTabletsDescription[];
+ extern const char kLogJsConsoleMessagesName[];
+ extern const char kLogJsConsoleMessagesDescription[];
+ 
++extern const char kMaxConnectionsPerHostName[];
++extern const char kMaxConnectionsPerHostDescription[];
++
+ extern const char kMediaRouterCastAllowAllIPsName[];
+ extern const char kMediaRouterCastAllowAllIPsDescription[];
+ 

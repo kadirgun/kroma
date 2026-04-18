@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/ui/browser_command_controller_unittest.cc b/chrome/browser/ui/browser_command_controller_unittest.cc
+index 19899484b3..c198f62683 100644
+--- a/chrome/browser/ui/browser_command_controller_unittest.cc
++++ b/chrome/browser/ui/browser_command_controller_unittest.cc
+@@ -34,7 +34,6 @@
+ #include "components/input/native_web_keyboard_event.h"
+ #include "components/performance_manager/public/features.h"
+ #include "components/policy/core/common/policy_pref_names.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "content/public/test/web_contents_tester.h"
+ #include "extensions/buildflags/buildflags.h"
+ #include "ui/events/keycodes/dom/dom_code.h"

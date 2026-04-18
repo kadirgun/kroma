@@ -1,0 +1,28 @@
+diff --git a/chrome/browser/ui/webui/chrome_web_ui_configs.cc b/chrome/browser/ui/webui/chrome_web_ui_configs.cc
+index a9e23b54aa..bacd959dea 100644
+--- a/chrome/browser/ui/webui/chrome_web_ui_configs.cc
++++ b/chrome/browser/ui/webui/chrome_web_ui_configs.cc
+@@ -47,6 +47,7 @@
+ #include "chrome/browser/ui/webui/signin_internals_ui.h"
+ #include "chrome/browser/ui/webui/sync_internals/sync_internals_ui.h"
+ #include "chrome/browser/ui/webui/translate_internals/translate_internals_ui.h"
++#include "chrome/browser/ui/webui/ungoogled_first_run.h"
+ #include "chrome/browser/ui/webui/usb_internals/usb_internals_ui.h"
+ #include "chrome/browser/ui/webui/user_actions/user_actions_ui.h"
+ #include "chrome/browser/ui/webui/version/version_ui.h"
+@@ -267,6 +268,7 @@ void RegisterChromeWebUIConfigs() {
+   map.AddWebUIConfig(std::make_unique<SiteEngagementUIConfig>());
+   map.AddWebUIConfig(std::make_unique<SyncInternalsUIConfig>());
+   map.AddWebUIConfig(std::make_unique<TranslateInternalsUIConfig>());
++  map.AddWebUIConfig(std::make_unique<UngoogledFirstRunUIConfig>());
+   map.AddWebUIConfig(std::make_unique<UsbInternalsUIConfig>());
+   map.AddWebUIConfig(std::make_unique<UserActionsUIConfig>());
+   map.AddWebUIConfig(std::make_unique<VersionUIConfig>());
+@@ -297,7 +299,6 @@ void RegisterChromeWebUIConfigs() {
+   map.AddWebUIConfig(std::make_unique<actor::ui::ActorOverlayUIConfig>());
+   map.AddWebUIConfig(std::make_unique<ActorInternalsUIConfig>());
+   map.AddWebUIConfig(std::make_unique<AppServiceInternalsUIConfig>());
+-  map.AddWebUIConfig(std::make_unique<AutofillMlInternalsUIConfig>());
+   map.AddWebUIConfig(std::make_unique<media_router::AccessCodeCastUIConfig>());
+   map.AddWebUIConfig(std::make_unique<BookmarksSidePanelUIConfig>());
+   map.AddWebUIConfig(std::make_unique<BookmarksUIConfig>());

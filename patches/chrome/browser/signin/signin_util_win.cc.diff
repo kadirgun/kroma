@@ -1,0 +1,54 @@
+diff --git a/chrome/browser/signin/signin_util_win.cc b/chrome/browser/signin/signin_util_win.cc
+index 5bb6cc0c72..916c8b0b47 100644
+--- a/chrome/browser/signin/signin_util_win.cc
++++ b/chrome/browser/signin/signin_util_win.cc
+@@ -38,7 +38,6 @@
+ #include "components/signin/core/browser/about_signin_internals.h"
+ #include "components/signin/public/base/consent_level.h"
+ #include "components/signin/public/base/signin_metrics.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/identity_manager/accounts_mutator.h"
+ #include "components/signin/public/identity_manager/identity_manager.h"
+ #include "components/signin/public/identity_manager/primary_account_mutator.h"
+@@ -159,9 +158,6 @@ void ImportCredentialsFromProvider(Profile* profile,
+                                   account_id, profile));
+     }
+   }
+-
+-  // Mark this profile as having been signed in with the credential provider.
+-  profile->GetPrefs()->SetBoolean(prefs::kSignedInWithCredentialProvider, true);
+ }
+ 
+ // Extracts the |cred_provider_gaia_id| and |cred_provider_email| for the user
+@@ -299,12 +295,6 @@ bool IsGCPWUsedInOtherProfile(Profile* profile) {
+ }
+ 
+ void SigninWithCredentialProviderIfPossible(Profile* profile) {
+-  // This flow is used for first time signin through credential provider. Any
+-  // subsequent signin for the credential provider user needs to go through
+-  // reauth flow.
+-  if (profile->GetPrefs()->GetBoolean(prefs::kSignedInWithCredentialProvider))
+-    return;
+-
+   std::wstring cred_provider_gaia_id;
+   std::wstring cred_provider_email;
+ 
+@@ -337,18 +327,7 @@ bool ReauthWithCredentialProviderIfPossible(Profile* profile) {
+   //  - The profile is marked as having been signed in with a system credential.
+   //  - The profile is already signed in.
+   //  - The profile is in an auth error state.
+-  auto* identity_manager = IdentityManagerFactory::GetForProfile(profile);
+-  if (!(profile->GetPrefs()->GetBoolean(
+-            prefs::kSignedInWithCredentialProvider) &&
+-        identity_manager->HasPrimaryAccount(GetConsentLevel()) &&
+-        identity_manager->HasAccountWithRefreshTokenInPersistentErrorState(
+-            identity_manager->GetPrimaryAccountId(GetConsentLevel())))) {
+     return false;
+-  }
+-
+-  const GaiaId gaia_id =
+-      identity_manager->GetPrimaryAccountInfo(GetConsentLevel()).gaia;
+-  return TrySigninWithCredentialProvider(profile, gaia_id, false);
+ }
+ 
+ }  // namespace signin_util

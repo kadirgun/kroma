@@ -1,0 +1,22 @@
+diff --git a/components/search_engines/template_url_service.cc b/components/search_engines/template_url_service.cc
+index 27bf2e1110..f04eb95d1e 100644
+--- a/components/search_engines/template_url_service.cc
++++ b/components/search_engines/template_url_service.cc
+@@ -1030,7 +1030,8 @@ void TemplateURLService::IncrementUsageCount(TemplateURL* url) {
+ void TemplateURLService::ResetTemplateURL(TemplateURL* url,
+                                           const std::u16string& title,
+                                           const std::u16string& keyword,
+-                                          const std::string& search_url) {
++                                          const std::string& search_url,
++                                          const std::string& suggestions_url) {
+   DCHECK(!IsCreatedByExtension(*url));
+   DCHECK(!keyword.empty());
+   DCHECK(!search_url.empty());
+@@ -1054,6 +1055,7 @@ void TemplateURLService::ResetTemplateURL(TemplateURL* url,
+   data.last_modified = clock_->Now();
+   data.is_active = TemplateURLData::ActiveStatus::kTrue;
+   data.policy_origin = TemplateURLData::PolicyOrigin::kNoPolicy;
++  data.suggestions_url = suggestions_url;
+ 
+   Update(url, base::FeatureList::IsEnabled(
+                   syncer::kSeparateLocalAndAccountSearchEngines)

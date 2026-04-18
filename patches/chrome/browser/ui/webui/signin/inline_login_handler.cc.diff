@@ -1,0 +1,21 @@
+diff --git a/chrome/browser/ui/webui/signin/inline_login_handler.cc b/chrome/browser/ui/webui/signin/inline_login_handler.cc
+index 9215f92927..509f12253b 100644
+--- a/chrome/browser/ui/webui/signin/inline_login_handler.cc
++++ b/chrome/browser/ui/webui/signin/inline_login_handler.cc
+@@ -27,7 +27,6 @@
+ #include "chrome/common/pref_names.h"
+ #include "components/metrics/metrics_pref_names.h"
+ #include "components/prefs/pref_service.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "content/public/browser/storage_partition.h"
+ #include "content/public/browser/web_contents.h"
+ #include "content/public/browser/web_ui.h"
+@@ -138,8 +137,6 @@ void InlineLoginHandler::ContinueHandleInitializeMessage() {
+   std::string default_email;
+   if (reason == signin_metrics::Reason::kSigninPrimaryAccount ||
+       reason == signin_metrics::Reason::kForcedSigninPrimaryAccount) {
+-    default_email = profile->GetPrefs()->GetString(
+-        prefs::kGoogleServicesLastSyncingUsername);
+   } else {
+     if (!net::GetValueForKeyInQuery(current_url, "email", &default_email)) {
+       default_email.clear();

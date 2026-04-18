@@ -1,0 +1,31 @@
+diff --git a/chrome/browser/ui/safety_hub/safe_browsing_result.cc b/chrome/browser/ui/safety_hub/safe_browsing_result.cc
+index ed287fc46c..2c44737fe1 100644
+--- a/chrome/browser/ui/safety_hub/safe_browsing_result.cc
++++ b/chrome/browser/ui/safety_hub/safe_browsing_result.cc
+@@ -12,7 +12,6 @@
+ #include "chrome/browser/ui/safety_hub/safety_hub_result.h"
+ #include "chrome/grit/generated_resources.h"
+ #include "components/prefs/pref_service.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ #include "ui/base/l10n/l10n_util.h"
+ 
+ #if !BUILDFLAG(IS_ANDROID)
+@@ -54,18 +53,6 @@ SafetyHubSafeBrowsingResult::GetResult(const PrefService* pref_service) {
+ // static
+ SafeBrowsingState SafetyHubSafeBrowsingResult::GetState(
+     const PrefService* pref_service) {
+-  if (safe_browsing::IsEnhancedProtectionEnabled(*pref_service)) {
+-    return SafeBrowsingState::kEnabledEnhanced;
+-  }
+-  if (safe_browsing::IsSafeBrowsingEnabled(*pref_service)) {
+-    return SafeBrowsingState::kEnabledStandard;
+-  }
+-  if (safe_browsing::IsSafeBrowsingPolicyManaged(*pref_service)) {
+-    return SafeBrowsingState::kDisabledByAdmin;
+-  }
+-  if (safe_browsing::IsSafeBrowsingExtensionControlled(*pref_service)) {
+-    return SafeBrowsingState::kDisabledByExtension;
+-  }
+   return SafeBrowsingState::kDisabledByUser;
+ }
+ 

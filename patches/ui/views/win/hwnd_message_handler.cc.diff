@@ -1,0 +1,141 @@
+diff --git a/ui/views/win/hwnd_message_handler.cc b/ui/views/win/hwnd_message_handler.cc
+index cd0207176f..2841945b40 100644
+--- a/ui/views/win/hwnd_message_handler.cc
++++ b/ui/views/win/hwnd_message_handler.cc
+@@ -454,7 +454,8 @@ HWNDMessageHandler::HWNDMessageHandler(HWNDMessageHandlerDelegate* delegate,
+       sent_window_size_changing_(false),
+       did_return_uia_object_(false),
+       left_button_down_on_caption_(false),
+-      background_fullscreen_hack_(false) {}
++      background_fullscreen_hack_(false),
++      has_become_visible_(0) {}
+ 
+ HWNDMessageHandler::~HWNDMessageHandler() {
+   // Unhook MoveLoopMouseWatcher, to prevent call backs to this after deletion.
+@@ -723,65 +724,62 @@ void HWNDMessageHandler::Show(ui::mojom::WindowShowState show_state,
+   TRACE_EVENT0("views", "HWNDMessageHandler::Show");
+ 
+   int native_show_state;
+-  if (show_state == ui::mojom::WindowShowState::kMaximized &&
+-      !pixel_restore_bounds.IsEmpty()) {
+-    WINDOWPLACEMENT placement = {0};
+-    placement.length = sizeof(WINDOWPLACEMENT);
+-    placement.showCmd = SW_SHOWMAXIMIZED;
+-    placement.rcNormalPosition = pixel_restore_bounds.ToRECT();
+-    SetWindowPlacement(hwnd(), &placement);
+-    native_show_state = SW_SHOWMAXIMIZED;
+-  } else {
+-    const bool is_maximized_or_arranged =
++  const bool is_maximized_or_arranged =
+         IsMaximized() || IsWindowArranged(hwnd());
+ 
+-    // Use SW_SHOW/SW_SHOWNA instead of SW_SHOWNORMAL/SW_SHOWNOACTIVATE so that
+-    // the window is not restored to its original position if it is maximized.
+-    // This could be used unconditionally for
+-    // ui::mojom::WindowShowState::kInactive, but cross-platform behavior when
+-    // showing a minimized window is inconsistent, some platforms restore the
+-    // position, some do not. See crbug.com/1296710
+-    switch (show_state) {
+-      case ui::mojom::WindowShowState::kInactive:
++  // Use SW_SHOW/SW_SHOWNA instead of SW_SHOWNORMAL/SW_SHOWNOACTIVATE so that
++  // the window is not restored to its original position if it is maximized.
++  // This could be used unconditionally for
++  // ui::mojom::WindowShowState::kInactive, but cross-platform behavior when
++  // showing a minimized window is inconsistent, some platforms restore the
++  // position, some do not. See crbug.com/1296710
++  switch (show_state) {
++    case ui::mojom::WindowShowState::kInactive:
++      native_show_state =
++          is_maximized_or_arranged ? SW_SHOWNA : SW_SHOWNOACTIVATE;
++      break;
++    case ui::mojom::WindowShowState::kMaximized:
++      native_show_state = SW_SHOWMAXIMIZED;
++      break;
++    case ui::mojom::WindowShowState::kMinimized:
++      native_show_state = SW_SHOWMINIMIZED;
++      break;
++    case ui::mojom::WindowShowState::kNormal:
++      if ((GetWindowLong(hwnd(), GWL_EXSTYLE) & WS_EX_TRANSPARENT) ||
++          (GetWindowLong(hwnd(), GWL_EXSTYLE) & WS_EX_NOACTIVATE)) {
+         native_show_state =
+             is_maximized_or_arranged ? SW_SHOWNA : SW_SHOWNOACTIVATE;
+-        break;
+-      case ui::mojom::WindowShowState::kMaximized:
+-        native_show_state = SW_SHOWMAXIMIZED;
+-        break;
+-      case ui::mojom::WindowShowState::kMinimized:
+-        native_show_state = SW_SHOWMINIMIZED;
+-        break;
+-      case ui::mojom::WindowShowState::kNormal:
+-        if ((GetWindowLong(hwnd(), GWL_EXSTYLE) & WS_EX_TRANSPARENT) ||
+-            (GetWindowLong(hwnd(), GWL_EXSTYLE) & WS_EX_NOACTIVATE)) {
+-          native_show_state =
+-              is_maximized_or_arranged ? SW_SHOWNA : SW_SHOWNOACTIVATE;
+-        } else {
+-          native_show_state =
+-              is_maximized_or_arranged ? SW_SHOW : SW_SHOWNORMAL;
+-        }
+-        break;
+-      case ui::mojom::WindowShowState::kFullscreen:
+-        native_show_state = SW_SHOWNORMAL;
+-        SetFullscreen(true, display::kInvalidDisplayId);
+-        break;
+-      default:
+-        native_show_state = delegate_->GetInitialShowState();
+-        break;
+-    }
++      } else {
++        native_show_state =
++            is_maximized_or_arranged ? SW_SHOW : SW_SHOWNORMAL;
++      }
++      break;
++    case ui::mojom::WindowShowState::kFullscreen:
++      native_show_state = SW_SHOWNORMAL;
++      SetFullscreen(true, display::kInvalidDisplayId);
++      break;
++    default:
++      native_show_state = delegate_->GetInitialShowState();
++      break;
++  }
+ 
++  if (has_become_visible_ < 2 && native_show_state == SW_SHOWMAXIMIZED) {
++    has_become_visible_++;
++    SetWindowPos(hwnd(), HWND_BOTTOM, 0, 0, 0, 0, 
++               SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW);
++    return;
++  }
++
++  ShowWindow(hwnd(), native_show_state);
++  // When launched from certain programs like bash and Windows Live
++  // Messenger, show_state is set to SW_HIDE, so we need to correct that
++  // condition. We don't just change show_state to SW_SHOWNORMAL because
++  // MSDN says we must always first call ShowWindow with the specified
++  // value from STARTUPINFO, otherwise all future ShowWindow calls will be
++  // ignored (!!#@@#!). Instead, we call ShowWindow again in this case.
++  if (native_show_state == SW_HIDE) {
++    native_show_state = SW_SHOWNORMAL;
+     ShowWindow(hwnd(), native_show_state);
+-    // When launched from certain programs like bash and Windows Live
+-    // Messenger, show_state is set to SW_HIDE, so we need to correct that
+-    // condition. We don't just change show_state to SW_SHOWNORMAL because
+-    // MSDN says we must always first call ShowWindow with the specified
+-    // value from STARTUPINFO, otherwise all future ShowWindow calls will be
+-    // ignored (!!#@@#!). Instead, we call ShowWindow again in this case.
+-    if (native_show_state == SW_HIDE) {
+-      native_show_state = SW_SHOWNORMAL;
+-      ShowWindow(hwnd(), native_show_state);
+-    }
+   }
+ 
+   // We need to explicitly activate the window if we've been shown with a state
+@@ -824,6 +822,10 @@ void HWNDMessageHandler::Restore() {
+ }
+ 
+ void HWNDMessageHandler::Activate() {
++  if (has_become_visible_ < 2) {
++    return;
++  }
++
+   if (IsMinimized()) {
+     base::AutoReset<bool> restoring_activate(&notify_restore_on_activate_,
+                                              true);

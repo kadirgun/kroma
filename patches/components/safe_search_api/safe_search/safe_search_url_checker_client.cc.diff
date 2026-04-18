@@ -1,0 +1,13 @@
+diff --git a/components/safe_search_api/safe_search/safe_search_url_checker_client.cc b/components/safe_search_api/safe_search/safe_search_url_checker_client.cc
+index 9ed117a0a0..04a0107e82 100644
+--- a/components/safe_search_api/safe_search/safe_search_url_checker_client.cc
++++ b/components/safe_search_api/safe_search/safe_search_url_checker_client.cc
+@@ -27,7 +27,7 @@ namespace safe_search_api {
+ namespace {
+ 
+ const char kSafeSearchApiUrl[] =
+-    "https://safesearch.googleapis.com/v1:classify";
++    "trk:238:https://safesearch.googleapis.com/v1:classify";
+ const char kDataContentType[] = "application/x-www-form-urlencoded";
+ const char kDataFormat[] = "key=%s&urls=%s";
+ 

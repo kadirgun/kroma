@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/signin/dice_browsertest.cc b/chrome/browser/signin/dice_browsertest.cc
+index 4bf862fdb8..92ab9f018c 100644
+--- a/chrome/browser/signin/dice_browsertest.cc
++++ b/chrome/browser/signin/dice_browsertest.cc
+@@ -82,7 +82,6 @@
+ #include "components/signin/public/base/signin_buildflags.h"
+ #include "components/signin/public/base/signin_client.h"
+ #include "components/signin/public/base/signin_metrics.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/base/signin_prefs.h"
+ #include "components/signin/public/base/signin_switches.h"
+ #include "components/signin/public/identity_manager/account_capabilities_test_mutator.h"

@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/extensions/api/safe_browsing_private/safe_browsing_private_event_router.cc b/chrome/browser/extensions/api/safe_browsing_private/safe_browsing_private_event_router.cc
+index dcc195d9b1..bede75bf05 100644
+--- a/chrome/browser/extensions/api/safe_browsing_private/safe_browsing_private_event_router.cc
++++ b/chrome/browser/extensions/api/safe_browsing_private/safe_browsing_private_event_router.cc
+@@ -26,7 +26,6 @@
+ #include "components/enterprise/connectors/core/reporting_service_settings.h"
+ #include "components/enterprise/connectors/core/reporting_utils.h"
+ #include "components/prefs/pref_service.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ #include "components/url_matcher/url_matcher.h"
+ #include "components/url_matcher/url_util.h"
+ #include "content/public/browser/browser_context.h"

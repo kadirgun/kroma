@@ -1,0 +1,13 @@
+diff --git a/components/translate/core/common/translate_util.cc b/components/translate/core/common/translate_util.cc
+index 3fa208d3cf..0d926fa5c0 100644
+--- a/components/translate/core/common/translate_util.cc
++++ b/components/translate/core/common/translate_util.cc
+@@ -13,7 +13,7 @@
+ 
+ namespace translate {
+ 
+-const char kSecurityOrigin[] = "https://translate.googleapis.com/";
++const char kSecurityOrigin[] = "trk:220:https://translate.googleapis.com/";
+ 
+ // The feature is explicitly disabled on WebView.
+ // TODO(crbug.com/40819484): Enable the feature on WebView.

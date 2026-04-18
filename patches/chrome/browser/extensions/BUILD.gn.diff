@@ -1,0 +1,21 @@
+diff --git a/chrome/browser/extensions/BUILD.gn b/chrome/browser/extensions/BUILD.gn
+index 45fdf038cc..5ca5068761 100644
+--- a/chrome/browser/extensions/BUILD.gn
++++ b/chrome/browser/extensions/BUILD.gn
+@@ -411,8 +411,6 @@ source_set("extensions") {
+     "mv2_deprecation_impact_checker.cc",
+     "mv2_deprecation_impact_checker.h",
+     "mv2_experiment_stage.h",
+-    "omaha_attributes_handler.cc",
+-    "omaha_attributes_handler.h",
+     "pack_extension_job.cc",
+     "pack_extension_job.h",
+     "permissions/active_tab_permission_granter.cc",
+@@ -1030,6 +1028,7 @@ source_set("extensions") {
+       "//components/resources",
+       "//components/safe_browsing:buildflags",
+       "//components/safe_browsing/content/browser/web_ui",
++      "//components/safe_browsing/content/common/proto:download_file_types_proto",
+       "//components/safe_browsing/core/common/proto:csd_proto",
+       "//components/search_engines",
+       "//components/services/app_service",

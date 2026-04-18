@@ -1,0 +1,53 @@
+diff --git a/chrome/browser/browsing_data/chrome_browsing_data_lifetime_manager.cc b/chrome/browser/browsing_data/chrome_browsing_data_lifetime_manager.cc
+index 916ec1b743..cb05b46e5c 100644
+--- a/chrome/browser/browsing_data/chrome_browsing_data_lifetime_manager.cc
++++ b/chrome/browser/browsing_data/chrome_browsing_data_lifetime_manager.cc
+@@ -33,7 +33,6 @@
+ #include "components/keep_alive_registry/keep_alive_types.h"
+ #include "components/keep_alive_registry/scoped_keep_alive.h"
+ #include "components/prefs/pref_service.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/sync/service/sync_service.h"
+ #include "components/sync/service/sync_user_settings.h"
+ #include "content/public/browser/browser_context.h"
+@@ -440,40 +439,5 @@ bool ChromeBrowsingDataLifetimeManager::
+     return sync_disabled;
+   }
+ 
+-#if !BUILDFLAG(IS_CHROMEOS)
+-  // Allow clearing data if browser signin is disabled.
+-  if (!profile_->GetPrefs()->GetBoolean(prefs::kSigninAllowed)) {
+-    return true;
+-  }
+-  // If signin will be disabled on next startup, delay the browsing data
+-  // clearing until then.
+-  if (!profile_->GetPrefs()->GetBoolean(prefs::kSigninAllowedOnNextStartup)) {
+-    profile_->GetPrefs()->SetBoolean(
+-        browsing_data::prefs::kClearBrowsingDataOnExitDeletionPending, true);
+-    return false;
+-  }
+-#endif
+-
+-  // Check that sync types have been disabled if neither sync nor browser sign
+-  // in is disabled.
+-  syncer::SyncService* sync_service =
+-      SyncServiceFactory::GetForProfile(profile_);
+-
+-  // If the sync service is not available, data can be safely cleared as it is
+-  // not synced.
+-  if (!sync_service) {
+-    return true;
+-  }
+-
+-  for (syncer::UserSelectableType type : sync_types) {
+-    if (!sync_service->GetUserSettings()->IsTypeManagedByPolicy(type)) {
+-      return false;
+-    } else if (sync_service->GetActiveDataTypes().HasAny(
+-                   syncer::UserSelectableTypeToAllDataTypes(type))) {
+-      // If the sync type is disabled by policy, but the sync service has not
+-      // deactivated the type yet, then data can not be safely cleared yet.
+-      return false;
+-    }
+-  }
+   return true;
+ }

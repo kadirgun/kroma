@@ -1,0 +1,25 @@
+diff --git a/third_party/blink/renderer/core/page/focus_controller.cc b/third_party/blink/renderer/core/page/focus_controller.cc
+index b4df26c322..caf268c864 100644
+--- a/third_party/blink/renderer/core/page/focus_controller.cc
++++ b/third_party/blink/renderer/core/page/focus_controller.cc
+@@ -1457,14 +1457,16 @@ void FocusController::SetFocusedFrame(Frame* frame, bool notify_embedder) {
+   // states of both frames.
+   if (old_frame && old_frame->View()) {
+     old_frame->Selection().SetFrameIsFocused(false);
+-    old_frame->DomWindow()->DispatchEvent(
+-        *Event::Create(event_type_names::kBlur));
++    // Suppress blur events so web content cannot detect loss of focus.
++    // old_frame->DomWindow()->DispatchEvent(
++    //     *Event::Create(event_type_names::kBlur));
+   }
+ 
+   if (new_frame && new_frame->View() && IsFocused()) {
+     new_frame->Selection().SetFrameIsFocused(true);
+-    new_frame->DomWindow()->DispatchEvent(
+-        *Event::Create(event_type_names::kFocus));
++    // Suppress focus events so web content cannot detect focus changes.
++    // new_frame->DomWindow()->DispatchEvent(
++    //     *Event::Create(event_type_names::kFocus));
+   }
+ 
+   is_changing_focused_frame_ = false;

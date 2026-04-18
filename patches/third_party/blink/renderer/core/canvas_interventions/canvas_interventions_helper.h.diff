@@ -1,0 +1,18 @@
+diff --git a/third_party/blink/renderer/core/canvas_interventions/canvas_interventions_helper.h b/third_party/blink/renderer/core/canvas_interventions/canvas_interventions_helper.h
+index beff4175bc..449ac194a4 100644
+--- a/third_party/blink/renderer/core/canvas_interventions/canvas_interventions_helper.h
++++ b/third_party/blink/renderer/core/canvas_interventions/canvas_interventions_helper.h
+@@ -67,6 +67,13 @@ class CORE_EXPORT CanvasInterventionsHelper
+   static bool MaybeNoiseSnapshot(ExecutionContext* execution_context,
+                                  scoped_refptr<StaticBitmapImage>& snapshot);
+ 
++  // Sample pixels from an RGBA8 buffer and compute Shannon entropy (luma).
++  // Returns true if the sampled entropy is >= `entropy_threshold`.
++  // `sample_limit` bounds the number of pixels examined for performance.
++  static bool IsLikelyHighEntropy(ExecutionContext* execution_context,
++                                  base::span<uint8_t> pixels_rgba,
++                                  double entropy_threshold = 4.0);
++
+   void Trace(Visitor* visitor) const override {
+     Supplement<ExecutionContext>::Trace(visitor);
+     ExecutionContextLifecycleObserver::Trace(visitor);

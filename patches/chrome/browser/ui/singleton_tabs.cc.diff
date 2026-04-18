@@ -1,0 +1,14 @@
+diff --git a/chrome/browser/ui/singleton_tabs.cc b/chrome/browser/ui/singleton_tabs.cc
+index b55241cf68..d58ee66063 100644
+--- a/chrome/browser/ui/singleton_tabs.cc
++++ b/chrome/browser/ui/singleton_tabs.cc
+@@ -132,7 +132,8 @@ int GetIndexOfExistingTab(Browser* browser, const NavigateParams& params) {
+     // RewriteURLIfNecessary removes the "view-source:" scheme which could lead
+     // to incorrect matching, so ensure that the target and the candidate are
+     // either both view-source:, or neither is.
+-    if (tab_url.SchemeIs(content::kViewSourceScheme) != target_is_view_source) {
++    if (tab_url.SchemeIs(content::kViewSourceScheme) != target_is_view_source ||
++        tab_url.SchemeIs(url::kTraceScheme)) {
+       continue;
+     }
+ 

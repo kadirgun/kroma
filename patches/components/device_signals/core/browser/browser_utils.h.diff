@@ -1,0 +1,25 @@
+diff --git a/components/device_signals/core/browser/browser_utils.h b/components/device_signals/core/browser/browser_utils.h
+index 73fffc660a..ca00b2202b 100644
+--- a/components/device_signals/core/browser/browser_utils.h
++++ b/components/device_signals/core/browser/browser_utils.h
+@@ -9,7 +9,6 @@
+ 
+ #include "build/build_config.h"
+ #include "components/device_signals/core/common/common_types.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ 
+ class PolicyBlocklistService;
+ class PrefService;
+@@ -22,12 +21,6 @@ namespace device_signals {
+ 
+ bool GetChromeRemoteDesktopAppBlocked(PolicyBlocklistService* service);
+ 
+-std::optional<safe_browsing::PasswordProtectionTrigger>
+-GetPasswordProtectionWarningTrigger(PrefService* profile_prefs);
+-
+-safe_browsing::SafeBrowsingState GetSafeBrowsingProtectionLevel(
+-    PrefService* profile_prefs);
+-
+ std::optional<std::string> TryGetEnrollmentDomain(
+     policy::CloudPolicyManager* manager);
+ 

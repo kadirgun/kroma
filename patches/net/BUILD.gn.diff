@@ -1,0 +1,13 @@
+diff --git a/net/BUILD.gn b/net/BUILD.gn
+index 21a8ed73bb..939b2e6db5 100644
+--- a/net/BUILD.gn
++++ b/net/BUILD.gn
+@@ -1123,6 +1123,8 @@ component("net") {
+     "url_request/static_http_user_agent_settings.cc",
+     "url_request/static_http_user_agent_settings.h",
+     "url_request/storage_access_status_cache.h",
++    "url_request/trk_protocol_handler.cc",
++    "url_request/trk_protocol_handler.h",
+     "url_request/url_request.cc",
+     "url_request/url_request.h",
+     "url_request/url_request_context.cc",

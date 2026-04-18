@@ -1,0 +1,12 @@
+diff --git a/components/signin/internal/identity_manager/mutable_profile_oauth2_token_service_delegate_unittest.cc b/components/signin/internal/identity_manager/mutable_profile_oauth2_token_service_delegate_unittest.cc
+index 3217bb729d..87cab5cf31 100644
+--- a/components/signin/internal/identity_manager/mutable_profile_oauth2_token_service_delegate_unittest.cc
++++ b/components/signin/internal/identity_manager/mutable_profile_oauth2_token_service_delegate_unittest.cc
+@@ -38,7 +38,6 @@
+ #include "components/signin/public/base/device_id_helper.h"
+ #include "components/signin/public/base/hybrid_encryption_key.h"
+ #include "components/signin/public/base/signin_metrics.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/base/signin_switches.h"
+ #include "components/signin/public/base/test_signin_client.h"
+ #include "components/signin/public/identity_manager/account_info.h"

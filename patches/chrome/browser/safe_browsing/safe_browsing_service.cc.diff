@@ -1,0 +1,75 @@
+diff --git a/chrome/browser/safe_browsing/safe_browsing_service.cc b/chrome/browser/safe_browsing/safe_browsing_service.cc
+index cae5444fd9..d99eddcd3a 100644
+--- a/chrome/browser/safe_browsing/safe_browsing_service.cc
++++ b/chrome/browser/safe_browsing/safe_browsing_service.cc
+@@ -198,7 +198,6 @@ bool SafeBrowsingServiceImpl::IsUserEligibleForESBPromo(Profile* profile) {
+ 
+ SafeBrowsingServiceImpl::SafeBrowsingServiceImpl()
+     : services_delegate_(ServicesDelegate::Create(this)),
+-      estimated_extended_reporting_by_prefs_(SBER_LEVEL_OFF),
+       shutdown_(false),
+       enabled_(false),
+       enabled_by_prefs_(false) {}
+@@ -339,9 +338,6 @@ TriggerManager* SafeBrowsingServiceImpl::trigger_manager() const {
+ 
+ PasswordProtectionService*
+ SafeBrowsingServiceImpl::GetPasswordProtectionService(Profile* profile) const {
+-  if (IsSafeBrowsingEnabled(*profile->GetPrefs())) {
+-    return ChromePasswordProtectionServiceFactory::GetForProfile(profile);
+-  }
+   return nullptr;
+ }
+ 
+@@ -378,7 +374,7 @@ SafeBrowsingUIManager* SafeBrowsingServiceImpl::CreateUIManager() {
+ }
+ 
+ void SafeBrowsingServiceImpl::RegisterAllDelayedAnalysis() {
+-#if BUILDFLAG(FULL_SAFE_BROWSING)
++#if 0
+   RegisterBinaryIntegrityAnalysis();
+ #endif
+ }
+@@ -442,9 +438,6 @@ void SafeBrowsingServiceImpl::OnProfileAdded(Profile* profile) {
+   std::unique_ptr<PrefChangeRegistrar> registrar =
+       std::make_unique<PrefChangeRegistrar>();
+   registrar->Init(pref_service);
+-  registrar->Add(prefs::kSafeBrowsingEnabled,
+-                 base::BindRepeating(&SafeBrowsingServiceImpl::RefreshState,
+-                                     base::Unretained(this)));
+   // ClientSideDetectionService will need to be refresh the models
+   // renderers have if extended-reporting changes.
+   registrar->Add(prefs::kSafeBrowsingScoutReportingEnabled,
+@@ -484,14 +477,6 @@ void SafeBrowsingServiceImpl::OnProfileAdded(Profile* profile) {
+                           NoCachedPopulationReason::kChangeMbbPref));
+   user_population_prefs_[pref_service] = std::move(user_population_registrar);
+ 
+-  // Record the current pref state for standard protection.
+-  UMA_HISTOGRAM_BOOLEAN(kSafeBrowsingEnabledHistogramName,
+-                        pref_service->GetBoolean(prefs::kSafeBrowsingEnabled));
+-  // Record the current pref state for enhanced protection. Enhanced protection
+-  // is a subset of the standard protection. Thus, |kSafeBrowsingEnabled| count
+-  // should always be more than the count of enhanced protection.
+-  UMA_HISTOGRAM_BOOLEAN("SafeBrowsing.Pref.Enhanced",
+-                        pref_service->GetBoolean(prefs::kSafeBrowsingEnhanced));
+ 
+   // Record the current enhanced protection pref state for regular profiles only
+   if (profiles::IsRegularUserProfile(profile)) {
+@@ -603,18 +588,6 @@ void SafeBrowsingServiceImpl::RefreshState() {
+ 
+   // Check if any profile requires the service to be active.
+   enabled_by_prefs_ = false;
+-  estimated_extended_reporting_by_prefs_ = SBER_LEVEL_OFF;
+-  for (const auto& pref : prefs_map_) {
+-    if (IsSafeBrowsingEnabled(*pref.first)) {
+-      enabled_by_prefs_ = true;
+-
+-      ExtendedReportingLevel erl =
+-          safe_browsing::GetExtendedReportingLevel(*pref.first);
+-      if (erl != SBER_LEVEL_OFF) {
+-        estimated_extended_reporting_by_prefs_ = erl;
+-      }
+-    }
+-  }
+ 
+   if (enabled_by_prefs_) {
+     Start();

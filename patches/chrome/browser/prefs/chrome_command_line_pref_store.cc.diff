@@ -1,0 +1,21 @@
+diff --git a/chrome/browser/prefs/chrome_command_line_pref_store.cc b/chrome/browser/prefs/chrome_command_line_pref_store.cc
+index 0ae9d813bf..b9c6bf0613 100644
+--- a/chrome/browser/prefs/chrome_command_line_pref_store.cc
++++ b/chrome/browser/prefs/chrome_command_line_pref_store.cc
+@@ -24,7 +24,6 @@
+ #include "components/language/core/browser/pref_names.h"
+ #include "components/proxy_config/proxy_config_dictionary.h"
+ #include "components/proxy_config/proxy_config_pref_names.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ #include "components/safe_browsing/core/common/safebrowsing_switches.h"
+ #include "components/sync/base/pref_names.h"
+ #include "content/public/common/content_switches.h"
+@@ -84,8 +83,6 @@ const CommandLinePrefStore::BooleanSwitchToPreferenceMapEntry
+         {switches::kAllowCrossOriginAuthPrompt,
+          prefs::kAllowCrossOriginAuthPrompt, true},
+         {switches::kDisablePrintPreview, prefs::kPrintPreviewDisabled, true},
+-        {safe_browsing::switches::kSbEnableEnhancedProtection,
+-         prefs::kSafeBrowsingEnhanced, true},
+ #if BUILDFLAG(IS_CHROMEOS)
+         {ash::switches::kEnableTouchpadThreeFingerClick,
+          ash::prefs::kEnableTouchpadThreeFingerClick, true},

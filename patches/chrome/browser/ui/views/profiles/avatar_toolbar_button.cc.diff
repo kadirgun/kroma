@@ -1,0 +1,38 @@
+diff --git a/chrome/browser/ui/views/profiles/avatar_toolbar_button.cc b/chrome/browser/ui/views/profiles/avatar_toolbar_button.cc
+index 4c107cba54..97d9c8ca82 100644
+--- a/chrome/browser/ui/views/profiles/avatar_toolbar_button.cc
++++ b/chrome/browser/ui/views/profiles/avatar_toolbar_button.cc
+@@ -49,7 +49,6 @@
+ #include "components/feature_engagement/public/feature_constants.h"
+ #include "components/feature_engagement/public/tracker.h"
+ #include "components/password_manager/content/common/web_ui_constants.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/base/signin_prefs.h"
+ #include "components/signin/public/base/signin_switches.h"
+ #include "components/signin/public/identity_manager/tribool.h"
+@@ -583,25 +582,6 @@ void AvatarToolbarButton::OnErrorStateOfRefreshTokenUpdatedForAccount(
+     const CoreAccountInfo& account_info,
+     const GoogleServiceAuthError& error,
+     signin_metrics::SourceForRefreshTokenOperation token_operation_source) {
+-  Profile* profile = browser_->profile();
+-  CHECK(profile);
+-  PrefService* prefs = profile->GetPrefs();
+-  CHECK(prefs);
+-  signin::IdentityManager* identity_manager =
+-      IdentityManagerFactory::GetForProfile(profile);
+-  CHECK(identity_manager);
+-  if (base::FeatureList::IsEnabled(
+-          syncer::kReplaceSyncPromosWithSignInPromos) &&
+-      prefs->GetBoolean(prefs::kExplicitBrowserSignin) &&
+-      account_info == identity_manager->GetPrimaryAccountInfo(
+-                          signin::ConsentLevel::kSignin) &&
+-      !identity_manager->HasPrimaryAccount(signin::ConsentLevel::kSync) &&
+-      error.state() ==
+-          GoogleServiceAuthError::State::INVALID_GAIA_CREDENTIALS &&
+-      token_operation_source == signin_metrics::SourceForRefreshTokenOperation::
+-                                    kDiceResponseHandler_Signout) {
+-    MaybeShowWebSignoutIPH(account_info.gaia);
+-  }
+ }
+ 
+ void AvatarToolbarButton::AfterPropertyChange(const void* key,

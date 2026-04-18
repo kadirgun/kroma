@@ -1,0 +1,42 @@
+diff --git a/chrome/installer/mini_installer/chrome.release b/chrome/installer/mini_installer/chrome.release
+index 0f331c3e0f..d8e4fc5e5c 100644
+--- a/chrome/installer/mini_installer/chrome.release
++++ b/chrome/installer/mini_installer/chrome.release
+@@ -69,6 +69,18 @@ MEIPreload\preloaded_data.pb: %(VersionDir)s\MEIPreload\
+ IwaKeyDistribution\iwa-key-distribution.pb: %(VersionDir)s\IwaKeyDistribution\
+ IwaKeyDistribution\manifest.json: %(VersionDir)s\IwaKeyDistribution\
+ 
++#
++# Widevine CDM sub-dir
++#
++WidevineCdm\manifest.json: %(VersionDir)s\WidevineCdm\
++WidevineCdm\LICENSE: %(VersionDir)s\WidevineCdm\
++WidevineCdm\_platform_specific\win_x86\widevinecdm.dll: %(VersionDir)s\WidevineCdm\_platform_specific\win_x86\
++WidevineCdm\_platform_specific\win_x86\widevinecdm.dll.sig: %(VersionDir)s\WidevineCdm\_platform_specific\win_x86\
++WidevineCdm\_platform_specific\win_x64\widevinecdm.dll: %(VersionDir)s\WidevineCdm\_platform_specific\win_x64\
++WidevineCdm\_platform_specific\win_x64\widevinecdm.dll.sig: %(VersionDir)s\WidevineCdm\_platform_specific\win_x64\
++WidevineCdm\_platform_specific\win_arm64\widevinecdm.dll: %(VersionDir)s\WidevineCdm\_platform_specific\win_arm64\
++WidevineCdm\_platform_specific\win_arm64\widevinecdm.dll.sig: %(VersionDir)s\WidevineCdm\_platform_specific\win_arm64\
++
+ [HIDPI]
+ chrome_200_percent.pak: %(VersionDir)s\
+ 
+@@ -98,18 +110,6 @@ SmallLogoBeta.png: %(VersionDir)s\VisualElements\
+ SmallLogoCanary.png: %(VersionDir)s\VisualElements\
+ SmallLogoDev.png: %(VersionDir)s\VisualElements\
+ 
+-#
+-# Widevine CDM sub-dir
+-#
+-WidevineCdm\manifest.json: %(VersionDir)s\WidevineCdm\
+-WidevineCdm\LICENSE: %(VersionDir)s\WidevineCdm\
+-WidevineCdm\_platform_specific\win_x86\widevinecdm.dll: %(VersionDir)s\WidevineCdm\_platform_specific\win_x86\
+-WidevineCdm\_platform_specific\win_x86\widevinecdm.dll.sig: %(VersionDir)s\WidevineCdm\_platform_specific\win_x86\
+-WidevineCdm\_platform_specific\win_x64\widevinecdm.dll: %(VersionDir)s\WidevineCdm\_platform_specific\win_x64\
+-WidevineCdm\_platform_specific\win_x64\widevinecdm.dll.sig: %(VersionDir)s\WidevineCdm\_platform_specific\win_x64\
+-WidevineCdm\_platform_specific\win_arm64\widevinecdm.dll: %(VersionDir)s\WidevineCdm\_platform_specific\win_arm64\
+-WidevineCdm\_platform_specific\win_arm64\widevinecdm.dll.sig: %(VersionDir)s\WidevineCdm\_platform_specific\win_arm64\
+-
+ [SNAPSHOTBLOB]
+ # The snapshot_blob.bin V8 snapshot is needed in builds that don't use
+ # v8_context_snapshot.bin, such as Linux-Windows cross-builds.

@@ -1,0 +1,34 @@
+diff --git a/components/privacy_sandbox/privacy_sandbox_settings_impl.cc b/components/privacy_sandbox/privacy_sandbox_settings_impl.cc
+index 9106c221af..8b9e289069 100644
+--- a/components/privacy_sandbox/privacy_sandbox_settings_impl.cc
++++ b/components/privacy_sandbox/privacy_sandbox_settings_impl.cc
+@@ -134,7 +134,7 @@ std::set<browsing_topics::Topic> GetTopicsSetFromString(
+ 
+ // static
+ bool PrivacySandboxSettingsImpl::IsAllowed(Status status) {
+-  return status == Status::kAllowed;
++  return false;
+ }
+ 
+ // static
+@@ -888,7 +888,7 @@ void PrivacySandboxSettingsImpl::SetTopicsBlockedForTesting() {
+ }
+ 
+ bool PrivacySandboxSettingsImpl::IsPrivacySandboxRestricted() const {
+-  return delegate_->IsPrivacySandboxRestricted();
++  return true;
+ }
+ 
+ bool PrivacySandboxSettingsImpl::IsPrivacySandboxCurrentlyUnrestricted() const {
+@@ -957,11 +957,7 @@ PrivacySandboxSettingsImpl::GetPrivacySandboxAllowedStatus(
+     return Status::kIncognitoProfile;
+   }
+ 
+-  if (IsPrivacySandboxRestricted() && !should_ignore_restriction) {
+     return Status::kRestricted;
+-  }
+-
+-  return Status::kAllowed;
+ }
+ 
+ PrivacySandboxSettingsImpl::Status

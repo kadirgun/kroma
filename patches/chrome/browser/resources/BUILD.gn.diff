@@ -1,0 +1,17 @@
+diff --git a/chrome/browser/resources/BUILD.gn b/chrome/browser/resources/BUILD.gn
+index 68b90eb9f3..b6433fe231 100644
+--- a/chrome/browser/resources/BUILD.gn
++++ b/chrome/browser/resources/BUILD.gn
+@@ -106,12 +106,6 @@ group("resources") {
+     ]
+   }
+ 
+-  if (is_mac) {
+-    public_deps += [
+-      "//chrome/browser/resources/media/mei_preload:component",
+-      "//components/privacy_sandbox/privacy_sandbox_attestations/preload:component",
+-    ]
+-  }
+ 
+   if (is_win || is_mac || is_linux || is_chromeos || is_desktop_android) {
+     public_deps += [ "discards:resources" ]

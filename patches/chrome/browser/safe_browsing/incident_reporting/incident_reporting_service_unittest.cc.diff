@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/safe_browsing/incident_reporting/incident_reporting_service_unittest.cc b/chrome/browser/safe_browsing/incident_reporting/incident_reporting_service_unittest.cc
+index 44bf45f416..3f59c98b2e 100644
+--- a/chrome/browser/safe_browsing/incident_reporting/incident_reporting_service_unittest.cc
++++ b/chrome/browser/safe_browsing/incident_reporting/incident_reporting_service_unittest.cc
+@@ -34,7 +34,6 @@
+ #include "chrome/test/base/testing_profile.h"
+ #include "chrome/test/base/testing_profile_manager.h"
+ #include "components/safe_browsing/core/common/proto/csd.pb.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ #include "components/sync_preferences/testing_pref_service_syncable.h"
+ #include "content/public/test/browser_task_environment.h"
+ #include "extensions/browser/quota_service.h"

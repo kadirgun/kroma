@@ -1,0 +1,23 @@
+diff --git a/chrome/browser/safe_browsing/cloud_content_scanning/file_opening_job.h b/chrome/browser/safe_browsing/cloud_content_scanning/file_opening_job.h
+index ee1fbe1c15..5beae6019b 100644
+--- a/chrome/browser/safe_browsing/cloud_content_scanning/file_opening_job.h
++++ b/chrome/browser/safe_browsing/cloud_content_scanning/file_opening_job.h
+@@ -11,7 +11,6 @@
+ #include "base/gtest_prod_util.h"
+ #include "base/memory/raw_ptr.h"
+ #include "base/task/post_job.h"
+-#include "chrome/browser/safe_browsing/cloud_content_scanning/file_analysis_request.h"
+ 
+ namespace safe_browsing {
+ 
+@@ -24,10 +23,6 @@ class FileOpeningJob {
+     FileOpeningTask();
+     ~FileOpeningTask();
+ 
+-    // Non-owning pointer to the request corresponding to the file to open.
+-    raw_ptr<safe_browsing::FileAnalysisRequest, AcrossTasksDanglingUntriaged>
+-        request = nullptr;
+-
+     // Indicates if this task has been taken and is owned by a thread.
+     std::atomic_bool taken{false};
+   };

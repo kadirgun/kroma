@@ -1,0 +1,15 @@
+diff --git a/chrome/browser/chrome_content_browser_client_navigation_throttles.cc b/chrome/browser/chrome_content_browser_client_navigation_throttles.cc
+index ac7d01de0c..a8e3b7583a 100644
+--- a/chrome/browser/chrome_content_browser_client_navigation_throttles.cc
++++ b/chrome/browser/chrome_content_browser_client_navigation_throttles.cc
+@@ -390,10 +390,6 @@ void CreateAndAddChromeThrottlesForNavigation(
+   registry.AddThrottle(std::make_unique<PolicyBlocklistNavigationThrottle>(
+       registry, handle.GetWebContents()->GetBrowserContext()));
+ 
+-  // Before setting up SSL error detection, configure SSLErrorHandler to invoke
+-  // the relevant extension API whenever an SSL interstitial is shown.
+-  SSLErrorHandler::SetClientCallbackOnInterstitialsShown(
+-      base::BindRepeating(&MaybeTriggerSecurityInterstitialShownEvent));
+   registry.AddThrottle(std::make_unique<SSLErrorNavigationThrottle>(
+       registry, base::BindOnce(&HandleSSLErrorWrapper),
+       base::BindOnce(&IsInHostedApp),

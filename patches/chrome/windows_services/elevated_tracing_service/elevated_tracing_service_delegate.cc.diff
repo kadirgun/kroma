@@ -1,0 +1,26 @@
+diff --git a/chrome/windows_services/elevated_tracing_service/elevated_tracing_service_delegate.cc b/chrome/windows_services/elevated_tracing_service/elevated_tracing_service_delegate.cc
+index aab08c75b3..550881e3df 100644
+--- a/chrome/windows_services/elevated_tracing_service/elevated_tracing_service_delegate.cc
++++ b/chrome/windows_services/elevated_tracing_service/elevated_tracing_service_delegate.cc
+@@ -15,7 +15,6 @@
+ #include "base/task/sequenced_task_runner.h"
+ #include "base/task/thread_pool.h"
+ #include "base/task/thread_pool/thread_pool_instance.h"
+-#include "chrome/common/win/eventlog_messages.h"
+ #include "chrome/install_static/install_util.h"
+ #include "chrome/windows_services/elevated_tracing_service/session_registry.h"
+ #include "chrome/windows_services/elevated_tracing_service/system_tracing_session.h"
+@@ -79,11 +78,11 @@ Delegate::Delegate() = default;
+ Delegate::~Delegate() = default;
+ 
+ uint16_t Delegate::GetLogEventCategory() {
+-  return TRACING_SERVICE_CATEGORY;
++  return 0;
+ }
+ 
+ uint32_t Delegate::GetLogEventMessageId() {
+-  return MSG_TRACING_SERVICE_LOG_MESSAGE;
++  return 0;
+ }
+ 
+ base::expected<base::HeapArray<FactoryAndClsid>, HRESULT>

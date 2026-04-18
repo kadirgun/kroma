@@ -1,0 +1,13 @@
+diff --git a/chrome/installer/setup/setup.rc b/chrome/installer/setup/setup.rc
+index 920109c69c..0fd4aa6fe9 100644
+--- a/chrome/installer/setup/setup.rc
++++ b/chrome/installer/setup/setup.rc
+@@ -58,7 +58,7 @@ IDI_SETUP               ICON                    "setup.ico"
+ #endif    // English (U.S.) resources
+ /////////////////////////////////////////////////////////////////////////////
+ 
+-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
++#if 0
+ 
+ /////////////////////////////////////////////////////////////////////////////
+ //

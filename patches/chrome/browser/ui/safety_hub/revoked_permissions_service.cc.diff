@@ -1,0 +1,59 @@
+diff --git a/chrome/browser/ui/safety_hub/revoked_permissions_service.cc b/chrome/browser/ui/safety_hub/revoked_permissions_service.cc
+index af2b089949..a8c8ef5080 100644
+--- a/chrome/browser/ui/safety_hub/revoked_permissions_service.cc
++++ b/chrome/browser/ui/safety_hub/revoked_permissions_service.cc
+@@ -18,6 +18,7 @@
+ #include "build/build_config.h"
+ #include "chrome/browser/browser_process.h"
+ #include "chrome/browser/engagement/site_engagement_service_factory.h"
++#include "chrome/browser/profiles/profile.h"
+ #include "chrome/browser/ui/safety_hub/safety_hub_prefs.h"
+ #include "chrome/browser/ui/safety_hub/safety_hub_result.h"
+ #include "chrome/browser/ui/safety_hub/safety_hub_service.h"
+@@ -39,7 +40,6 @@
+ #include "components/prefs/pref_change_registrar.h"
+ #include "components/prefs/pref_service.h"
+ #include "components/safe_browsing/core/common/features.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ #include "content/public/browser/browser_context.h"
+ #include "content/public/browser/browser_thread.h"
+ #include "content/public/browser/page.h"
+@@ -156,31 +156,6 @@ RevokedPermissionsService::RevokedPermissionsService(
+           base::Unretained(this)));
+ #endif  // BUILDFLAG(IS_ANDROID)
+ 
+-  abusive_notification_manager_ =
+-      std::make_unique<AbusiveNotificationPermissionsManager>(
+-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
+-          g_browser_process->safe_browsing_service()
+-              ? g_browser_process->safe_browsing_service()->database_manager()
+-              : nullptr,
+-#else
+-          nullptr,
+-#endif
+-          hcsm(), pref_change_registrar_->prefs());
+-
+-  pref_change_registrar_->Add(
+-      prefs::kSafeBrowsingEnabled,
+-      base::BindRepeating(
+-          &RevokedPermissionsService::OnPermissionsAutorevocationControlChanged,
+-          base::Unretained(this)));
+-
+-  if (base::FeatureList::IsEnabled(
+-          features::kSafetyHubDisruptiveNotificationRevocation)) {
+-    disruptive_notification_manager_ =
+-        std::make_unique<DisruptiveNotificationPermissionsManager>(
+-            hcsm(),
+-            site_engagement::SiteEngagementServiceFactory::GetForProfile(
+-                browser_context_));
+-  }
+ 
+   unused_site_permissions_manager_ =
+       std::make_unique<UnusedSitePermissionsManager>(browser_context, prefs);
+@@ -561,5 +536,5 @@ bool RevokedPermissionsService::IsUnusedSiteAutoRevocationEnabled() {
+ }
+ 
+ bool RevokedPermissionsService::IsAbusiveNotificationAutoRevocationEnabled() {
+-  return safe_browsing::IsSafeBrowsingEnabled(*pref_change_registrar_->prefs());
++  return false;
+ }

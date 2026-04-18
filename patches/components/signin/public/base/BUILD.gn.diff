@@ -1,0 +1,13 @@
+diff --git a/components/signin/public/base/BUILD.gn b/components/signin/public/base/BUILD.gn
+index 2bc8fc8ff9..f052cebc64 100644
+--- a/components/signin/public/base/BUILD.gn
++++ b/components/signin/public/base/BUILD.gn
+@@ -153,8 +153,6 @@ component("signin_switches") {
+   defines = [ "IS_SIGNIN_SWITCHES_IMPL" ]
+ 
+   sources = [
+-    "signin_pref_names.cc",
+-    "signin_pref_names.h",
+     "signin_switches.cc",
+     "signin_switches.h",
+   ]

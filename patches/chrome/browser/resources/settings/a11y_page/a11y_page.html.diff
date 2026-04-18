@@ -1,0 +1,15 @@
+diff --git a/chrome/browser/resources/settings/a11y_page/a11y_page.html b/chrome/browser/resources/settings/a11y_page/a11y_page.html
+index 85341e0832..dccb75c61d 100644
+--- a/chrome/browser/resources/settings/a11y_page/a11y_page.html
++++ b/chrome/browser/resources/settings/a11y_page/a11y_page.html
+@@ -99,10 +99,5 @@
+             sub-label="$i18n{toastAlertLevelDescription}">
+         </settings-toggle-button>
+ </if>
+-        <cr-link-row class="hr" label="$i18n{moreFeaturesLink}"
+-            on-click="onMoreFeaturesLinkClick_" sub-label="$i18n{a11yWebStore}"
+-            button-aria-description="$i18n{opensInNewTab}"
+-            external>
+-        </cr-link-row>
+       </div>
+     </settings-section>

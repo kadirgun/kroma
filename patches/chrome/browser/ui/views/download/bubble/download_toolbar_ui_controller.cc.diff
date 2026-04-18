@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/ui/views/download/bubble/download_toolbar_ui_controller.cc b/chrome/browser/ui/views/download/bubble/download_toolbar_ui_controller.cc
+index b20c1dd33e..810bb83ecc 100644
+--- a/chrome/browser/ui/views/download/bubble/download_toolbar_ui_controller.cc
++++ b/chrome/browser/ui/views/download/bubble/download_toolbar_ui_controller.cc
+@@ -44,7 +44,6 @@
+ #include "components/feature_engagement/public/feature_constants.h"
+ #include "components/safe_browsing/core/common/features.h"
+ #include "components/safe_browsing/core/common/safe_browsing_policy_handler.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ #include "content/public/browser/browser_thread.h"
+ #include "ui/base/l10n/l10n_util.h"
+ #include "ui/base/metadata/metadata_impl_macros.h"

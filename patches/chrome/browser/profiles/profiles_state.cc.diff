@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/profiles/profiles_state.cc b/chrome/browser/profiles/profiles_state.cc
+index 82fdea8cf7..622718c2be 100644
+--- a/chrome/browser/profiles/profiles_state.cc
++++ b/chrome/browser/profiles/profiles_state.cc
+@@ -48,7 +48,6 @@
+ #include <algorithm>
+ #include "chrome/browser/profiles/gaia_info_update_service.h"
+ #include "chrome/browser/profiles/gaia_info_update_service_factory.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #endif
+ 
+ namespace profiles {

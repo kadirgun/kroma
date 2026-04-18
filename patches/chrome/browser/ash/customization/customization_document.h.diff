@@ -1,0 +1,13 @@
+diff --git a/chrome/browser/ash/customization/customization_document.h b/chrome/browser/ash/customization/customization_document.h
+index 68a8cdc918..a25c4a41a3 100644
+--- a/chrome/browser/ash/customization/customization_document.h
++++ b/chrome/browser/ash/customization/customization_document.h
+@@ -155,7 +155,7 @@ class ServicesCustomizationDocument : public CustomizationDocument {
+ 
+   // Template URL where to fetch OEM services customization manifest from.
+   static constexpr char kManifestUrl[] =
+-      "https://ssl.gstatic.com/chrome/chromeos-customization/%s.json";
++      "trk:151:https://ssl.gstatic.com/chrome/chromeos-customization/%s.json";
+ 
+   // Return true if the customization was applied. Customization is applied only
+   // once per machine.

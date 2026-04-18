@@ -1,0 +1,14 @@
+diff --git a/components/security_interstitials/core/controller_client.h b/components/security_interstitials/core/controller_client.h
+index 60e4b8d498..4cce79dc89 100644
+--- a/components/security_interstitials/core/controller_client.h
++++ b/components/security_interstitials/core/controller_client.h
+@@ -141,9 +141,6 @@ class ControllerClient {
+   virtual void OpenReportingPrivacyInNewTab() {}
+   virtual void OpenWhitepaperInNewTab() {}
+ 
+- protected:
+-  virtual const std::string GetExtendedReportingPrefName() const = 0;
+-
+  private:
+   std::unique_ptr<MetricsHelper> metrics_helper_;
+   // Link to the help center.

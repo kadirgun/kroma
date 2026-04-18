@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/profiles/gaia_info_update_service_unittest.cc b/chrome/browser/profiles/gaia_info_update_service_unittest.cc
+index c75e122e32..d074512b7d 100644
+--- a/chrome/browser/profiles/gaia_info_update_service_unittest.cc
++++ b/chrome/browser/profiles/gaia_info_update_service_unittest.cc
+@@ -36,7 +36,6 @@
+ #include "components/prefs/pref_service.h"
+ #include "components/profile_metrics/state.h"
+ #include "components/signin/public/base/consent_level.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/base/signin_prefs.h"
+ #include "components/signin/public/identity_manager/account_capabilities_test_mutator.h"
+ #include "components/signin/public/identity_manager/account_info.h"

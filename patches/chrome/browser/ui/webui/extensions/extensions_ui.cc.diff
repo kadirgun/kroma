@@ -1,0 +1,13 @@
+diff --git a/chrome/browser/ui/webui/extensions/extensions_ui.cc b/chrome/browser/ui/webui/extensions/extensions_ui.cc
+index 641f3b2370..aeb3c3da04 100644
+--- a/chrome/browser/ui/webui/extensions/extensions_ui.cc
++++ b/chrome/browser/ui/webui/extensions/extensions_ui.cc
+@@ -484,7 +484,7 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
+           extensions_features::kExtensionsMenuAccessControlWithPermittedSites));
+   source->AddBoolean(
+       "safetyHubThreeDotDetails",
+-      base::FeatureList::IsEnabled(features::kSafetyHubThreeDotDetails));
++      false);
+ 
+   // MV2 deprecation.
+   auto* mv2_experiment_manager = ManifestV2ExperimentManager::Get(profile);

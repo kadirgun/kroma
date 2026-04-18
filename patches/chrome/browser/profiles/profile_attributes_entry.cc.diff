@@ -1,0 +1,29 @@
+diff --git a/chrome/browser/profiles/profile_attributes_entry.cc b/chrome/browser/profiles/profile_attributes_entry.cc
+index 0ccaf4d536..4f772db80b 100644
+--- a/chrome/browser/profiles/profile_attributes_entry.cc
++++ b/chrome/browser/profiles/profile_attributes_entry.cc
+@@ -28,7 +28,6 @@
+ #include "components/prefs/pref_service.h"
+ #include "components/prefs/scoped_user_pref_update.h"
+ #include "components/profile_metrics/state.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/base/signin_switches.h"
+ #include "components/signin/public/identity_manager/account_info.h"
+ #include "components/signin/public/identity_manager/signin_constants.h"
+@@ -524,7 +523,7 @@ bool ProfileAttributesEntry::IsUsingDefaultAvatar() const {
+ }
+ 
+ bool ProfileAttributesEntry::IsSignedInWithCredentialProvider() const {
+-  return GetBool(prefs::kSignedInWithCredentialProvider);
++  return false;
+ }
+ 
+ bool ProfileAttributesEntry::IsDasherlessManagement() const {
+@@ -769,7 +768,6 @@ void ProfileAttributesEntry::SetLastDownloadedGAIAPictureUrlWithSize(
+ }
+ 
+ void ProfileAttributesEntry::SetSignedInWithCredentialProvider(bool value) {
+-  SetBool(prefs::kSignedInWithCredentialProvider, value);
+ }
+ 
+ void ProfileAttributesEntry::SetDasherlessManagement(bool value) {

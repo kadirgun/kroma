@@ -1,0 +1,26 @@
+diff --git a/chrome/common/chrome_switches.h b/chrome/common/chrome_switches.h
+index a4ac956da5..4192ec95d8 100644
+--- a/chrome/common/chrome_switches.h
++++ b/chrome/common/chrome_switches.h
+@@ -86,6 +86,12 @@ extern const char kDisableStackProfiler[];
+ extern const char kDisableZeroBrowsersOpenForTests[];
+ extern const char kDiskCacheDir[];
+ extern const char kDiskCacheSize[];
++// Command-line switch to provide a DNS over HTTPS (DoH) template. When set,
++// the value will be treated as the same format used by the
++// DnsOverHttpsTemplates pref (e.g. "https://dns.example.net/dns-query{?dns}").
++// This switch is intended for testing/debugging; it will not override a
++// managed/policy preference.
++extern const char kDohTemplate[];
+ extern const char kDoNotDeElevateOnLaunch[];
+ extern const char kDumpBrowserHistograms[];
+ extern const char kEnableAudioDebugRecordingsFromExtension[];
+@@ -183,6 +189,8 @@ extern const char kSSLVersionMin[];
+ extern const char kSSLVersionTLSv12[];
+ extern const char kSSLVersionTLSv13[];
+ extern const char kStartMaximized[];
++// Start the browser window without activating it (start inactive/background).
++extern const char kStartInactive[];
+ extern const char kStartStackProfiler[];
+ extern const char kStartStackProfilerBrowserTest[];
+ extern const char kStoragePressureNotificationInterval[];

@@ -1,0 +1,13 @@
+diff --git a/content/browser/preloading/prefetch/prefetch_container.cc b/content/browser/preloading/prefetch/prefetch_container.cc
+index 3f4f7e183a..fad66bf15d 100644
+--- a/content/browser/preloading/prefetch/prefetch_container.cc
++++ b/content/browser/preloading/prefetch/prefetch_container.cc
+@@ -777,7 +777,7 @@ void PrefetchContainer::AddRedirectHop(const net::RedirectInfo& redirect_info) {
+   // some which are added by throttles). These aren't yet supported for
+   // prefetch, including browsing topics and client hints.
+   net::HttpRequestHeaders updated_headers;
+-  std::vector<std::string> headers_to_remove = {variations::kClientDataHeader};
++  std::vector<std::string> headers_to_remove;
+   updated_headers.SetHeader(blink::kSecPurposeHeaderName,
+                             GetSecPurposeHeaderValue(redirect_info.new_url));
+ 

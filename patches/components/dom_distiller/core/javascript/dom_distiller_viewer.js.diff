@@ -1,0 +1,13 @@
+diff --git a/components/dom_distiller/core/javascript/dom_distiller_viewer.js b/components/dom_distiller/core/javascript/dom_distiller_viewer.js
+index 4288322e53..9dbfbbfb90 100644
+--- a/components/dom_distiller/core/javascript/dom_distiller_viewer.js
++++ b/components/dom_distiller/core/javascript/dom_distiller_viewer.js
+@@ -211,7 +211,7 @@ function maybeSetWebFont() {
+   }
+ 
+   const e = document.createElement('link');
+-  e.href = 'https://fonts.googleapis.com/css?family=Roboto';
++  e.href = 'chrome://resources/css/roboto.css';
+   e.rel = 'stylesheet';
+   e.type = 'text/css';
+   document.head.appendChild(e);

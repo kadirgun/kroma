@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/ui/views/page_info/page_info_bubble_view_sync_browsertest.cc b/chrome/browser/ui/views/page_info/page_info_bubble_view_sync_browsertest.cc
+index 7b17ed368c..06f3da27fc 100644
+--- a/chrome/browser/ui/views/page_info/page_info_bubble_view_sync_browsertest.cc
++++ b/chrome/browser/ui/views/page_info/page_info_bubble_view_sync_browsertest.cc
+@@ -19,7 +19,6 @@
+ #include "components/safe_browsing/content/browser/password_protection/password_protection_test_util.h"
+ #include "components/safe_browsing/core/browser/password_protection/metrics_util.h"
+ #include "components/security_state/content/security_state_tab_helper.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/identity_manager/account_info.h"
+ #include "components/signin/public/identity_manager/identity_manager.h"
+ #include "components/signin/public/identity_manager/identity_test_utils.h"

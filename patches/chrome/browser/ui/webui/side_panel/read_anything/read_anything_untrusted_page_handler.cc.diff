@@ -1,0 +1,28 @@
+diff --git a/chrome/browser/ui/webui/side_panel/read_anything/read_anything_untrusted_page_handler.cc b/chrome/browser/ui/webui/side_panel/read_anything/read_anything_untrusted_page_handler.cc
+index af7145c06d..a8170ad9de 100644
+--- a/chrome/browser/ui/webui/side_panel/read_anything/read_anything_untrusted_page_handler.cc
++++ b/chrome/browser/ui/webui/side_panel/read_anything/read_anything_untrusted_page_handler.cc
+@@ -21,8 +21,6 @@
+ #include "chrome/browser/browser_features.h"
+ #include "chrome/browser/language/language_model_manager_factory.h"
+ #include "chrome/browser/profiles/profile.h"
+-#include "chrome/browser/screen_ai/screen_ai_service_router.h"
+-#include "chrome/browser/screen_ai/screen_ai_service_router_factory.h"
+ #include "chrome/browser/speech/extension_api/tts_engine_extension_api.h"
+ #include "chrome/browser/translate/chrome_translate_client.h"
+ #include "chrome/browser/ui/browser.h"
+@@ -325,14 +323,6 @@ ReadAnythingUntrustedPageHandler::ReadAnythingUntrustedPageHandler(
+   prefs_lang = language::ExtractBaseLanguage(prefs_lang);
+   SetDefaultLanguageCode(prefs_lang);
+ 
+-  if (use_screen_ai_service_) {
+-    screen_ai::ScreenAIServiceRouterFactory::GetForBrowserContext(profile_)
+-        ->GetServiceStateAsync(
+-            screen_ai::ScreenAIServiceRouter::Service::kMainContentExtraction,
+-            base::BindOnce(
+-                &ReadAnythingUntrustedPageHandler::OnScreenAIServiceInitialized,
+-                weak_factory_.GetWeakPtr()));
+-  }
+ 
+   // Enable accessibility for the top level render frame and all descendants.
+   // This causes AXTreeSerializer to reset and send accessibility events of

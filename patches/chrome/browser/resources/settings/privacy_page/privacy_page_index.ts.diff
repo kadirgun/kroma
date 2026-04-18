@@ -1,0 +1,34 @@
+diff --git a/chrome/browser/resources/settings/privacy_page/privacy_page_index.ts b/chrome/browser/resources/settings/privacy_page/privacy_page_index.ts
+index 58c4684b13..0d136c9140 100644
+--- a/chrome/browser/resources/settings/privacy_page/privacy_page_index.ts
++++ b/chrome/browser/resources/settings/privacy_page/privacy_page_index.ts
+@@ -8,7 +8,6 @@ import '../basic_page/basic_page.js';
+ import '../safety_hub/safety_hub_entry_point.js';
+ import '../settings_page/settings_section.js';
+ import '../settings_shared.css.js';
+-import './privacy_guide/privacy_guide_promo.js';
+ import './privacy_page.js';
+ 
+ import {PrefsMixin} from '/shared/settings/prefs/prefs_mixin.js';
+@@ -158,13 +157,6 @@ export class SettingsPrivacyPageIndexElement extends
+   private getDefaultViews_(): string[] {
+     const defaultViews = ['old'];
+ 
+-    if (this.isPrivacyGuideAvailable) {
+-      defaultViews.push('privacyGuidePromo');
+-    }
+-
+-    if (this.showPage_(this.pageVisibility_.safetyHub)) {
+-      defaultViews.push('safetyHubEntryPoint');
+-    }
+ 
+     return defaultViews;
+   }
+@@ -335,7 +327,6 @@ export class SettingsPrivacyPageIndexElement extends
+       this.showPrivacyGuidePromo_ = false;
+       return;
+     }
+-    this.showPrivacyGuidePromo_ = true;
+     if (!this.privacyGuidePromoWasShown_) {
+       this.privacyGuideBrowserProxy_.incrementPromoImpressionCount();
+       this.privacyGuidePromoWasShown_ = true;

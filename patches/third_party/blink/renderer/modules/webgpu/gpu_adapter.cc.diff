@@ -1,0 +1,65 @@
+diff --git a/third_party/blink/renderer/modules/webgpu/gpu_adapter.cc b/third_party/blink/renderer/modules/webgpu/gpu_adapter.cc
+index 6039644e2d..cc534a5566 100644
+--- a/third_party/blink/renderer/modules/webgpu/gpu_adapter.cc
++++ b/third_party/blink/renderer/modules/webgpu/gpu_adapter.cc
+@@ -23,6 +23,7 @@
+ #include "third_party/blink/renderer/modules/webgpu/gpu_supported_limits.h"
+ #include "third_party/blink/renderer/modules/webgpu/string_utils.h"
+ #include "third_party/blink/renderer/platform/heap/garbage_collected.h"
++#include "base/command_line.h"
+ 
+ namespace blink {
+ 
+@@ -117,6 +118,15 @@ GPUAdapter::GPUAdapter(
+   GetHandle().GetLimits(limits.GetLinked());
+   limits_ = MakeGarbageCollected<GPUSupportedLimits>(limits);
+ 
++  // Restore command-line reading logic for vendor and architecture
++  base::CommandLine* cmd = base::CommandLine::ForCurrentProcess();
++  if (cmd) {
++    if (cmd->HasSwitch("gpu-vendor"))
++      vendor_ = String::FromUTF8(cmd->GetSwitchValueASCII("gpu-vendor"));
++    if (cmd->HasSwitch("gpu-arch"))
++      architecture_ = String::FromUTF8(cmd->GetSwitchValueASCII("gpu-arch"));
++  }
++
+   info_ = CreateAdapterInfoForAdapter();
+ }
+ 
+@@ -124,14 +134,17 @@ GPUAdapterInfo* GPUAdapter::CreateAdapterInfoForAdapter() {
+   bool is_fallback_adapter = adapter_type_ == wgpu::AdapterType::CPU;
+ 
+   GPUAdapterInfo* info;
++
+   if (RuntimeEnabledFeatures::WebGPUDeveloperFeaturesEnabled()) {
+     // If WebGPU developer features have been enabled then provide all available
+     // adapter info values.
+-    info = MakeGarbageCollected<GPUAdapterInfo>(
+-        vendor_, architecture_, subgroup_min_size_, subgroup_max_size_,
+-        is_fallback_adapter, device_, description_, driver_,
+-        FromDawnEnum(backend_type_), FromDawnEnum(adapter_type_),
+-        d3d_shader_model_, vk_driver_version_, FromDawnEnum(power_preference_));
++  info = MakeGarbageCollected<GPUAdapterInfo>(
++    vendor_,
++    architecture_,
++    subgroup_min_size_, subgroup_max_size_, is_fallback_adapter,
++    device_, description_, driver_, FromDawnEnum(backend_type_),
++    FromDawnEnum(adapter_type_), d3d_shader_model_, vk_driver_version_,
++    FromDawnEnum(power_preference_));
+ 
+     // SAFETY: Required from caller
+     const auto memory_heaps_span =
+@@ -141,9 +154,10 @@ GPUAdapterInfo* GPUAdapter::CreateAdapterInfoForAdapter() {
+       info->AppendMemoryHeapInfo(MakeGarbageCollected<GPUMemoryHeapInfo>(m));
+     }
+   } else {
+-    info = MakeGarbageCollected<GPUAdapterInfo>(
+-        vendor_, architecture_, subgroup_min_size_, subgroup_max_size_,
+-        is_fallback_adapter);
++  info = MakeGarbageCollected<GPUAdapterInfo>(
++    vendor_,
++    architecture_,
++    subgroup_min_size_, subgroup_max_size_, is_fallback_adapter);
+   }
+ 
+   // SAFETY: Required from caller

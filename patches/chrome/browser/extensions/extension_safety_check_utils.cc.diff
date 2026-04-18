@@ -1,0 +1,14 @@
+diff --git a/chrome/browser/extensions/extension_safety_check_utils.cc b/chrome/browser/extensions/extension_safety_check_utils.cc
+index e5c608506b..72b03c4112 100644
+--- a/chrome/browser/extensions/extension_safety_check_utils.cc
++++ b/chrome/browser/extensions/extension_safety_check_utils.cc
+@@ -262,9 +262,6 @@ developer::SafetyCheckWarningReason GetSafetyCheckWarningReasonHelper(
+       top_warning_reason =
+           developer::SafetyCheckWarningReason::kNoPrivacyPractice;
+ 
+-    } else if (SafetyCheckShouldShowOffstoreExtension(extension, profile,
+-                                                      cws_info)) {
+-      top_warning_reason = developer::SafetyCheckWarningReason::kOffstore;
+     }
+   }
+ 

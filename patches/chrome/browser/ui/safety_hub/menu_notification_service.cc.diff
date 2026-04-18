@@ -1,0 +1,27 @@
+diff --git a/chrome/browser/ui/safety_hub/menu_notification_service.cc b/chrome/browser/ui/safety_hub/menu_notification_service.cc
+index 9206f495fb..df813e7563 100644
+--- a/chrome/browser/ui/safety_hub/menu_notification_service.cc
++++ b/chrome/browser/ui/safety_hub/menu_notification_service.cc
+@@ -22,7 +22,6 @@
+ #include "chrome/browser/ui/safety_hub/safety_hub_service.h"
+ #include "chrome/common/chrome_features.h"
+ #include "components/prefs/pref_service.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ #include "components/safety_check/features.h"
+ 
+ #if BUILDFLAG(IS_ANDROID)
+@@ -139,14 +138,6 @@ SafetyHubMenuNotificationService::SafetyHubMenuNotificationService(
+   }
+ #endif  // !BUILDFLAG(IS_ANDROID)
+ 
+-  // Listen for changes to the Safe Browsing pref to accommodate the trigger
+-  // logic.
+-  registrar_.Init(pref_service);
+-  registrar_.Add(
+-      prefs::kSafeBrowsingEnabled,
+-      base::BindRepeating(
+-          &SafetyHubMenuNotificationService::OnSafeBrowsingPrefUpdate,
+-          base::Unretained(this)));
+ }
+ 
+ void SafetyHubMenuNotificationService::UpdateResultGetterForTesting(

@@ -1,0 +1,22 @@
+diff --git a/chrome/browser/ui/search_engines/template_url_table_model.h b/chrome/browser/ui/search_engines/template_url_table_model.h
+index 6d89e1a114..0069e8b618 100644
+--- a/chrome/browser/ui/search_engines/template_url_table_model.h
++++ b/chrome/browser/ui/search_engines/template_url_table_model.h
+@@ -85,13 +85,15 @@ class TemplateURLTableModel : public ui::TableModel,
+   void Add(size_t index,
+            const std::u16string& short_name,
+            const std::u16string& keyword,
+-           const std::string& url);
++           const std::string& url,
++           const std::string& suggestions_url);
+ 
+   // Update the entry at the specified index.
+   void ModifyTemplateURL(size_t index,
+                          const std::u16string& title,
+                          const std::u16string& keyword,
+-                         const std::string& url);
++                         const std::string& url,
++                         const std::string& suggestions_url);
+ 
+   // Reloads the icon at the specified index.
+   void ReloadIcon(size_t index);

@@ -1,0 +1,26 @@
+diff --git a/chrome/browser/shell_integration_win.cc b/chrome/browser/shell_integration_win.cc
+index cc6f4f4c4c..042f4ac6e3 100644
+--- a/chrome/browser/shell_integration_win.cc
++++ b/chrome/browser/shell_integration_win.cc
+@@ -813,10 +813,17 @@ std::wstring GetAppUserModelIdForApp(const std::wstring& app_name,
+ }
+ 
+ std::wstring GetAppUserModelIdForBrowser(const base::FilePath& profile_path) {
+-  return GetAppUserModelIdImpl(
+-      std::wstring(),
+-      ShellUtil::GetBrowserModelId(InstallUtil::IsPerUserInstall()),
+-      profile_path);
++  // Generate AppUserModelId for the browser without including the profile id,
++  // so all Chromium browser windows (any profile) share the same AUMID and are
++  // grouped under the same taskbar icon.
++  // NOTE: This will prevent per-profile pinned icons / separate jump lists.
++  // Ensure this trade-off is acceptable before enabling in production.
++  std::vector<std::wstring> components;
++  std::wstring app_name =
++      ShellUtil::GetBrowserModelId(InstallUtil::IsPerUserInstall());
++  if (!app_name.empty())
++    components.push_back(app_name);
++  return ShellUtil::BuildAppUserModelId(components);
+ }
+ 
+ void UnpinShortcuts(const std::vector<base::FilePath>& shortcuts,

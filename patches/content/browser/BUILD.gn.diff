@@ -1,0 +1,20 @@
+diff --git a/content/browser/BUILD.gn b/content/browser/BUILD.gn
+index c92c7110c7..64be30ee5b 100644
+--- a/content/browser/BUILD.gn
++++ b/content/browser/BUILD.gn
+@@ -120,6 +120,7 @@ source_set("browser") {
+     "//components/fingerprinting_protection_filter/interventions/common:features",
+     "//components/history/core/browser:features",
+     "//components/input",
++    "//components/lens:buildflags",
+     "//components/language/core/common",
+     "//components/language_detection/content/common",
+     "//components/link_header_util",
+@@ -138,7 +139,6 @@ source_set("browser") {
+     "//components/performance_manager/scenario_api",
+     "//components/power_monitor",
+     "//components/services/filesystem:lib",
+-    "//components/services/quarantine",
+     "//components/services/storage",
+     "//components/services/storage:filesystem_proxy_factory",
+     "//components/services/storage/dom_storage:local_storage_proto",

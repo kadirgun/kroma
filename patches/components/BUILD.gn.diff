@@ -1,0 +1,12 @@
+diff --git a/components/BUILD.gn b/components/BUILD.gn
+index 062225d7ca..e8aede3cc0 100644
+--- a/components/BUILD.gn
++++ b/components/BUILD.gn
+@@ -617,7 +617,6 @@ test("components_unittests") {
+       "//components/media_router/common/providers/cast/channel:unit_tests",
+       "//components/page_info:unit_tests",
+       "//components/permissions:unit_tests",
+-      "//components/permissions/prediction_service:unit_tests",
+       "//components/privacy_sandbox/privacy_sandbox_attestations:unit_tests",
+       "//components/safety_check:unit_tests",
+       "//components/security_interstitials/content:unit_tests",

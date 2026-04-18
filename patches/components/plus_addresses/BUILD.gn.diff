@@ -1,0 +1,12 @@
+diff --git a/components/plus_addresses/BUILD.gn b/components/plus_addresses/BUILD.gn
+index 1672f33a3e..eb25b2de6b 100644
+--- a/components/plus_addresses/BUILD.gn
++++ b/components/plus_addresses/BUILD.gn
+@@ -58,6 +58,7 @@ source_set("plus_addresses") {
+     "//net",
+     "//services/data_decoder/public/cpp",
+     "//services/network/public/cpp",
++    "//third_party/re2",
+     "//ui/base",
+   ]
+   public_deps = [

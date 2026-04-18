@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/safe_browsing/android/services_delegate_android.h b/chrome/browser/safe_browsing/android/services_delegate_android.h
+index 78640f4282..56a651c173 100644
+--- a/chrome/browser/safe_browsing/android/services_delegate_android.h
++++ b/chrome/browser/safe_browsing/android/services_delegate_android.h
+@@ -6,7 +6,6 @@
+ #define CHROME_BROWSER_SAFE_BROWSING_ANDROID_SERVICES_DELEGATE_ANDROID_H_
+ 
+ #include "chrome/browser/safe_browsing/services_delegate.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ 
+ namespace safe_browsing {
+ 

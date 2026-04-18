@@ -1,0 +1,112 @@
+diff --git a/components/embedder_support/user_agent_utils.cc b/components/embedder_support/user_agent_utils.cc
+index 8c44d2265b..1de0a9165e 100644
+--- a/components/embedder_support/user_agent_utils.cc
++++ b/components/embedder_support/user_agent_utils.cc
+@@ -201,10 +201,12 @@ const blink::UserAgentBrandList GetUserAgentBrandList(
+   int major_version_number;
+   bool parse_result = base::StringToInt(major_version, &major_version_number);
+   DCHECK(parse_result);
+-  std::optional<std::string> brand;
+-#if !BUILDFLAG(CHROMIUM_BRANDING)
+-  brand = version_info::GetProductName();
+-#endif
++  // Include the product brand (e.g. "Google Chrome" or "Chromium").
++  // Historically this was omitted for Chromium-branded builds, but making
++  // it unconditional ensures navigator.userAgentData.brands contains the
++  // product name consistently across builds.
++  std::optional<std::string> brand =
++      std::string(version_info::GetProductName());
+ 
+   std::string brand_version =
+       output_version_type == blink::UserAgentBrandVersionType::kFullVersion
+@@ -222,8 +224,8 @@ const blink::UserAgentBrandList GetUserAgentBrandList(
+ // GetVersionNumber()
+ const blink::UserAgentBrandList GetUserAgentBrandMajorVersionListInternal(
+     std::optional<blink::UserAgentBrandVersion> additional_brand_version) {
+-  return GetUserAgentBrandList(version_info::GetMajorVersionNumber(),
+-                               std::string(version_info::GetVersionNumber()),
++  return GetUserAgentBrandList(GetMajorVersionNumber(),
++                               GetVersionNumber(),
+                                blink::UserAgentBrandVersionType::kMajorVersion,
+                                additional_brand_version);
+ }
+@@ -233,9 +235,15 @@ const blink::UserAgentBrandList GetUserAgentBrandMajorVersionListInternal(
+ // TODO(crbug.com/1291612): Consolidate *FullVersionList() methods by using
+ // GetVersionNumber()
+ const blink::UserAgentBrandList GetUserAgentBrandFullVersionListInternal(
+-    std::optional<blink::UserAgentBrandVersion> additional_brand_version) {
+-  return GetUserAgentBrandList(version_info::GetMajorVersionNumber(),
+-                               std::string(version_info::GetVersionNumber()),
++    std::optional<blink::UserAgentBrandVersion> additional_brand_version,
++    const std::string& custom_version = "") {
++  std::string version_to_use = custom_version.empty() ? GetVersionNumber() : custom_version;
++  std::string major_version_to_use = custom_version.empty() ? GetMajorVersionNumber() : 
++                                     (version_to_use.find('.') != std::string::npos ? 
++                                      version_to_use.substr(0, version_to_use.find('.')) : version_to_use);
++  
++  return GetUserAgentBrandList(major_version_to_use,
++                               version_to_use,
+                                blink::UserAgentBrandVersionType::kFullVersion,
+                                additional_brand_version);
+ }
+@@ -474,6 +482,12 @@ std::string BuildOSCpuInfo(
+ 
+ std::string GetProductAndVersion(
+     UserAgentReductionEnterprisePolicyState user_agent_reduction) {
++  std::optional<std::string> custom_version = GetUserAgentVersionFromCommandLine();
++  if (custom_version.has_value()) {
++    std::string product_name(version_info::GetProductName());
++    return base::StrCat({product_name, "/", custom_version.value()});
++  }
++  
+   return ShouldReduceUserAgentMinorVersion(user_agent_reduction)
+              ? version_info::GetProductNameAndVersionForReducedUserAgent(
+                    blink::features::kUserAgentFrozenBuildVersion.Get())
+@@ -493,6 +507,38 @@ std::optional<std::string> GetUserAgentFromCommandLine() {
+   return std::nullopt;
+ }
+ 
++std::optional<std::string> GetUserAgentVersionFromCommandLine() {
++  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
++  if (command_line->HasSwitch(kUserAgentVersion)) {
++    std::string version = command_line->GetSwitchValueASCII(kUserAgentVersion);
++    // Basic validation: check if version looks like x.y.z.w format
++    if (!version.empty() && version.find_first_not_of("0123456789.") == std::string::npos) {
++      return version;
++    }
++    LOG(WARNING) << "Ignored invalid value for flag --" << kUserAgentVersion;
++  }
++  return std::nullopt;
++}
++
++std::string GetVersionNumber() {
++  std::optional<std::string> custom_version = GetUserAgentVersionFromCommandLine();
++  return custom_version.has_value() 
++      ? custom_version.value() 
++      : std::string(version_info::GetVersionNumber());
++}
++
++std::string GetMajorVersionNumber() {
++  std::optional<std::string> custom_version = GetUserAgentVersionFromCommandLine();
++  if (custom_version.has_value()) {
++    size_t dot_pos = custom_version.value().find('.');
++    if (dot_pos != std::string::npos) {
++      return custom_version.value().substr(0, dot_pos);
++    }
++    return custom_version.value(); // fallback if no dot found
++  }
++  return version_info::GetMajorVersionNumber();
++}
++
+ std::string GetUserAgent(
+     UserAgentReductionEnterprisePolicyState user_agent_reduction) {
+   std::optional<std::string> custom_ua = GetUserAgentFromCommandLine();
+@@ -700,7 +746,7 @@ blink::UserAgentMetadata GetUserAgentMetadata(const PrefService* pref_service,
+   // High entropy client hints.
+   metadata.brand_full_version_list =
+       GetUserAgentBrandFullVersionListInternal(std::nullopt);
+-  metadata.full_version = std::string(version_info::GetVersionNumber());
++  metadata.full_version = GetVersionNumber();
+   metadata.architecture = GetCpuArchitecture();
+   metadata.model = BuildModelInfo();
+   metadata.form_factors = GetFormFactorsClientHint(metadata, metadata.mobile);

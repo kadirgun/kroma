@@ -1,0 +1,12 @@
+diff --git a/components/safe_browsing/core/common/safe_browsing_prefs_unittest.cc b/components/safe_browsing/core/common/safe_browsing_prefs_unittest.cc
+index c3fc5560ec..188c9f77d6 100644
+--- a/components/safe_browsing/core/common/safe_browsing_prefs_unittest.cc
++++ b/components/safe_browsing/core/common/safe_browsing_prefs_unittest.cc
+@@ -2,7 +2,6 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ 
+ #include <string>
+ 

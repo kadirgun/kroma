@@ -1,0 +1,12 @@
+diff --git a/components/signin/public/identity_manager/identity_utils_unittest.cc b/components/signin/public/identity_manager/identity_utils_unittest.cc
+index 23f8881950..6631ece28e 100644
+--- a/components/signin/public/identity_manager/identity_utils_unittest.cc
++++ b/components/signin/public/identity_manager/identity_utils_unittest.cc
+@@ -12,7 +12,6 @@
+ #include "components/prefs/pref_service.h"
+ #include "components/prefs/testing_pref_service.h"
+ #include "components/signin/public/base/consent_level.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/base/signin_switches.h"
+ #include "components/signin/public/identity_manager/accounts_in_cookie_jar_info.h"
+ #include "components/signin/public/identity_manager/identity_manager.h"

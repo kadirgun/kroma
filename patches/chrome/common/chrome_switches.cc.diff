@@ -1,0 +1,25 @@
+diff --git a/chrome/common/chrome_switches.cc b/chrome/common/chrome_switches.cc
+index ad982f0a1a..1902eefba6 100644
+--- a/chrome/common/chrome_switches.cc
++++ b/chrome/common/chrome_switches.cc
+@@ -619,6 +619,9 @@ const char kSSLVersionTLSv13[] = "tls1.3";
+ // Starts the browser maximized, regardless of any previous settings.
+ const char kStartMaximized[] = "start-maximized";
+ 
++// Start the browser window without activating it (start inactive/background).
++const char kStartInactive[] = "start-inactive";
++
+ // Starts the stack sampling profiler in the child process.
+ const char kStartStackProfiler[] = "start-stack-profiler";
+ 
+@@ -992,4 +995,10 @@ const char kUserDataMigrated[] = "user-data-migrated";
+ // ifdef at the bottom. The order should match the header.
+ // -----------------------------------------------------------------------------
+ 
++// Command-line switch to provide a DNS over HTTPS (DoH) template. See the
++// matching declaration in chrome_switches.h. The value should be a single
++// template string, for example:
++// --doh-template="https://dns.example.net/dns-query{?dns}"
++const char kDohTemplate[] = "doh-template";
++
+ }  // namespace switches

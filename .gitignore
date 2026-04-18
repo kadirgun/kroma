@@ -1,0 +1,9 @@
+chromium/**
+!chromium/.gclient
+depot_tools
+sccache
+msvc_toolchain
+!.gitkeep
+node_modules
+tmp
+msvc_toolchan.ciopfs

@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/safe_browsing/incident_reporting/state_store.cc b/chrome/browser/safe_browsing/incident_reporting/state_store.cc
+index 4700a05571..56bc99ce7b 100644
+--- a/chrome/browser/safe_browsing/incident_reporting/state_store.cc
++++ b/chrome/browser/safe_browsing/incident_reporting/state_store.cc
+@@ -14,7 +14,6 @@
+ #include "chrome/browser/safe_browsing/incident_reporting/incident.h"
+ #include "chrome/browser/safe_browsing/incident_reporting/platform_state_store.h"
+ #include "components/prefs/pref_service.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ 
+ namespace safe_browsing {
+ 

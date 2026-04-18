@@ -1,0 +1,18 @@
+diff --git a/chrome/browser/resources/history/side_bar.html b/chrome/browser/resources/history/side_bar.html
+index f877875920..e01adfdb89 100644
+--- a/chrome/browser/resources/history/side_bar.html
++++ b/chrome/browser/resources/history/side_bar.html
+@@ -11,13 +11,6 @@
+     $i18n{historyMenuItem}
+     <cr-ripple></cr-ripple>
+   </a>
+-  <a id="syncedTabs" role="menuitem" href="/syncedTabs"
+-      class="page-item cr-nav-menu-item"
+-      path="syncedTabs" @click="${this.onItemClick_}">
+-    <cr-icon icon="cr:phonelink"></cr-icon>
+-    $i18n{openTabsMenuItem}
+-    <cr-ripple></cr-ripple>
+-  </a>
+   <a role="menuitem" id="clear-browsing-data"
+       class="cr-nav-menu-item"
+       href="chrome://settings/clearBrowserData"

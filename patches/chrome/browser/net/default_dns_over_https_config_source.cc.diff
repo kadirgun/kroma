@@ -1,0 +1,13 @@
+diff --git a/chrome/browser/net/default_dns_over_https_config_source.cc b/chrome/browser/net/default_dns_over_https_config_source.cc
+index 258250afc9..8b70f3b350 100644
+--- a/chrome/browser/net/default_dns_over_https_config_source.cc
++++ b/chrome/browser/net/default_dns_over_https_config_source.cc
+@@ -25,7 +25,7 @@ DefaultDnsOverHttpsConfigSource::DefaultDnsOverHttpsConfigSource(
+   if (set_up_pref_defaults) {
+     local_state->SetDefaultPrefValue(prefs::kDnsOverHttpsMode,
+                                      base::Value(SecureDnsConfig::ModeToString(
+-                                         net::SecureDnsMode::kAutomatic)));
++                                         net::SecureDnsMode::kOff)));
+   }
+ }
+ 

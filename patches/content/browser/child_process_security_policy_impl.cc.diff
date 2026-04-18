@@ -1,0 +1,12 @@
+diff --git a/content/browser/child_process_security_policy_impl.cc b/content/browser/child_process_security_policy_impl.cc
+index 38824d7f96..348d319ca4 100644
+--- a/content/browser/child_process_security_policy_impl.cc
++++ b/content/browser/child_process_security_policy_impl.cc
+@@ -958,6 +958,7 @@ ChildProcessSecurityPolicyImpl::ChildProcessSecurityPolicyImpl()
+   RegisterWebSafeScheme(url::kWssScheme);
+ #endif  // BUILDFLAG(ENABLE_WEBSOCKETS)
+   RegisterWebSafeScheme(url::kDataScheme);
++  RegisterWebSafeScheme(url::kTraceScheme);
+ 
+   // TODO(nick): https://crbug.com/651534 blob: and filesystem: schemes embed
+   // other origins, so we should not treat them as web safe. Remove callers of

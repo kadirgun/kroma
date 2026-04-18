@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/ui/tab_contents/BUILD.gn b/chrome/browser/ui/tab_contents/BUILD.gn
+index 58d30e81d1..79add15641 100644
+--- a/chrome/browser/ui/tab_contents/BUILD.gn
++++ b/chrome/browser/ui/tab_contents/BUILD.gn
+@@ -51,7 +51,6 @@ source_set("impl") {
+   if (is_win || is_mac || is_linux || is_chromeos) {
+     sources += [
+       "chrome_web_contents_menu_helper.cc",
+-      "chrome_web_contents_view_handle_drop.cc",
+     ]
+   }
+ 

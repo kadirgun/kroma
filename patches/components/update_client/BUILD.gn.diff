@@ -1,0 +1,13 @@
+diff --git a/components/update_client/BUILD.gn b/components/update_client/BUILD.gn
+index a0f3587427..4551c454bc 100644
+--- a/components/update_client/BUILD.gn
++++ b/components/update_client/BUILD.gn
+@@ -361,8 +361,6 @@ source_set("unit_tests") {
+     "//third_party/puffin:libpuffpatch",
+     "//third_party/re2",
+   ]
+-
+-  data_deps = [ "//components/test/data/update_client/puffin_patch_test:puffin_patch_test_files" ]
+ }
+ 
+ fuzzer_test("update_client_protocol_serializer_fuzzer") {

@@ -1,0 +1,12 @@
+diff --git a/components/network_session_configurator/common/network_features.cc b/components/network_session_configurator/common/network_features.cc
+index c1bd42fa99..f6387f1cd9 100644
+--- a/components/network_session_configurator/common/network_features.cc
++++ b/components/network_session_configurator/common/network_features.cc
+@@ -8,4 +8,7 @@
+ 
+ namespace features {
+ 
++const char kMaxConnectionsPerHostChoiceDefault[] = "6",
++                 kMaxConnectionsPerHostChoice15[] = "15";
++
+ }  // namespace features

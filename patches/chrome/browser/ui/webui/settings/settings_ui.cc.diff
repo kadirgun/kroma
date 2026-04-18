@@ -1,0 +1,55 @@
+diff --git a/chrome/browser/ui/webui/settings/settings_ui.cc b/chrome/browser/ui/webui/settings/settings_ui.cc
+index 662d7bd4ac..46a075c60d 100644
+--- a/chrome/browser/ui/webui/settings/settings_ui.cc
++++ b/chrome/browser/ui/webui/settings/settings_ui.cc
+@@ -116,7 +116,6 @@
+ #include "components/safe_browsing/core/common/features.h"
+ #include "components/safe_browsing/core/common/hashprefix_realtime/hash_realtime_utils.h"
+ #include "components/search_engines/template_url_service.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/base/signin_switches.h"
+ #include "components/sync/base/features.h"
+ #include "content/public/browser/url_data_source.h"
+@@ -278,9 +277,7 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
+   AddSettingsPageUIHandler(std::make_unique<MacSystemSettingsHandler>());
+ #endif
+ 
+-  html_source->AddBoolean("signinAllowed", !profile->IsGuestSession() &&
+-                                               profile->GetPrefs()->GetBoolean(
+-                                                   prefs::kSigninAllowed));
++  html_source->AddBoolean("signinAllowed", false);
+   ProfileAttributesEntry* entry =
+       g_browser_process->profile_manager()
+           ->GetProfileAttributesStorage()
+@@ -579,27 +576,20 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
+                ->UserIsActivePasswordChangeUser()},
+   };
+ 
+-  const bool show_ai_settings_for_testing = base::FeatureList::IsEnabled(
+-      optimization_guide::features::kAiSettingsPageForceAvailable);
+-
+-  // Show the AI features section in the AI page if any of the AI features are
+-  // enabled.
+-  bool show_ai_features_section = show_ai_settings_for_testing;
+   for (auto [name, visible] : optimization_guide_features) {
+-    html_source->AddBoolean(name, visible || show_ai_settings_for_testing);
+-    show_ai_features_section |= visible;
++    html_source->AddBoolean(name, false);
+   }
+ 
+   // Within the AI subpage are separate sections for Glic and for all other AI
+   // features, the visibility of these are separately controlled but we want to
+   // show the subpage if any of the AI features or Glic are enabled.
+   html_source->AddBoolean("showAiPage",
+-                          show_glic_section || show_ai_features_section);
++                          false);
+   html_source->AddBoolean("showAiPageAiFeatureSection",
+-                          show_ai_features_section);
++                          false);
+   html_source->AddBoolean(
+       "enableAiSettingsInPrivacyGuide",
+-      optimization_guide::features::IsPrivacyGuideAiSettingsEnabled());
++      false);
+ 
+   // Delete Browsing Data
+   html_source->AddBoolean(

@@ -1,0 +1,268 @@
+diff --git a/third_party/blink/renderer/core/canvas_interventions/noise_helper.cc b/third_party/blink/renderer/core/canvas_interventions/noise_helper.cc
+index 7874aae9a7..549d86713f 100644
+--- a/third_party/blink/renderer/core/canvas_interventions/noise_helper.cc
++++ b/third_party/blink/renderer/core/canvas_interventions/noise_helper.cc
+@@ -7,20 +7,26 @@
+ #include <array>
+ #include <cstddef>
+ #include <cstdint>
++#include <map>
++#include <vector>
++#include "base/no_destructor.h"
+ 
+ #include "base/check_op.h"
+ #include "base/containers/span.h"
+ #include "base/containers/span_writer.h"
+ #include "base/numerics/byte_conversions.h"
+ #include "base/numerics/safe_conversions.h"
++#include "base/hash/sha1.h"
+ #include "third_party/blink/renderer/core/canvas_interventions/noise_hash.h"
+ 
+ namespace blink {
+ 
+ namespace {
+ 
+-constexpr uint8_t kMaxClosePixelDelta = 10u;
+-constexpr uint8_t kMaxNoisePerChannel = 3u;
++constexpr uint8_t kMaxClosePixelDelta = 5u;
++// Reduce the maximum per-channel noise to lower visible artifacts.
++// Previously 3; lowering to 1 reduces noise amplitude significantly.
++constexpr uint8_t kMaxNoisePerChannel = 1u;
+ constexpr uint8_t kChannelsPerPixel = 4u;
+ constexpr std::array<uint8_t, 4u> kEmptyPixel({0, 0, 0, 0});
+ 
+@@ -65,9 +71,13 @@ void NoisePixel(base::span<uint8_t> pixel, NoiseHash& token_hash) {
+   base::SpanWriter writer(base::as_writable_bytes(pixel));
+   for (int i = 0; i < kChannelsPerPixel; ++i) {
+     int channel_value = pixel[i];
+-    // Clamp min- and maxNoisedVal to [0, 255] and [1, 255] for the alpha
+-    // channel if it was non-zero before.
+-    int lowerLimit = (i == kChannelsPerPixel - 1 && channel_value > 0) ? 1 : 0;
++    // Preserve alpha channel to avoid introducing transparency artifacts.
++    if (i == kChannelsPerPixel - 1) {
++      writer.WriteU8LittleEndian(static_cast<uint8_t>(channel_value));
++      continue;
++    }
++    // Reduce noise amplitude by using the smaller kMaxNoisePerChannel.
++    int lowerLimit = 0;
+     int minNoisedVal = channel_value <= kMaxNoisePerChannel
+                            ? lowerLimit
+                            : channel_value - kMaxNoisePerChannel;
+@@ -109,8 +119,109 @@ void CopyPixelValue(const base::span<uint8_t> from_pixel,
+   writer.Write(from_pixel.first<kChannelsPerPixel>());
+ }
+ 
++// Block-anchor + quantize helpers.
++// The block-anchor deterministically picks one pixel per block (based on
++// token_hash) which will always receive noise. The quantize helper counts
++// distinct quantized colors in a small neighborhood to detect smooth
++// gradients / low-color regions where gradient pixels should be considered
++// part of the same shape and thus be forced to receive noise.
++constexpr int kBlockSize = 16;
++constexpr int kQuantWindowSize = 5;  // 5x5 window
++constexpr int kQuantShift = 5;       // quantize to 3 bits per channel (>>5)
++constexpr int kQuantDistinctThreshold = 3;
++
++bool IsBlockAnchorPixel(const NoiseHash& token_hash,
++                        int x,
++                        int y,
++                        int width,
++                        int height) {
++  int block_x = x / kBlockSize;
++  int block_y = y / kBlockSize;
++  NoiseHash h = token_hash;
++  // Mix block coords into hash deterministically.
++  uint64_t v = (static_cast<uint64_t>(static_cast<uint32_t>(block_x)) << 32) |
++               static_cast<uint64_t>(static_cast<uint32_t>(block_y));
++  h.Update(v);
++  int ax = h.GetValueBelow(kBlockSize);
++  int ay = h.GetValueBelow(kBlockSize);
++  int anchor_x = block_x * kBlockSize + ax;
++  int anchor_y = block_y * kBlockSize + ay;
++  // Clamp anchor to canvas.
++  anchor_x = std::min(anchor_x, width - 1);
++  anchor_y = std::min(anchor_y, height - 1);
++  return (x == anchor_x && y == anchor_y);
++}
++
++int QuantizedDistinctColorsCount(const base::span<uint8_t> pixels,
++                                 int width,
++                                 int height,
++                                 int cx,
++                                 int cy) {
++  const int half = kQuantWindowSize / 2;
++  uint32_t uniques[kQuantWindowSize * kQuantWindowSize];
++  int unique_count = 0;
++  for (int dy = -half; dy <= half; ++dy) {
++    int ny = cy + dy;
++    if (ny < 0 || ny >= height)
++      continue;
++    for (int dx = -half; dx <= half; ++dx) {
++      int nx = cx + dx;
++      if (nx < 0 || nx >= width)
++        continue;
++      auto p = GetPixelAt(nx, ny, width, pixels);
++      if (p == kEmptyPixel)
++        continue;
++      uint32_t key = ((static_cast<uint32_t>(p[0]) >> kQuantShift) << 16) |
++                     ((static_cast<uint32_t>(p[1]) >> kQuantShift) << 8) |
++                     (static_cast<uint32_t>(p[2]) >> kQuantShift);
++      bool found = false;
++      for (int i = 0; i < unique_count; ++i) {
++        if (uniques[i] == key) {
++          found = true;
++          break;
++        }
++      }
++      if (!found) {
++        uniques[unique_count++] = key;
++        if (unique_count > kQuantDistinctThreshold)
++          return unique_count;
++      }
++    }
++  }
++  return unique_count;
++}
++
+ }  // namespace
+ 
++// Cache of previously noised pixel digests. We store a map from digest ->
++// boolean (true) to indicate presence. The boolean value is unused but keeps
++// the API flexible for future metadata.
++static std::map<base::SHA1Digest, bool>* GetNoisedPixelsCache() {
++  static base::NoDestructor<std::map<base::SHA1Digest, bool>> cache;
++  return cache.get();
++}
++
++// Compute SHA1 key from pixels + width + height. We include width and height
++// as little-endian 32-bit integers to avoid collisions across different
++// canvas sizes with the same raw bytes.
++static base::SHA1Digest ComputePixelsKey(const base::span<uint8_t> pixels,
++                                        int width,
++                                        int height) {
++  // Build a temporary buffer: pixels + width(4 bytes LE) + height(4 bytes LE).
++  std::vector<uint8_t> buffer;
++  buffer.reserve(pixels.size() + 8);
++  buffer.insert(buffer.end(), pixels.begin(), pixels.end());
++  // Append width and height as 32-bit little endian.
++  uint32_t w = static_cast<uint32_t>(width);
++  uint32_t h = static_cast<uint32_t>(height);
++  auto w_bytes = base::U32ToLittleEndian(w);
++  auto h_bytes = base::U32ToLittleEndian(h);
++  buffer.insert(buffer.end(), w_bytes.begin(), w_bytes.end());
++  buffer.insert(buffer.end(), h_bytes.begin(), h_bytes.end());
++  return base::SHA1Hash(
++      base::as_bytes(base::span<const uint8_t>(buffer.data(), buffer.size())));
++}
++
+ void NoisePixels(const NoiseHash& token_hash,
+                  base::span<uint8_t> pixels,
+                  const int width,
+@@ -118,6 +229,15 @@ void NoisePixels(const NoiseHash& token_hash,
+   CHECK_EQ(pixels.size(),
+            static_cast<size_t>(width * height * kChannelsPerPixel));
+ 
++  // Check cache first. If we've previously generated noise for this exact
++  // pixel buffer and size, skip re-computation. Only the digest presence is
++  // tested; we don't retrieve a stored pixel buffer here.
++  base::SHA1Digest noiselessKey = ComputePixelsKey(pixels, width, height);
++  auto* cache = GetNoisedPixelsCache();
++  if (cache->find(noiselessKey) != cache->end()) {
++    return; 
++  }
++
+   const size_t row_size = width * kChannelsPerPixel;
+   std::vector<uint8_t> row1(row_size);
+   std::vector<uint8_t> row2(row_size);
+@@ -131,22 +251,77 @@ void NoisePixels(const NoiseHash& token_hash,
+       if (pixel == kEmptyPixel) {
+         continue;
+       }
++      // Decide if we should force noise for this pixel based on block-anchor
++      // or quantized neighborhood uniqueness. These checks are deterministic
++      // because they derive from `token_hash` and the current pixel data.
++      bool force_noise = false;
++      // Block anchor: deterministic single pixel per block.
++      if (IsBlockAnchorPixel(token_hash, x, y, width, height))
++        force_noise = true;
++      // Low distinct quantized colors indicates same-shape / smooth gradient
++      // region; force noise to ensure coverage.
++      if (!force_noise) {
++        int distinct = QuantizedDistinctColorsCount(pixels, width, height, x, y);
++        if (distinct <= kQuantDistinctThreshold)
++          force_noise = true;
++      }
+       if (y > 0 && x > 0 &&
+           GetPixelAt(x - 1, 0, width, unnoised_previous_row) == pixel) {
+         // same top-left pixel, copy.
+-        CopyPixelValue(GetPixelAt(x - 1, y - 1, width, pixels), pixel);
++        if (force_noise) {
++          // Even though copy would normally be used, force noise instead.
++          NoiseHash hash_copy = token_hash;
++          hash_copy.Update(base::U32FromLittleEndian(pixel));
++          const std::pair<PixelLocation, PixelLocation> other_pixels =
++              GetRandomPixelLocations(hash_copy, {x, y}, width, height);
++          hash_copy.Update(
++              GetValueFromPixelLocations(other_pixels, pixels, width));
++          NoisePixel(pixel, hash_copy);
++        } else {
++          CopyPixelValue(GetPixelAt(x - 1, y - 1, width, pixels), pixel);
++        }
+       } else if (y > 0 &&
+                  GetPixelAt(x, 0, width, unnoised_previous_row) == pixel) {
+         // same top pixel, copy.
+-        CopyPixelValue(GetPixelAt(x, y - 1, width, pixels), pixel);
++        if (force_noise) {
++          NoiseHash hash_copy = token_hash;
++          hash_copy.Update(base::U32FromLittleEndian(pixel));
++          const std::pair<PixelLocation, PixelLocation> other_pixels =
++              GetRandomPixelLocations(hash_copy, {x, y}, width, height);
++          hash_copy.Update(
++              GetValueFromPixelLocations(other_pixels, pixels, width));
++          NoisePixel(pixel, hash_copy);
++        } else {
++          CopyPixelValue(GetPixelAt(x, y - 1, width, pixels), pixel);
++        }
+       } else if (y > 0 && x < width - 1 &&
+                  GetPixelAt(x + 1, 0, width, unnoised_previous_row) == pixel) {
+         // same top-right pixel, copy.
+-        CopyPixelValue(GetPixelAt(x + 1, y - 1, width, pixels), pixel);
++        if (force_noise) {
++          NoiseHash hash_copy = token_hash;
++          hash_copy.Update(base::U32FromLittleEndian(pixel));
++          const std::pair<PixelLocation, PixelLocation> other_pixels =
++              GetRandomPixelLocations(hash_copy, {x, y}, width, height);
++          hash_copy.Update(
++              GetValueFromPixelLocations(other_pixels, pixels, width));
++          NoisePixel(pixel, hash_copy);
++        } else {
++          CopyPixelValue(GetPixelAt(x + 1, y - 1, width, pixels), pixel);
++        }
+       } else if (x > 0 &&
+                  GetPixelAt(x - 1, 0, width, unnoised_current_row) == pixel) {
+         // same left pixel, copy.
+-        CopyPixelValue(GetPixelAt(x - 1, y, width, pixels), pixel);
++        if (force_noise) {
++          NoiseHash hash_copy = token_hash;
++          hash_copy.Update(base::U32FromLittleEndian(pixel));
++          const std::pair<PixelLocation, PixelLocation> other_pixels =
++              GetRandomPixelLocations(hash_copy, {x, y}, width, height);
++          hash_copy.Update(
++              GetValueFromPixelLocations(other_pixels, pixels, width));
++          NoisePixel(pixel, hash_copy);
++        } else {
++          CopyPixelValue(GetPixelAt(x - 1, y, width, pixels), pixel);
++        }
+       } else {
+         // otherwise, noise the pixel.
+         NoiseHash hash_copy = token_hash;
+@@ -163,6 +338,9 @@ void NoisePixels(const NoiseHash& token_hash,
+     // Previous can be overwritten (new current). Current is the now previous.
+     std::swap(unnoised_previous_row, unnoised_current_row);
+   }
++
++  base::SHA1Digest noisedKey = ComputePixelsKey(pixels, width, height);
++  (*cache)[noisedKey] = true;
+ }
+ 
+ }  // namespace blink

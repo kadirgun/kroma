@@ -1,0 +1,24 @@
+diff --git a/chrome/browser/browser_process_impl.h b/chrome/browser/browser_process_impl.h
+index b09ace515f..dc255a3915 100644
+--- a/chrome/browser/browser_process_impl.h
++++ b/chrome/browser/browser_process_impl.h
+@@ -90,9 +90,6 @@ namespace speech {
+ class SodaInstaller;
+ }  // namespace speech
+ 
+-namespace screen_ai {
+-class ScreenAIInstallState;
+-}  // namespace screen_ai
+ 
+ // Real implementation of BrowserProcess that creates and returns the services.
+ class BrowserProcessImpl : public BrowserProcess,
+@@ -437,9 +434,6 @@ class BrowserProcessImpl : public BrowserProcess,
+   // to ensure that SodaInstallerImpl gets destructed first.
+   std::unique_ptr<speech::SodaInstaller> soda_installer_impl_;
+ 
+-  // Used to download Screen AI on demand and keep track of the library
+-  // availability.
+-  std::unique_ptr<screen_ai::ScreenAIInstallState> screen_ai_download_;
+ #endif
+ 
+   std::unique_ptr<BrowserProcessPlatformPart> platform_part_;

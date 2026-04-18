@@ -1,0 +1,22 @@
+diff --git a/chrome/browser/ui/webui/signin/managed_user_profile_notice_ui.cc b/chrome/browser/ui/webui/signin/managed_user_profile_notice_ui.cc
+index 8de6205665..cc826229d5 100644
+--- a/chrome/browser/ui/webui/signin/managed_user_profile_notice_ui.cc
++++ b/chrome/browser/ui/webui/signin/managed_user_profile_notice_ui.cc
+@@ -32,7 +32,6 @@
+ #include "chrome/grit/signin_resources.h"
+ #include "components/prefs/pref_service.h"
+ #include "components/signin/public/base/consent_level.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/base/signin_switches.h"
+ #include "components/signin/public/identity_manager/identity_manager.h"
+ #include "components/signin/public/identity_manager/tribool.h"
+@@ -351,8 +350,7 @@ void ManagedUserProfileNoticeUI::Initialize(
+   // Change the text so that the "(Recommended)" label is not shown when the
+   // admin has set merging data as the default option.
+   bool profile_separation_data_migration_settings_optout =
+-      profile->GetPrefs()->GetInteger(
+-          prefs::kProfileSeparationDataMigrationSettings) == 2;
++      false;
+   bool check_link_data_checkbox_by_default_from_legacy_policy =
+       g_browser_process->local_state()->GetBoolean(
+           prefs::kEnterpriseProfileCreationKeepBrowsingData);

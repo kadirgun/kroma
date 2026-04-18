@@ -1,0 +1,25 @@
+diff --git a/components/send_tab_to_self/entry_point_display_reason.cc b/components/send_tab_to_self/entry_point_display_reason.cc
+index 503fccbfb7..4f3edda7b1 100644
+--- a/components/send_tab_to_self/entry_point_display_reason.cc
++++ b/components/send_tab_to_self/entry_point_display_reason.cc
+@@ -7,7 +7,6 @@
+ #include "components/prefs/pref_service.h"
+ #include "components/send_tab_to_self/send_tab_to_self_model.h"
+ #include "components/send_tab_to_self/send_tab_to_self_sync_service.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/identity_manager/account_info.h"
+ #include "components/sync/service/sync_service.h"
+ #include "components/sync/service/sync_user_settings.h"
+@@ -19,11 +18,7 @@ namespace {
+ 
+ bool ShouldOfferSignin(syncer::SyncService* sync_service,
+                        PrefService* pref_service) {
+-  return pref_service->GetBoolean(prefs::kSigninAllowed) &&
+-         sync_service->GetAccountInfo().IsEmpty() &&
+-         !sync_service->HasDisableReason(
+-             syncer::SyncService::DISABLE_REASON_ENTERPRISE_POLICY) &&
+-         !sync_service->IsLocalSyncEnabled();
++  return false;
+ }
+ 
+ }  // namespace

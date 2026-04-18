@@ -1,0 +1,16 @@
+diff --git a/content/browser/webauth/webauth_request_security_checker.h b/content/browser/webauth/webauth_request_security_checker.h
+index 36e474a22b..f122c9c344 100644
+--- a/content/browser/webauth/webauth_request_security_checker.h
++++ b/content/browser/webauth/webauth_request_security_checker.h
+@@ -90,9 +90,9 @@ class CONTENT_EXPORT WebAuthRequestSecurityChecker
+   // Legacy App IDs, which google.com origins are allowed to assert for
+   // compatibility reasons.
+   static constexpr char kGstaticAppId[] =
+-      "https://www.gstatic.com/securitykey/origins.json";
++      "trk:276:https://www.gstatic.com/securitykey/origins.json";
+   static constexpr char kGstaticCorpAppId[] =
+-      "https://www.gstatic.com/securitykey/a/google.com/origins.json";
++      "trk:277:https://www.gstatic.com/securitykey/a/google.com/origins.json";
+ 
+   explicit WebAuthRequestSecurityChecker(RenderFrameHost* host);
+   WebAuthRequestSecurityChecker(const WebAuthRequestSecurityChecker&) = delete;

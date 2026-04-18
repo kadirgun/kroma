@@ -1,0 +1,13 @@
+diff --git a/components/dom_distiller/content/browser/dom_distiller_viewer_source.cc b/components/dom_distiller/content/browser/dom_distiller_viewer_source.cc
+index c5d3a553ec..a7b6761493 100644
+--- a/components/dom_distiller/content/browser/dom_distiller_viewer_source.cc
++++ b/components/dom_distiller/content/browser/dom_distiller_viewer_source.cc
+@@ -295,7 +295,7 @@ bool DomDistillerViewerSource::ShouldServiceRequest(
+ std::string DomDistillerViewerSource::GetContentSecurityPolicy(
+     network::mojom::CSPDirectiveName directive) {
+   if (directive == network::mojom::CSPDirectiveName::StyleSrc) {
+-    return "style-src 'self' https://fonts.googleapis.com;";
++    return "style-src 'self';";
+   } else if (directive == network::mojom::CSPDirectiveName::ChildSrc) {
+     return "child-src *;";
+   } else if (directive ==

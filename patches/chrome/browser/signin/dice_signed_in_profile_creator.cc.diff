@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/signin/dice_signed_in_profile_creator.cc b/chrome/browser/signin/dice_signed_in_profile_creator.cc
+index db70ee4bf1..6fdd99ce76 100644
+--- a/chrome/browser/signin/dice_signed_in_profile_creator.cc
++++ b/chrome/browser/signin/dice_signed_in_profile_creator.cc
+@@ -20,7 +20,6 @@
+ #include "chrome/browser/signin/identity_manager_factory.h"
+ #include "chrome/browser/signin/signin_util.h"
+ #include "components/prefs/pref_service.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/identity_manager/accounts_mutator.h"
+ #include "components/signin/public/identity_manager/identity_manager.h"
+ #include "content/public/browser/storage_partition.h"

@@ -1,0 +1,13 @@
+diff --git a/components/security_interstitials/content/security_interstitial_controller_client.h b/components/security_interstitials/content/security_interstitial_controller_client.h
+index 8af946a3eb..f402727dfd 100644
+--- a/components/security_interstitials/content/security_interstitial_controller_client.h
++++ b/components/security_interstitials/content/security_interstitial_controller_client.h
+@@ -59,8 +59,6 @@ class SecurityInterstitialControllerClient
+   bool CanGoBackBeforeNavigation() override;
+ 
+  protected:
+-  // security_interstitials::ControllerClient overrides.
+-  const std::string GetExtendedReportingPrefName() const override;
+   content::WebContents* web_contents() { return &*web_contents_; }
+   content::RenderFrameHost* InterstitialRenderFrameHost() const;
+ 

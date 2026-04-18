@@ -1,0 +1,49 @@
+diff --git a/components/signin/core/browser/account_reconcilor.cc b/components/signin/core/browser/account_reconcilor.cc
+index 4efaf3e1d9..6aaed3a61b 100644
+--- a/components/signin/core/browser/account_reconcilor.cc
++++ b/components/signin/core/browser/account_reconcilor.cc
+@@ -31,7 +31,6 @@
+ #include "components/signin/public/base/consent_level.h"
+ #include "components/signin/public/base/signin_client.h"
+ #include "components/signin/public/base/signin_metrics.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/base/signin_switches.h"
+ #include "components/signin/public/identity_manager/accounts_cookie_mutator.h"
+ #include "components/signin/public/identity_manager/accounts_in_cookie_jar_info.h"
+@@ -96,12 +95,6 @@ bool IsAnyAccountInErrorState(
+ // consider the migration done.
+ void MaybeMigrateClearOnExit(SigninClient& client,
+                              signin::IdentityManager& identity_manager) {
+-  PrefService& prefs = *client.GetPrefs();
+-  if (!client.AreSigninCookiesDeletedOnExit() &&
+-      signin::AreGoogleCookiesRebuiltAfterClearingWhenSignedIn(identity_manager,
+-                                                               prefs)) {
+-    prefs.SetBoolean(prefs::kCookieClearOnExitMigrationNoticeComplete, true);
+-  }
+ }
+ #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
+ 
+@@ -177,10 +170,6 @@ AccountReconcilor::~AccountReconcilor() {
+ 
+ // static
+ void AccountReconcilor::RegisterProfilePrefs(PrefRegistrySimple* registry) {
+-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
+-  registry->RegisterBooleanPref(
+-      prefs::kCookieClearOnExitMigrationNoticeComplete, false);
+-#endif
+ }
+ 
+ void AccountReconcilor::RegisterWithAllDependencies() {
+@@ -288,12 +277,6 @@ void AccountReconcilor::RegisterWithIdentityManager() {
+   }
+ 
+   identity_manager_observer_.Observe(identity_manager_);
+-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
+-  pref_observer_.Add(
+-      prefs::kExplicitBrowserSignin,
+-      base::BindRepeating(&MaybeMigrateClearOnExit, std::ref(*client_),
+-                          std::ref(*identity_manager_)));
+-#endif
+   registered_with_identity_manager_ = true;
+ }
+ 

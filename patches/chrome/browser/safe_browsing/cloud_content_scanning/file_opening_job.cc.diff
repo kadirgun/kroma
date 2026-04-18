@@ -1,0 +1,15 @@
+diff --git a/chrome/browser/safe_browsing/cloud_content_scanning/file_opening_job.cc b/chrome/browser/safe_browsing/cloud_content_scanning/file_opening_job.cc
+index a3e20dce6a..c3c610a233 100644
+--- a/chrome/browser/safe_browsing/cloud_content_scanning/file_opening_job.cc
++++ b/chrome/browser/safe_browsing/cloud_content_scanning/file_opening_job.cc
+@@ -72,10 +72,6 @@ void FileOpeningJob::ProcessNextTask(base::JobDelegate* job_delegate) {
+     if (tasks_[i].taken.exchange(true, std::memory_order_relaxed))
+       continue;
+ 
+-    // Since we know we now have taken `tasks_[i]`, we can do the file opening
+-    // work safely.
+-    tasks_[i].request->OpenFile();
+-
+     // Now that the file opening work is done, `num_unopened_files_` is
+     // decremented atomically and we return to free the thread.
+     num_unopened_files_.fetch_sub(1, std::memory_order_relaxed);

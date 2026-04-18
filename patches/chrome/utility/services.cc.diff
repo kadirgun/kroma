@@ -1,0 +1,34 @@
+diff --git a/chrome/utility/services.cc b/chrome/utility/services.cc
+index 4083a712e5..a4bd44e38b 100644
+--- a/chrome/utility/services.cc
++++ b/chrome/utility/services.cc
+@@ -61,8 +61,6 @@
+ #include "services/passage_embeddings/passage_embeddings_service.h"
+ #include "services/proxy_resolver/proxy_resolver_factory_impl.h"  // nogncheck
+ #include "services/proxy_resolver/public/mojom/proxy_resolver.mojom.h"
+-#include "services/screen_ai/public/mojom/screen_ai_factory.mojom.h"  // nogncheck
+-#include "services/screen_ai/screen_ai_service_impl.h"  // nogncheck
+ #endif  // !BUILDFLAG(IS_ANDROID)
+ 
+ #if BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
+@@ -268,12 +266,6 @@ auto RunSpeechRecognitionService(
+ }
+ #endif  // !BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
+ 
+-#if !BUILDFLAG(IS_ANDROID)
+-auto RunScreenAIServiceFactory(
+-    mojo::PendingReceiver<screen_ai::mojom::ScreenAIServiceFactory> receiver) {
+-  return std::make_unique<screen_ai::ScreenAIService>(std::move(receiver));
+-}
+-#endif
+ 
+ #if BUILDFLAG(IS_CHROMEOS)
+ auto RunCupsIppParser(
+@@ -476,7 +468,6 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
+   services.Add(RunProfileImporter);
+   services.Add(RunMirroringService);
+   services.Add(RunPassageEmbeddingsService);
+-  services.Add(RunScreenAIServiceFactory);
+ #endif  // !BUILDFLAG(IS_ANDROID)
+ 
+ #if BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)

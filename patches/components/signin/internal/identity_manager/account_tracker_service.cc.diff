@@ -1,0 +1,261 @@
+diff --git a/components/signin/internal/identity_manager/account_tracker_service.cc b/components/signin/internal/identity_manager/account_tracker_service.cc
+index fc55c2240b..d63d9be163 100644
+--- a/components/signin/internal/identity_manager/account_tracker_service.cc
++++ b/components/signin/internal/identity_manager/account_tracker_service.cc
+@@ -37,7 +37,6 @@
+ #include "components/signin/internal/identity_manager/account_capabilities_constants.h"
+ #include "components/signin/internal/identity_manager/account_info_util.h"
+ #include "components/signin/public/base/signin_metrics.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/identity_manager/account_capabilities.h"
+ #include "components/signin/public/identity_manager/account_info.h"
+ #include "components/signin/public/identity_manager/tribool.h"
+@@ -194,11 +193,6 @@ AccountTrackerService::~AccountTrackerService() {
+ 
+ // static
+ void AccountTrackerService::RegisterPrefs(PrefRegistrySimple* registry) {
+-  registry->RegisterListPref(prefs::kAccountInfo);
+-#if BUILDFLAG(IS_CHROMEOS)
+-  registry->RegisterIntegerPref(prefs::kAccountIdMigrationState,
+-                                AccountTrackerService::MIGRATION_NOT_STARTED);
+-#endif
+ }
+ 
+ void AccountTrackerService::Initialize(PrefService* pref_service,
+@@ -552,14 +546,12 @@ AccountTrackerService::ComputeNewMigrationState() const {
+ void AccountTrackerService::SetMigrationState(AccountIdMigrationState state) {
+   DCHECK(state != MIGRATION_DONE || AreAllAccountsMigrated())
+       << "state: " << state << ", accounts = " << AccountsToString(accounts_);
+-  pref_service_->SetInteger(prefs::kAccountIdMigrationState, state);
+ }
+ 
+ // static
+ AccountTrackerService::AccountIdMigrationState
+ AccountTrackerService::GetMigrationState(const PrefService* pref_service) {
+-  return static_cast<AccountTrackerService::AccountIdMigrationState>(
+-      pref_service->GetInteger(prefs::kAccountIdMigrationState));
++  return MIGRATION_NOT_STARTED;
+ }
+ #endif  // BUILDFLAG(IS_CHROMEOS)
+ 
+@@ -619,27 +611,6 @@ void AccountTrackerService::OnAccountImageUpdated(
+     const CoreAccountId& account_id,
+     const std::string& image_url_with_size,
+     bool success) {
+-  if (!success || !pref_service_) {
+-    return;
+-  }
+-
+-  base::Value::Dict* dict = nullptr;
+-  ScopedListPrefUpdate update(pref_service_, prefs::kAccountInfo);
+-  for (base::Value& value : *update) {
+-    base::Value::Dict* maybe_dict = value.GetIfDict();
+-    if (maybe_dict) {
+-      const std::string* account_key = maybe_dict->FindString(kAccountKeyKey);
+-      if (account_key && *account_key == account_id.ToString()) {
+-        dict = maybe_dict;
+-        break;
+-      }
+-    }
+-  }
+-
+-  if (!dict) {
+-    return;
+-  }
+-  dict->Set(kLastDownloadedImageURLWithSizeKey, image_url_with_size);
+ }
+ 
+ void AccountTrackerService::RemoveAccountImageFromDisk(
+@@ -652,176 +623,9 @@ void AccountTrackerService::RemoveAccountImageFromDisk(
+ }
+ 
+ void AccountTrackerService::LoadFromPrefs() {
+-  const base::Value::List& list = pref_service_->GetList(prefs::kAccountInfo);
+-  std::set<CoreAccountId> to_remove;
+-  for (size_t i = 0; i < list.size(); ++i) {
+-    const base::Value::Dict* dict = list[i].GetIfDict();
+-    if (!dict) {
+-      continue;
+-    }
+-
+-    const std::string* account_key = dict->FindString(kAccountKeyKey);
+-    if (!account_key) {
+-      continue;
+-    }
+-
+-    // Ignore empty account ids.
+-    if (account_key->empty()) {
+-      to_remove.insert(CoreAccountId());
+-      continue;
+-    }
+-    // Ignore incorrectly persisted non-canonical account ids.
+-    if (account_key->find('@') != std::string::npos &&
+-        *account_key != gaia::CanonicalizeEmail(*account_key)) {
+-      to_remove.insert(CoreAccountId::FromString(*account_key));
+-      continue;
+-    }
+-
+-    CoreAccountId account_id = CoreAccountId::FromString(*account_key);
+-    StartTrackingAccount(account_id);
+-    AccountInfo& account_info = accounts_[account_id];
+-
+-    std::string gaia_id_string;
+-    GetString(*dict, kAccountGaiaKey, gaia_id_string);
+-    account_info.gaia = GaiaId(gaia_id_string);
+-
+-    GetString(*dict, kAccountEmailKey, account_info.email);
+-    GetString(*dict, kAccountHostedDomainKey, account_info.hosted_domain);
+-    GetString(*dict, kAccountFullNameKey, account_info.full_name);
+-    GetString(*dict, kAccountGivenNameKey, account_info.given_name);
+-    GetString(*dict, kAccountLocaleKey, account_info.locale);
+-    GetString(*dict, kAccountPictureURLKey, account_info.picture_url);
+-    GetString(*dict, kLastDownloadedImageURLWithSizeKey,
+-              account_info.last_downloaded_image_url_with_size);
+-
+-    account_info.is_child_account =
+-        ParseTribool(dict->FindInt(kAccountChildAttributeKey));
+-
+-    std::optional<bool> is_under_advanced_protection =
+-        dict->FindBool(kAdvancedProtectionAccountStatusKey);
+-    if (is_under_advanced_protection.has_value()) {
+-      account_info.is_under_advanced_protection =
+-          is_under_advanced_protection.value();
+-    }
+-
+-    std::optional<int> access_point = dict->FindInt(kAccountAccessPoint);
+-    if (access_point.has_value()) {
+-      account_info.access_point =
+-          static_cast<signin_metrics::AccessPoint>(access_point.value());
+-    }
+-
+-    if (std::optional<int> deprecated_can_offer_extended_chrome_sync_promos =
+-            dict->FindIntByDottedPath(
+-                kDeprecatedCanOfferExtendedChromeSyncPromosPrefPath)) {
+-      // Migrate to Capability names based pref paths.
+-      ScopedListPrefUpdate update(pref_service_, prefs::kAccountInfo);
+-      base::Value::Dict& update_dict = (*update)[i].GetDict();
+-      SetAccountCapabilityState(
+-          update_dict,
+-          kCanShowHistorySyncOptInsWithoutMinorModeRestrictionsCapabilityName,
+-          ParseTribool(deprecated_can_offer_extended_chrome_sync_promos));
+-      update_dict.RemoveByDottedPath(
+-          kDeprecatedCanOfferExtendedChromeSyncPromosPrefPath);
+-    }
+-
+-    for (std::string_view name :
+-         AccountCapabilities::GetSupportedAccountCapabilityNames()) {
+-      switch (FindAccountCapabilityState(*dict, name)) {
+-        case signin::Tribool::kUnknown:
+-          account_info.capabilities.capabilities_map_.erase(name);
+-          break;
+-        case signin::Tribool::kTrue:
+-          account_info.capabilities.capabilities_map_[std::string(name)] = true;
+-          break;
+-        case signin::Tribool::kFalse:
+-          account_info.capabilities.capabilities_map_[std::string(name)] =
+-              false;
+-          break;
+-      }
+-    }
+-
+-    if (!account_info.gaia.empty()) {
+-      NotifyAccountUpdated(account_info);
+-    }
+-  }
+-
+-  // Remove any obsolete prefs.
+-  for (auto account_id : to_remove) {
+-    AccountInfo account_info;
+-    account_info.account_id = account_id;
+-    RemoveFromPrefs(account_info);
+-    RemoveAccountImageFromDisk(account_id);
+-  }
+-
+-#if BUILDFLAG(IS_CHROMEOS)
+-  if (GetMigrationState() != MIGRATION_DONE) {
+-    const AccountIdMigrationState new_state = ComputeNewMigrationState();
+-    SetMigrationState(new_state);
+-
+-    if (new_state == MIGRATION_IN_PROGRESS) {
+-      MigrateToGaiaId();
+-    }
+-  }
+-  DCHECK(GetMigrationState() != MIGRATION_DONE || AreAllAccountsMigrated())
+-      << "state: " << (int)GetMigrationState()
+-      << ", accounts = " << AccountsToString(accounts_);
+-
+-  UMA_HISTOGRAM_ENUMERATION("Signin.AccountTracker.GaiaIdMigrationState",
+-                            GetMigrationState(), NUM_MIGRATION_STATES);
+-#else
+-  DCHECK(AreAllAccountsMigrated())
+-      << "accounts = " << AccountsToString(accounts_);
+-#endif  // BUILDFLAG(IS_CHROMEOS)
+-
+-  UMA_HISTOGRAM_COUNTS_100("Signin.AccountTracker.CountOfLoadedAccounts",
+-                           accounts_.size());
+ }
+ 
+ void AccountTrackerService::SaveToPrefs(const AccountInfo& account_info) {
+-  if (!pref_service_) {
+-    return;
+-  }
+-
+-  base::Value::Dict* dict = nullptr;
+-  ScopedListPrefUpdate update(pref_service_, prefs::kAccountInfo);
+-  for (base::Value& value : *update) {
+-    base::Value::Dict* maybe_dict = value.GetIfDict();
+-    if (maybe_dict) {
+-      const std::string* account_key = maybe_dict->FindString(kAccountKeyKey);
+-      if (account_key && *account_key == account_info.account_id.ToString()) {
+-        dict = maybe_dict;
+-        break;
+-      }
+-    }
+-  }
+-
+-  if (!dict) {
+-    update->Append(base::Value::Dict());
+-    dict = &update->back().GetDict();
+-    dict->Set(kAccountKeyKey, account_info.account_id.ToString());
+-  }
+-
+-  dict->Set(kAccountEmailKey, account_info.email);
+-  dict->Set(kAccountGaiaKey, account_info.gaia.ToString());
+-  dict->Set(kAccountHostedDomainKey, account_info.hosted_domain);
+-  dict->Set(kAccountFullNameKey, account_info.full_name);
+-  dict->Set(kAccountGivenNameKey, account_info.given_name);
+-  dict->Set(kAccountLocaleKey, account_info.locale);
+-  dict->Set(kAccountPictureURLKey, account_info.picture_url);
+-  dict->Set(kAccountChildAttributeKey,
+-            static_cast<int>(account_info.is_child_account));
+-  dict->Set(kAdvancedProtectionAccountStatusKey,
+-            account_info.is_under_advanced_protection);
+-  dict->Set(kAccountAccessPoint, static_cast<int>(account_info.access_point));
+-  // |kLastDownloadedImageURLWithSizeKey| should only be set after the GAIA
+-  // picture is successufly saved to disk. Otherwise, there is no guarantee that
+-  // |kLastDownloadedImageURLWithSizeKey| matches the picture on disk.
+-  for (std::string_view name :
+-       AccountCapabilities::GetSupportedAccountCapabilityNames()) {
+-    signin::Tribool capability_state =
+-        account_info.capabilities.GetCapabilityByName(name);
+-    SetAccountCapabilityState(*dict, name, capability_state);
+-  }
+ }
+ 
+ void AccountTrackerService::RemoveFromPrefs(const AccountInfo& account_info) {
+@@ -829,15 +633,7 @@ void AccountTrackerService::RemoveFromPrefs(const AccountInfo& account_info) {
+     return;
+   }
+ 
+-  ScopedListPrefUpdate update(pref_service_, prefs::kAccountInfo);
+   const std::string account_id = account_info.account_id.ToString();
+-  update->EraseIf([&account_id](const base::Value& value) {
+-    if (!value.is_dict()) {
+-      return false;
+-    }
+-    const std::string* account_key = value.GetDict().FindString(kAccountKeyKey);
+-    return account_key && *account_key == account_id;
+-  });
+ }
+ 
+ CoreAccountId AccountTrackerService::PickAccountIdForAccount(

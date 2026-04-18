@@ -1,0 +1,36 @@
+diff --git a/components/autofill/core/browser/studies/autofill_experiments.cc b/components/autofill/core/browser/studies/autofill_experiments.cc
+index b9ed2ac2c5..0076edd172 100644
+--- a/components/autofill/core/browser/studies/autofill_experiments.cc
++++ b/components/autofill/core/browser/studies/autofill_experiments.cc
+@@ -35,7 +35,6 @@
+ #include "components/prefs/pref_service.h"
+ #include "components/prefs/scoped_user_pref_update.h"
+ #include "components/signin/public/base/signin_buildflags.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/strings/grit/components_strings.h"
+ #include "components/sync/base/features.h"
+ #include "components/sync/base/user_selectable_type.h"
+@@ -175,12 +174,6 @@ bool IsCreditCardUploadEnabled(
+   // TODO(crbug.com/40066949): Simplify once IsSyncFeatureActive() is deleted
+   // from the codebase.
+   bool addresses_in_transport_mode = true;
+-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
+-  // Dice users don't have addresses in transport mode until they went through
+-  // the explicit signin flow.
+-  addresses_in_transport_mode =
+-      pref_service.GetBoolean(::prefs::kExplicitBrowserSignin);
+-#endif
+   bool syncing_or_addresses_in_transport_mode =
+       sync_service->IsSyncFeatureActive() || addresses_in_transport_mode;
+   if (syncing_or_addresses_in_transport_mode &&
+@@ -294,10 +287,6 @@ bool IsUserOptedInWalletSyncTransport(const PrefService* prefs,
+   // On mobile, no specific opt-in is required.
+   return true;
+ #else
+-  if (prefs->GetBoolean(::prefs::kExplicitBrowserSignin)) {
+-    // Explicit browser signin makes the explicit opt-in unnecessary.
+-    return true;
+-  }
+ 
+   // Get the hash of the account id.
+   std::string account_hash =

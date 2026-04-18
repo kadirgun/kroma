@@ -1,0 +1,125 @@
+diff --git a/chrome/browser/signin/signin_util.cc b/chrome/browser/signin/signin_util.cc
+index 36734d94d7..e543695a6d 100644
+--- a/chrome/browser/signin/signin_util.cc
++++ b/chrome/browser/signin/signin_util.cc
+@@ -34,7 +34,6 @@
+ #include "components/policy/core/browser/signin/profile_separation_policies.h"
+ #include "components/prefs/pref_service.h"
+ #include "components/signin/core/browser/account_reconcilor.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/base/signin_switches.h"
+ #include "components/signin/public/identity_manager/account_managed_status_finder.h"
+ #include "components/signin/public/identity_manager/accounts_mutator.h"
+@@ -79,8 +78,7 @@ ScopedForceSigninSetterForTesting::~ScopedForceSigninSetterForTesting() {
+ CookiesMover::CookiesMover(base::WeakPtr<Profile> source_profile,
+                            base::WeakPtr<Profile> destination_profile,
+                            base::OnceCallback<void()> callback)
+-    : url_(source_profile->GetPrefs()->GetString(
+-          prefs::kSigninInterceptionIDPCookiesUrl)),
++    : url_(std::string()),
+       source_profile_(std::move(source_profile)),
+       destination_profile_(std::move(destination_profile)),
+       callback_(std::move(callback)) {
+@@ -90,25 +88,7 @@ CookiesMover::CookiesMover(base::WeakPtr<Profile> source_profile,
+ CookiesMover::~CookiesMover() = default;
+ 
+ void CookiesMover::StartMovingCookies() {
+-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+-  bool allow_cookies_to_be_moved = base::FeatureList::IsEnabled(
+-      profile_management::features::kThirdPartyProfileManagement);
+-#else
+-  bool allow_cookies_to_be_moved = false;
+-#endif
+-  if (!allow_cookies_to_be_moved || url_.is_empty() || !url_.is_valid()) {
+     std::move(callback_).Run();
+-    return;
+-  }
+-
+-  source_profile_->GetPrefs()->ClearPref(
+-      prefs::kSigninInterceptionIDPCookiesUrl);
+-  source_profile_->GetDefaultStoragePartition()
+-      ->GetCookieManagerForBrowserProcess()
+-      ->GetCookieList(url_, net::CookieOptions::MakeAllInclusive(),
+-                      net::CookiePartitionKeyCollection::Todo(),
+-                      base::BindOnce(&CookiesMover::OnCookiesReceived,
+-                                     weak_pointer_factory_.GetWeakPtr()));
+ }
+ 
+ void CookiesMover::OnCookiesReceived(
+@@ -248,16 +228,7 @@ bool ProfileSeparationAllowsKeepingUnmanagedBrowsingDataInManagedProfile(
+ bool IsAccountExemptedFromEnterpriseProfileSeparation(
+     Profile* profile,
+     const std::string& email) {
+-  if (profile->GetPrefs()
+-          ->FindPreference(prefs::kProfileSeparationDomainExceptionList)
+-          ->IsDefaultValue()) {
+     return true;
+-  }
+-
+-  const std::string domain = gaia::ExtractDomainName(email);
+-  const auto& allowed_domains = profile->GetPrefs()->GetList(
+-      prefs::kProfileSeparationDomainExceptionList);
+-  return base::Contains(allowed_domains, base::Value(domain));
+ }
+ #endif  // !BUILDFLAG(IS_CHROMEOS)
+ 
+@@ -410,59 +381,7 @@ bool ShouldShowHistorySyncOptinScreen(Profile& profile) {
+ }
+ 
+ bool ShouldShowAvatarSyncPromo(Profile* profile) {
+-  CHECK(switches::IsAvatarSyncPromoFeatureEnabled());
+-
+-  // Do not show the promo for users that are not signed in. (E.g. Signed out,
+-  // Signin Pending or already syncing).
+-  if (GetSignedInState(IdentityManagerFactory::GetForProfile(profile)) !=
+-      signin_util::SignedInState::kSignedIn) {
+-    return false;
+-  }
+-
+-  // SyncService should be usable.
+-  syncer::SyncService* sync_service =
+-      SyncServiceFactory::GetForProfile(profile);
+-  if (!sync_service) {
+     return false;
+-  }
+-  if (sync_service->HasDisableReason(
+-          syncer::SyncService::DISABLE_REASON_ENTERPRISE_POLICY)) {
+-    return false;
+-  }
+-
+-  signin::IdentityManager* identity_manager =
+-      IdentityManagerFactory::GetForProfile(profile);
+-  CHECK(identity_manager->AreRefreshTokensLoaded());
+-  AccountInfo account_info = identity_manager->FindExtendedAccountInfo(
+-      identity_manager->GetPrimaryAccountInfo(signin::ConsentLevel::kSignin));
+-  // Do not show the promo for non signed in accounts, or managed accounts.
+-  if (account_info.IsEmpty() ||
+-      account_info.IsManaged() != signin::Tribool::kFalse) {
+-    return false;
+-  }
+-
+-  // Do not show the promo if there was a previously syncing account that does
+-  // not match the currently signed in one.
+-  PrefService* pref_service = profile->GetPrefs();
+-  GaiaId previously_syncing_gaia_id =
+-      GaiaId(pref_service->GetString(prefs::kGoogleServicesLastSyncingGaiaId));
+-  if (IsCrossAccountError(profile, account_info.gaia)) {
+-    return false;
+-  }
+-
+-  // For non-dice users, do not show the promo for users that have been signed
+-  // for a short period of time.
+-  if (pref_service->GetBoolean(prefs::kExplicitBrowserSignin)) {
+-    const base::Time last_changed = base::Time::FromSecondsSinceUnixEpoch(
+-        pref_service->GetDouble(prefs::kGaiaCookieChangedTime));
+-    if (last_changed.is_null() ||
+-        (base::Time::Now() - last_changed <
+-         switches::GetAvatarSyncPromoFeatureMinimumCookeAgeParam())) {
+-      return false;
+-    }
+-  }
+-
+-  return true;
+ }
+ #endif  // BUILDFLAG(IS_LINUX) ||  BUILDFLAG(IS_MAC) ||  BUILDFLAG(IS_WIN)
+ 

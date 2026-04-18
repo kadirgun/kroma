@@ -1,0 +1,70 @@
+diff --git a/chrome/browser/ui/toasts/toast_service.cc b/chrome/browser/ui/toasts/toast_service.cc
+index 4ccbe86e83..a9cfbcd273 100644
+--- a/chrome/browser/ui/toasts/toast_service.cc
++++ b/chrome/browser/ui/toasts/toast_service.cc
+@@ -35,7 +35,6 @@
+ #include "components/plus_addresses/core/common/features.h"
+ #include "components/plus_addresses/grit/plus_addresses_strings.h"
+ #include "components/safe_browsing/core/common/features.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ #include "components/strings/grit/components_strings.h"
+ #include "components/tabs/public/tab_interface.h"
+ #include "components/vector_icons/vector_icons.h"
+@@ -145,57 +144,6 @@ void ToastService::RegisterToasts(
+             .Build());
+   }
+ 
+-  // ESB as a synced setting.
+-  if (base::FeatureList::IsEnabled(safe_browsing::kEsbAsASyncedSetting)) {
+-    toast_registry_->RegisterToast(
+-        ToastId::kSyncEsbOn,
+-        ToastSpecification::Builder(
+-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
+-            vector_icons::kGshieldIcon,
+-#else
+-            kSecurityIcon,
+-#endif
+-            IDS_SETTINGS_SAFEBROWSING_ENHANCED_ON_TOAST_MESSAGE)
+-            .AddActionButton(
+-                IDS_SETTINGS_SETTINGS,
+-                base::BindRepeating(
+-                    [](BrowserWindowInterface* window) {
+-                      window->OpenGURL(
+-                          chrome::GetSettingsUrl(
+-                              chrome::kSafeBrowsingEnhancedProtectionSubPage),
+-                          WindowOpenDisposition::NEW_FOREGROUND_TAB);
+-                    },
+-                    base::Unretained(browser_window_interface)))
+-            .AddCloseButton()
+-            .Build());
+-    toast_registry_->RegisterToast(
+-        ToastId::kSyncEsbOnWithoutActionButton,
+-        ToastSpecification::Builder(
+-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
+-            vector_icons::kGshieldIcon,
+-#else
+-            kSecurityIcon,
+-#endif
+-            IDS_SETTINGS_SAFEBROWSING_ENHANCED_ON_TOAST_MESSAGE)
+-            .Build());
+-    toast_registry_->RegisterToast(
+-        ToastId::kSyncEsbOff,
+-        ToastSpecification::Builder(
+-            kInfoIcon, IDS_SETTINGS_SAFEBROWSING_ENHANCED_OFF_TOAST_MESSAGE)
+-            .AddActionButton(
+-                IDS_SETTINGS_SAFEBROWSING_TURN_ON_ENHANCED_TOAST_BUTTON,
+-                base::BindRepeating(
+-                    [](BrowserWindowInterface* window) {
+-                      Profile* profile = window->GetProfile();
+-                      if (profile) {
+-                        profile->GetPrefs()->SetBoolean(
+-                            prefs::kSafeBrowsingEnhanced, true);
+-                      }
+-                    },
+-                    base::Unretained(browser_window_interface)))
+-            .AddCloseButton()
+-            .Build());
+-  }
+ 
+   if (data_sharing::features::IsDataSharingFunctionalityEnabled()) {
+     // Current tab has been removed from the group.

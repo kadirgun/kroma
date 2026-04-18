@@ -1,0 +1,17 @@
+diff --git a/content/browser/web_contents/web_contents_impl.cc b/content/browser/web_contents/web_contents_impl.cc
+index c1cd8903a1..9a2a8d2ea9 100644
+--- a/content/browser/web_contents/web_contents_impl.cc
++++ b/content/browser/web_contents/web_contents_impl.cc
+@@ -4192,12 +4192,6 @@ void WebContentsImpl::Init(const WebContents::CreateParams& params,
+   DateTimeChooser::CreateDateTimeChooser(this);
+ #endif
+ 
+-  // AttributionHost must be created after `view_->CreateView()` is called as it
+-  // may invoke `WebContentsAndroid::AddObserver()`.
+-  if (base::FeatureList::IsEnabled(
+-          attribution_reporting::features::kConversionMeasurement)) {
+-    AttributionHost::CreateForWebContents(this);
+-  }
+ 
+   RedirectChainDetector::CreateForWebContents(this);
+   BtmWebContentsObserver::MaybeCreateForWebContents(this);

@@ -1,0 +1,23 @@
+diff --git a/net/cert/ev_root_ca_metadata.cc b/net/cert/ev_root_ca_metadata.cc
+index 25be2e5ff9..bd4baebef0 100644
+--- a/net/cert/ev_root_ca_metadata.cc
++++ b/net/cert/ev_root_ca_metadata.cc
+@@ -36,7 +36,17 @@ struct EVMetadata {
+   const std::string_view policy_oids[kMaxOIDsPerCA];
+ };
+ 
+-#include "net/data/ssl/chrome_root_store/chrome-ev-roots-inc.cc"
++static const EVMetadata kEvRootCaMetadata[] = {
++    // need some dummy thing to make compiler happy, because
++    // arraysize() is implemented as a convoluted template rather than
++    // the traditional sizeof(x)/sizeof(*x)
++    { { { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++          0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff } },
++      {
++        "0",
++      }
++    }
++};
+ 
+ #endif  // defined(PLATFORM_USES_CHROMIUM_EV_METADATA)
+ }  // namespace

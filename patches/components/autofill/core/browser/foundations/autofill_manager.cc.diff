@@ -1,0 +1,31 @@
+diff --git a/components/autofill/core/browser/foundations/autofill_manager.cc b/components/autofill/core/browser/foundations/autofill_manager.cc
+index 170ac9fab6..66327107ca 100644
+--- a/components/autofill/core/browser/foundations/autofill_manager.cc
++++ b/components/autofill/core/browser/foundations/autofill_manager.cc
+@@ -909,26 +909,6 @@ void AutofillManager::LogCurrentFieldTypes(const FormStructure& form) {
+ void AutofillManager::SubscribeToMlModelChanges(
+     FieldClassificationModelHandler& handler,
+     optimization_guide::proto::OptimizationTarget optimization_target) {
+-  switch (optimization_target) {
+-    case optimization_guide::proto::OptimizationTarget::
+-        OPTIMIZATION_TARGET_AUTOFILL_FIELD_CLASSIFICATION:
+-      if (!autofill_model_change_subscription_) {
+-        autofill_model_change_subscription_ =
+-            handler.RegisterModelChangeCallback(base::BindRepeating(
+-                &AutofillManager::ReparseKnownForms, base::Unretained(this)));
+-      }
+-      break;
+-    case optimization_guide::proto::OptimizationTarget::
+-        OPTIMIZATION_TARGET_PASSWORD_MANAGER_FORM_CLASSIFICATION:
+-      if (!password_manager_model_change_subscription_) {
+-        password_manager_model_change_subscription_ =
+-            handler.RegisterModelChangeCallback(base::BindRepeating(
+-                &AutofillManager::ReparseKnownForms, base::Unretained(this)));
+-      }
+-      break;
+-    default:
+-      NOTREACHED();
+-  }
+ }
+ 
+ }  // namespace autofill

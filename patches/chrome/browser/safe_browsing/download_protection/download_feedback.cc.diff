@@ -1,0 +1,13 @@
+diff --git a/chrome/browser/safe_browsing/download_protection/download_feedback.cc b/chrome/browser/safe_browsing/download_protection/download_feedback.cc
+index 03b62388a2..6f2bb7474a 100644
+--- a/chrome/browser/safe_browsing/download_protection/download_feedback.cc
++++ b/chrome/browser/safe_browsing/download_protection/download_feedback.cc
+@@ -178,7 +178,7 @@ const int64_t DownloadFeedback::kMaxUploadSize = 50 * 1024 * 1024;
+ 
+ // static
+ const char DownloadFeedback::kSbFeedbackURL[] =
+-    "https://safebrowsing.google.com/safebrowsing/uploads/chrome";
++    "trk:164:https://safebrowsing.google.com/safebrowsing/uploads/chrome";
+ 
+ // static
+ DownloadFeedbackFactory* DownloadFeedback::factory_ = nullptr;

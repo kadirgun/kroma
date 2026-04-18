@@ -1,0 +1,23 @@
+diff --git a/components/device_signals/core/browser/signals_types.h b/components/device_signals/core/browser/signals_types.h
+index 7bf1dc3d93..d826294489 100644
+--- a/components/device_signals/core/browser/signals_types.h
++++ b/components/device_signals/core/browser/signals_types.h
+@@ -13,7 +13,6 @@
+ #include "build/build_config.h"
+ #include "components/device_signals/core/common/common_types.h"
+ #include "components/enterprise/connectors/core/reporting_constants.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ 
+ #if BUILDFLAG(IS_WIN)
+ #include "components/device_signals/core/common/win/win_types.h"
+@@ -256,10 +255,7 @@ struct ProfileSignalsResponse : BaseSignalResponse {
+ 
+   bool built_in_dns_client_enabled;
+   bool chrome_remote_desktop_app_blocked;
+-  std::optional<safe_browsing::PasswordProtectionTrigger>
+-      password_protection_warning_trigger = std::nullopt;
+   std::optional<std::string> profile_enrollment_domain = std::nullopt;
+-  safe_browsing::SafeBrowsingState safe_browsing_protection_level;
+   bool site_isolation_enabled;
+   std::optional<std::string> profile_id = std::nullopt;
+ 

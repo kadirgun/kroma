@@ -1,0 +1,16 @@
+diff --git a/chrome/browser/page_load_metrics/observers/serp_page_load_metrics_observer.cc b/chrome/browser/page_load_metrics/observers/serp_page_load_metrics_observer.cc
+index 2157cbee1d..0106296da2 100644
+--- a/chrome/browser/page_load_metrics/observers/serp_page_load_metrics_observer.cc
++++ b/chrome/browser/page_load_metrics/observers/serp_page_load_metrics_observer.cc
+@@ -80,11 +80,6 @@ void SerpPageLoadMetricsObserver::OnFirstContentfulPaintInPage(
+     return;
+   }
+ 
+-  safe_browsing::ExtensionTelemetryService* telemetry_service =
+-      safe_browsing::ExtensionTelemetryServiceFactory::GetForProfile(profile);
+-  if (telemetry_service) {
+-    telemetry_service->OnDseSerpLoaded();
+-  }
+ }
+ 
+ page_load_metrics::PageLoadMetricsObserver::ObservePolicy

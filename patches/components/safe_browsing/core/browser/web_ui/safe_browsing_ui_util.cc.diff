@@ -1,0 +1,25 @@
+diff --git a/components/safe_browsing/core/browser/web_ui/safe_browsing_ui_util.cc b/components/safe_browsing/core/browser/web_ui/safe_browsing_ui_util.cc
+index 69f409c22a..bb41470e9a 100644
+--- a/components/safe_browsing/core/browser/web_ui/safe_browsing_ui_util.cc
++++ b/components/safe_browsing/core/browser/web_ui/safe_browsing_ui_util.cc
+@@ -300,20 +300,7 @@ std::string SerializeHitReport(const HitReport& hit_report) {
+   }
+   hit_report_dict.Set("threat_source", std::move(threat_source));
+   std::string extended_reporting_level;
+-  switch (hit_report.extended_reporting_level) {
+-    case ExtendedReportingLevel::SBER_LEVEL_OFF:
+       extended_reporting_level = "SBER_LEVEL_OFF";
+-      break;
+-    case ExtendedReportingLevel::SBER_LEVEL_LEGACY:
+-      extended_reporting_level = "SBER_LEVEL_LEGACY";
+-      break;
+-    case ExtendedReportingLevel::SBER_LEVEL_SCOUT:
+-      extended_reporting_level = "SBER_LEVEL_SCOUT";
+-      break;
+-    case ExtendedReportingLevel::SBER_LEVEL_ENHANCED_PROTECTION:
+-      extended_reporting_level = "SBER_LEVEL_ENHANCED_PROTECTION";
+-      break;
+-  }
+   hit_report_dict.Set("extended_reporting_level",
+                       std::move(extended_reporting_level));
+   hit_report_dict.Set("is_enhanced_protection",

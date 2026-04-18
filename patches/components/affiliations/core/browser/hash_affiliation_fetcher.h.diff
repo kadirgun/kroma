@@ -1,0 +1,13 @@
+diff --git a/components/affiliations/core/browser/hash_affiliation_fetcher.h b/components/affiliations/core/browser/hash_affiliation_fetcher.h
+index 21cf3631af..7dd52cee3f 100644
+--- a/components/affiliations/core/browser/hash_affiliation_fetcher.h
++++ b/components/affiliations/core/browser/hash_affiliation_fetcher.h
+@@ -40,6 +40,8 @@ class HashAffiliationFetcher : public AffiliationFetcherInterface {
+       const std::vector<FacetURI>& facet_uris,
+       RequestInfo request_info,
+       base::OnceCallback<void(FetchResult)> result_callback) override;
++  void DeadStartRequest(const std::vector<FacetURI>& a, RequestInfo b,
++      base::OnceCallback<void(FetchResult)> c);
+   const std::vector<FacetURI>& GetRequestedFacetURIs() const override;
+ 
+   // Builds the URL for the Affiliation API's lookup method.

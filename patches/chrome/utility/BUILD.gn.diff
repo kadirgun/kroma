@@ -1,0 +1,12 @@
+diff --git a/chrome/utility/BUILD.gn b/chrome/utility/BUILD.gn
+index 88b6b588f5..f0f97dad45 100644
+--- a/chrome/utility/BUILD.gn
++++ b/chrome/utility/BUILD.gn
+@@ -145,7 +145,6 @@ static_library("utility") {
+       "//components/user_data_importer/content",
+       "//components/user_data_importer/utility:bookmarks",
+       "//services/proxy_resolver:lib",
+-      "//services/screen_ai",
+     ]
+   }
+ 

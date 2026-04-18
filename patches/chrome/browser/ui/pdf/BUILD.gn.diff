@@ -1,0 +1,20 @@
+diff --git a/chrome/browser/ui/pdf/BUILD.gn b/chrome/browser/ui/pdf/BUILD.gn
+index 57796b9f06..82ba550577 100644
+--- a/chrome/browser/ui/pdf/BUILD.gn
++++ b/chrome/browser/ui/pdf/BUILD.gn
+@@ -6,7 +6,6 @@ import("//pdf/features.gni")
+ import("//services/screen_ai/buildflags/features.gni")
+ 
+ assert(enable_pdf)
+-assert(enable_screen_ai_service)
+ 
+ source_set("pdf") {
+   sources = [
+@@ -16,7 +15,6 @@ source_set("pdf") {
+   deps = [
+     "//chrome/browser/download",
+     "//chrome/browser/pdf",
+-    "//chrome/browser/screen_ai:screen_ai_install_state",
+     "//chrome/browser/ui/tab_contents",
+     "//chrome/browser/ui/user_education",
+     "//chrome/common",

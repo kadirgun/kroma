@@ -1,0 +1,47 @@
+diff --git a/chrome/browser/extensions/api/settings_private/prefs_util.cc b/chrome/browser/extensions/api/settings_private/prefs_util.cc
+index ab19b6cb94..75f3b883bd 100644
+--- a/chrome/browser/extensions/api/settings_private/prefs_util.cc
++++ b/chrome/browser/extensions/api/settings_private/prefs_util.cc
+@@ -59,10 +59,8 @@
+ #include "components/privacy_sandbox/privacy_sandbox_prefs.h"
+ #include "components/privacy_sandbox/tracking_protection_prefs.h"
+ #include "components/proxy_config/proxy_config_pref_names.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ #include "components/saved_tab_groups/public/pref_names.h"
+ #include "components/search_engines/default_search_manager.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/spellcheck/browser/pref_names.h"
+ #include "components/supervised_user/core/common/pref_names.h"
+ #include "components/themes/pref_names.h"
+@@ -343,8 +341,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
+       settings_api::PrefType::kNumber;
+ 
+   // Privacy page
+-  (*s_allowlist)[::prefs::kSigninAllowedOnNextStartup] =
+-      settings_api::PrefType::kBoolean;
+   (*s_allowlist)[::prefs::kDnsOverHttpsMode] = settings_api::PrefType::kString;
+   (*s_allowlist)[::prefs::kDnsOverHttpsTemplates] =
+       settings_api::PrefType::kString;
+@@ -367,22 +363,10 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
+       settings_api::PrefType::kBoolean;
+ 
+   // Security page
+-  (*s_allowlist)[::kGeneratedPasswordLeakDetectionPref] =
+-      settings_api::PrefType::kBoolean;
+-  (*s_allowlist)[::prefs::kSafeBrowsingEnabled] =
+-      settings_api::PrefType::kBoolean;
+-  (*s_allowlist)[::prefs::kSafeBrowsingEnhanced] =
+-      settings_api::PrefType::kBoolean;
+-  (*s_allowlist)[::prefs::kSafeBrowsingScoutReportingEnabled] =
+-      settings_api::PrefType::kBoolean;
+-  (*s_allowlist)[::safe_browsing::kGeneratedSafeBrowsingPref] =
+-      settings_api::PrefType::kNumber;
+   (*s_allowlist)[::prefs::kHttpsOnlyModeEnabled] =
+       settings_api::PrefType::kBoolean;
+   (*s_allowlist)[::kGeneratedHttpsFirstModePref] =
+       settings_api::PrefType::kNumber;
+-  (*s_allowlist)[::prefs::kSecuritySettingsBundle] =
+-      settings_api::PrefType::kNumber;
+   (*s_allowlist)[::safe_browsing::kGeneratedSecuritySettingsBundlePref] =
+       settings_api::PrefType::kNumber;
+ 

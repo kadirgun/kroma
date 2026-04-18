@@ -1,0 +1,146 @@
+diff --git a/content/browser/file_system_access/file_system_access_safe_move_helper.cc b/content/browser/file_system_access/file_system_access_safe_move_helper.cc
+index 4b5f086171..a9f346ef5f 100644
+--- a/content/browser/file_system_access/file_system_access_safe_move_helper.cc
++++ b/content/browser/file_system_access/file_system_access_safe_move_helper.cc
+@@ -14,7 +14,6 @@
+ #include "base/task/thread_pool.h"
+ #include "base/thread_annotations.h"
+ #include "build/build_config.h"
+-#include "components/services/quarantine/quarantine.h"
+ #include "content/browser/file_system_access/features.h"
+ #include "content/browser/file_system_access/file_system_access_error.h"
+ #include "content/public/browser/content_browser_client.h"
+@@ -169,15 +168,8 @@ void FileSystemAccessSafeMoveHelper::Start(
+     return;
+   }
+ 
+-  if (!RequireAfterWriteChecks() || !manager_->permission_context()) {
+     DidAfterWriteCheck(
+         FileSystemAccessPermissionContext::AfterWriteCheckResult::kAllow);
+-    return;
+-  }
+-
+-  ComputeHashForSourceFile(
+-      base::BindOnce(&FileSystemAccessSafeMoveHelper::DoAfterWriteCheck,
+-                     weak_factory_.GetWeakPtr()));
+ }
+ 
+ void FileSystemAccessSafeMoveHelper::ComputeHashForSourceFile(
+@@ -216,45 +208,6 @@ bool FileSystemAccessSafeMoveHelper::RequireQuarantine() const {
+   return dest_url().type() != storage::kFileSystemTypeTemporary;
+ }
+ 
+-void FileSystemAccessSafeMoveHelper::DoAfterWriteCheck(
+-    base::File::Error hash_result,
+-    const std::string& hash,
+-    int64_t size) {
+-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+-
+-  if (hash_result != base::File::FILE_OK) {
+-    // Calculating the hash failed.
+-    std::move(callback_).Run(file_system_access_error::FromStatus(
+-        blink::mojom::FileSystemAccessStatus::kOperationAborted,
+-        "Failed to perform Safe Browsing check."));
+-    return;
+-  }
+-
+-  if (!manager_) {
+-    std::move(callback_).Run(file_system_access_error::FromStatus(
+-        blink::mojom::FileSystemAccessStatus::kOperationAborted));
+-    return;
+-  }
+-
+-  content::GlobalRenderFrameHostId outermost_main_frame_id;
+-  auto* rfh = content::RenderFrameHost::FromID(context_.frame_id);
+-  if (rfh)
+-    outermost_main_frame_id = rfh->GetOutermostMainFrame()->GetGlobalId();
+-
+-  auto item = std::make_unique<FileSystemAccessWriteItem>();
+-  item->target_file_path = dest_url().path();
+-  item->full_path = source_url().path();
+-  item->sha256_hash = hash;
+-  item->size = size;
+-  item->frame_url = context_.url;
+-  item->outermost_main_frame_id = outermost_main_frame_id;
+-  item->has_user_gesture = has_transient_user_activation_;
+-  manager_->permission_context()->PerformAfterWriteChecks(
+-      std::move(item), context_.frame_id,
+-      base::BindOnce(&FileSystemAccessSafeMoveHelper::DidAfterWriteCheck,
+-                     weak_factory_.GetWeakPtr()));
+-}
+-
+ void FileSystemAccessSafeMoveHelper::DidAfterWriteCheck(
+     FileSystemAccessPermissionContext::AfterWriteCheckResult result) {
+   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+@@ -277,22 +230,9 @@ void FileSystemAccessSafeMoveHelper::DidAfterWriteCheck(
+   // not exist anymore. In case of error, the source file URL will point to a
+   // valid filesystem location.
+   base::OnceCallback<void(base::File::Error)> result_callback;
+-  if (RequireQuarantine()) {
+-    GURL referrer_url = manager_->is_off_the_record() ? GURL() : context_.url;
+-    mojo::Remote<quarantine::mojom::Quarantine> quarantine_remote;
+-    if (quarantine_connection_callback_) {
+-      quarantine_connection_callback_.Run(
+-          quarantine_remote.BindNewPipeAndPassReceiver());
+-    }
+-    result_callback =
+-        base::BindOnce(&FileSystemAccessSafeMoveHelper::DidFileDoQuarantine,
+-                       weak_factory_.GetWeakPtr(), dest_url(), referrer_url,
+-                       std::move(quarantine_remote));
+-  } else {
+     result_callback =
+         base::BindOnce(&FileSystemAccessSafeMoveHelper::DidFileSkipQuarantine,
+                        weak_factory_.GetWeakPtr());
+-  }
+   manager_->DoFileSystemOperation(
+       FROM_HERE, &storage::FileSystemOperationRunner::Move,
+       std::move(result_callback), source_url(), dest_url(), options_,
+@@ -309,7 +249,6 @@ void FileSystemAccessSafeMoveHelper::DidFileSkipQuarantine(
+ void FileSystemAccessSafeMoveHelper::DidFileDoQuarantine(
+     const storage::FileSystemURL& target_url,
+     const GURL& referrer_url,
+-    mojo::Remote<quarantine::mojom::Quarantine> quarantine_remote,
+     base::File::Error result) {
+   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+ 
+@@ -340,40 +279,9 @@ void FileSystemAccessSafeMoveHelper::DidFileDoQuarantine(
+       referrer_url.is_valid() && referrer_url.SchemeIsHTTPOrHTTPS()
+           ? referrer_url
+           : GURL();
+-
+-  if (quarantine_remote) {
+-    quarantine::mojom::Quarantine* raw_quarantine = quarantine_remote.get();
+-    raw_quarantine->QuarantineFile(
+-        target_url.path(), authority_url, referrer_url,
+-        // TODO(crbug.com/351165321): Consider propagating request_initiator
+-        // information here.
+-        /*request_initiator=*/std::nullopt,
+-        GetContentClient()
+-            ->browser()
+-            ->GetApplicationClientGUIDForQuarantineCheck(),
+-        mojo::WrapCallbackWithDefaultInvokeIfNotRun(
+-            base::BindOnce(&FileSystemAccessSafeMoveHelper::DidAnnotateFile,
+-                           weak_factory_.GetWeakPtr(),
+-                           std::move(quarantine_remote)),
+-            quarantine::mojom::QuarantineFileResult::ANNOTATION_FAILED));
+-  } else {
+-#if BUILDFLAG(IS_WIN)
+-    base::ThreadPool::PostTaskAndReplyWithResult(
+-        FROM_HERE, {base::MayBlock()},
+-        base::BindOnce(&quarantine::SetInternetZoneIdentifierDirectly,
+-                       target_url.path(), authority_url, referrer_url),
+-        base::BindOnce(&FileSystemAccessSafeMoveHelper::DidAnnotateFile,
+-                       weak_factory_.GetWeakPtr(),
+-                       std::move(quarantine_remote)));
+-#else
+-    DidAnnotateFile(std::move(quarantine_remote),
+-                    quarantine::mojom::QuarantineFileResult::ANNOTATION_FAILED);
+-#endif
+-  }
+ }
+ 
+ void FileSystemAccessSafeMoveHelper::DidAnnotateFile(
+-    mojo::Remote<quarantine::mojom::Quarantine> quarantine_remote,
+     quarantine::mojom::QuarantineFileResult result) {
+   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+ 

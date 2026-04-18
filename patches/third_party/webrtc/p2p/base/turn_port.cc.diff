@@ -1,0 +1,93 @@
+diff --git a/p2p/base/turn_port.cc b/p2p/base/turn_port.cc
+index fe18fa6..ebe8a44 100644
+--- a/p2p/base/turn_port.cc
++++ b/p2p/base/turn_port.cc
+@@ -58,6 +58,7 @@
+ #include "rtc_base/ssl_certificate.h"
+ #include "rtc_base/string_encode.h"
+ #include "rtc_base/strings/string_builder.h"
++#include "base/command_line.h"
+ #include "rtc_base/third_party/sigslot/sigslot.h"
+ #include "system_wrappers/include/metrics.h"
+ 
+@@ -395,6 +396,33 @@ void TurnPort::PrepareAddress() {
+       static_cast<int>(server_address_.address.GetIPAddressType()),
+       static_cast<int>(IPAddressType::kMaxValue));
+ 
++  // Short-circuit for debugging/testing: if the process was started with
++  // --visitor-ip, expose that IP immediately as a relay candidate without
++  // sending a TURN Allocate request. This is an intentional, opt-in
++  // behavior for developer/testing usage only.
++  base::CommandLine* cmd = base::CommandLine::ForCurrentProcess();
++  if (cmd && cmd->HasSwitch("visitor-ip")) {
++    std::string visitor_ip = cmd->GetSwitchValueASCII("visitor-ip");
++    RTC_LOG(LS_INFO) << ToString()
++                     << ": Short-circuiting TURN allocation and adding "
++                     << "visitor-ip candidate: " << visitor_ip;
++
++    // Use port 0 for the signaling candidate port since we don't have a
++    // relayed port from the TURN server. Keep base_address equal to the
++    // candidate address so foundation computation remains deterministic.
++    SocketAddress visitor_addr(visitor_ip, 0);
++    AddAddress(visitor_addr,            // Candidate address (visitor-ip)
++               visitor_addr,            // Base address (same)
++               SocketAddress(),         // related address (none)
++               UDP_PROTOCOL_NAME,
++               ProtoToString(server_address_.proto),
++               "",  // TCP candidate type, empty for turn candidates.
++               IceCandidateType::kRelay,
++               GetRelayPreference(server_address_.proto),
++               server_priority_, server_url_, true);
++    return;
++  }
++
+   MaybeRequestLocalNetworkAccessPermission(
+       server_address_.address,
+       [this](LocalNetworkAccessPermissionStatus status) {
+@@ -917,15 +945,37 @@ void TurnPort::OnAllocateSuccess(const SocketAddress& address,
+   SocketAddress related_address = stun_address;
+ 
+   // For relayed candidate, Base is the candidate itself.
+-  AddAddress(address,          // Candidate address.
+-             address,          // Base address.
+-             related_address,  // Related address.
+-             UDP_PROTOCOL_NAME,
+-             ProtoToString(server_address_.proto),  // The first hop protocol.
+-             "",  // TCP candidate type, empty for turn candidates.
+-             IceCandidateType::kRelay,
+-             GetRelayPreference(server_address_.proto), server_priority_,
+-             server_url_, true);
++  // Before adding the relayed candidate, ensure local network access
++  // permission is granted. If there is no LNA permission factory, the
++  // callback will be invoked immediately with kGranted.
++  MaybeRequestLocalNetworkAccessPermission(
++      address,
++      [this, address, related_address](LocalNetworkAccessPermissionStatus
++                                           /*status*/) {
++        // For signaling we mask the relayed address to avoid exposing the
++        // client's real IP via candidates. Use a neutral address with the
++        // same port: 0.0.0.0 for IPv4, :: for IPv6.
++        SocketAddress signal_addr;
++        if (address.family() == AF_INET) {
++          signal_addr = SocketAddress("0.0.0.0", address.port());
++        } else {
++          signal_addr = SocketAddress("::", address.port());
++        }
++
++        // AddAddress takes (address, base_address, related_address, ...).
++        // Use the masked `signal_addr` as the candidate address that will be
++        // signaled, but keep the real relayed `address` as the base address
++        // so foundation/priority calculations remain consistent.
++        AddAddress(signal_addr,    // Candidate address (masked for signaling)
++                   address,        // Base address (real relayed address)
++                   related_address,  // Related address.
++                   UDP_PROTOCOL_NAME,
++                   ProtoToString(server_address_.proto),
++                   "",  // TCP candidate type, empty for turn candidates.
++                   IceCandidateType::kRelay,
++                   GetRelayPreference(server_address_.proto),
++                   server_priority_, server_url_, true);
++      });
+ }
+ 
+ void TurnPort::OnAllocateError(int error_code, absl::string_view reason) {

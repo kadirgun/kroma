@@ -1,0 +1,30 @@
+diff --git a/components/safe_browsing/core/browser/realtime/url_lookup_service_base.cc b/components/safe_browsing/core/browser/realtime/url_lookup_service_base.cc
+index 717029483a..764933a7fb 100644
+--- a/components/safe_browsing/core/browser/realtime/url_lookup_service_base.cc
++++ b/components/safe_browsing/core/browser/realtime/url_lookup_service_base.cc
+@@ -22,7 +22,6 @@
+ #include "components/safe_browsing/core/browser/referrer_chain_provider.h"
+ #include "components/safe_browsing/core/browser/verdict_cache_manager.h"
+ #include "components/safe_browsing/core/common/features.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ #include "components/safe_browsing/core/common/safebrowsing_constants.h"
+ #include "components/safe_browsing/core/common/utils.h"
+ #include "net/base/ip_address.h"
+@@ -645,17 +644,6 @@ void RealTimeUrlLookupServiceBase::StartFillingRequestProto(
+   request->set_report_type(is_sampled_report ? RTLookupRequest::SAMPLED_REPORT
+                                              : RTLookupRequest::FULL_REPORT);
+   request->set_frame_type(RTLookupRequest::MAIN_FRAME);
+-  if (referring_app_info && pref_service_ &&
+-      IsEnhancedProtectionEnabled(*pref_service_)) {
+-    safe_browsing::ReferringAppInfo referring_app_info_proto;
+-    referring_app_info_proto.set_referring_app_name(
+-        referring_app_info.value().referring_app_name);
+-    referring_app_info_proto.set_referring_app_source(
+-        referring_app_info.value().referring_app_source);
+-    *request->mutable_referring_app_info() =
+-        std::move(referring_app_info_proto);
+-    MaybeFillReferringWebApk(*referring_app_info, *request);
+-  }
+ 
+   std::string browser_dm_token = GetBrowserDMTokenString();
+   if (!browser_dm_token.empty()) {

@@ -1,0 +1,24 @@
+diff --git a/chrome/browser/enterprise/connectors/reporting/telomere_reporting_context.cc b/chrome/browser/enterprise/connectors/reporting/telomere_reporting_context.cc
+index fdc8e7eb1f..5f8a60ebc6 100644
+--- a/chrome/browser/enterprise/connectors/reporting/telomere_reporting_context.cc
++++ b/chrome/browser/enterprise/connectors/reporting/telomere_reporting_context.cc
+@@ -177,19 +177,6 @@ TelomereReportingContext* TelomereReportingContext::GetInstance() {
+ }
+ 
+ RealtimeReportingClient* TelomereReportingContext::GetReportingClient() const {
+-  for (auto& it : active_profiles_) {
+-    Profile* profile = it.second;
+-    RealtimeReportingClient* reporting_client =
+-        RealtimeReportingClientFactory::GetForProfile(profile);
+-    if (!reporting_client) {
+-      continue;
+-    }
+-    std::optional<ReportingSettings> settings =
+-        reporting_client->GetReportingSettings();
+-    if (settings.has_value() && !settings->per_profile) {
+-      return reporting_client;
+-    }
+-  }
+   return nullptr;
+ }
+ 

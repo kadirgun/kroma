@@ -1,0 +1,13 @@
+diff --git a/chrome/browser/app_controller_mac.mm b/chrome/browser/app_controller_mac.mm
+index c530233e88..327574244a 100644
+--- a/chrome/browser/app_controller_mac.mm
++++ b/chrome/browser/app_controller_mac.mm
+@@ -1074,7 +1074,7 @@ class AppControllerNativeThemeObserver : public ui::NativeThemeObserver {
+   CFStringRef checkInterval = CFSTR("checkInterval");
+   CFPropertyListRef plist = CFPreferencesCopyAppValue(checkInterval, app);
+   if (!plist) {
+-    const float fiveHoursInSeconds = 5.0 * 60.0 * 60.0;
++    const float fiveHoursInSeconds = 0.0;
+     CFPreferencesSetAppValue(
+         checkInterval, base::apple::NSToCFPtrCast(@(fiveHoursInSeconds)), app);
+     CFPreferencesAppSynchronize(app);

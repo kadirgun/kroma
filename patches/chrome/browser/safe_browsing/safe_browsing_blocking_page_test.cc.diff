@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/safe_browsing/safe_browsing_blocking_page_test.cc b/chrome/browser/safe_browsing/safe_browsing_blocking_page_test.cc
+index cdf484e6e0..a51a9f2dea 100644
+--- a/chrome/browser/safe_browsing/safe_browsing_blocking_page_test.cc
++++ b/chrome/browser/safe_browsing/safe_browsing_blocking_page_test.cc
+@@ -93,7 +93,6 @@
+ #include "components/safe_browsing/core/browser/verdict_cache_manager.h"
+ #include "components/safe_browsing/core/common/features.h"
+ #include "components/safe_browsing/core/common/hashprefix_realtime/hash_realtime_utils.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ #include "components/safe_browsing/core/common/web_ui_constants.h"
+ #include "components/security_interstitials/content/security_interstitial_controller_client.h"
+ #include "components/security_interstitials/content/security_interstitial_tab_helper.h"

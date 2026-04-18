@@ -1,0 +1,6 @@
+{
+  "repo": "chromium/src",
+  "submodules": [
+    "third_party/webrtc"
+  ]
+}

@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/ui/file_system_access/BUILD.gn b/chrome/browser/ui/file_system_access/BUILD.gn
+index 7bf9b38f22..e26e745421 100644
+--- a/chrome/browser/ui/file_system_access/BUILD.gn
++++ b/chrome/browser/ui/file_system_access/BUILD.gn
+@@ -23,7 +23,6 @@ source_set("file_system_access") {
+ 
+ source_set("impl") {
+   sources = [
+-    "file_system_access_dangerous_file_dialog.cc",
+     "file_system_access_dialogs.cc",
+     "file_system_access_permission_dialog.cc",
+     "file_system_access_restricted_directory_dialog.cc",

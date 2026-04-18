@@ -1,0 +1,79 @@
+diff --git a/chrome/browser/ui/hats/trust_safety_sentiment_service.cc b/chrome/browser/ui/hats/trust_safety_sentiment_service.cc
+index e90576176b..eef0ad3227 100644
+--- a/chrome/browser/ui/hats/trust_safety_sentiment_service.cc
++++ b/chrome/browser/ui/hats/trust_safety_sentiment_service.cc
+@@ -31,8 +31,6 @@
+ #include "components/privacy_sandbox/privacy_sandbox_prefs.h"
+ #include "components/privacy_sandbox/tracking_protection_prefs.h"
+ #include "components/safe_browsing/core/browser/db/v4_protocol_manager_util.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/unified_consent/pref_names.h"
+ #include "components/version_info/channel.h"
+ 
+@@ -78,9 +76,6 @@ bool HasNonDefaultPrivacySetting(Profile* profile) {
+   auto* prefs = profile->GetPrefs();
+ 
+   std::vector<std::string> prefs_to_check = {
+-      prefs::kSafeBrowsingEnabled,
+-      prefs::kSafeBrowsingEnhanced,
+-      prefs::kSafeBrowsingScoutReportingEnabled,
+       prefs::kEnableDoNotTrack,
+       password_manager::prefs::kPasswordLeakDetectionEnabled,
+       prefs::kCookieControlsMode,
+@@ -98,13 +93,9 @@ bool HasNonDefaultPrivacySetting(Profile* profile) {
+   // Users consenting to sync automatically enable UKM collection
+   auto* ukm_pref = prefs->FindPreference(
+       unified_consent::prefs::kUrlKeyedAnonymizedDataCollectionEnabled);
+-  auto* sync_consent_pref =
+-      prefs->FindPreference(prefs::kGoogleServicesConsentedToSync);
+ 
+   bool has_non_default_ukm =
+-      ukm_pref->GetValue()->GetBool() !=
+-          sync_consent_pref->GetValue()->GetBool() &&
+-      (ukm_pref->IsUserControlled() || sync_consent_pref->IsUserControlled());
++      ukm_pref->GetValue()->GetBool() != false && ukm_pref->IsUserControlled();
+ 
+   // Check the default value for each user facing content setting. Note that
+   // this will not include content setting exceptions set via permission
+@@ -177,8 +168,6 @@ std::map<std::string, bool> BuildProductSpecificDataForPasswordProtection(
+     PasswordProtectionUIType ui_type,
+     PasswordProtectionUIAction action) {
+   std::map<std::string, bool> product_specific_data;
+-  product_specific_data["Enhanced protection enabled"] =
+-      safe_browsing::IsEnhancedProtectionEnabled(*profile->GetPrefs());
+   product_specific_data["Is page info UI"] = false;
+   product_specific_data["Is modal dialog UI"] = false;
+   product_specific_data["Is interstitial UI"] = false;
+@@ -440,31 +429,12 @@ void TrustSafetySentimentService::FinishedPrivacyGuide() {
+ void TrustSafetySentimentService::InteractedWithSafeBrowsingInterstitial(
+     bool did_proceed,
+     safe_browsing::SBThreatType threat_type) {
+-  std::map<std::string, bool> product_specific_data;
+-  product_specific_data["User proceeded past interstitial"] = did_proceed;
+-  product_specific_data["Enhanced protection enabled"] =
+-      safe_browsing::IsEnhancedProtectionEnabled(*profile_->GetPrefs());
+-  product_specific_data["Threat is phishing"] =
+-      threat_type == safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_PHISHING ||
+-      threat_type ==
+-          safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_CLIENT_SIDE_PHISHING;
+-  product_specific_data["Threat is malware"] =
+-      threat_type == safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_MALWARE;
+-  product_specific_data["Threat is unwanted software"] =
+-      threat_type == safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_UNWANTED;
+-  product_specific_data["Threat is billing"] =
+-      threat_type == safe_browsing::SBThreatType::SB_THREAT_TYPE_BILLING;
+-  DCHECK(!IsOtherSBInterstitialCategory(threat_type));
+-  TriggerOccurred(FeatureArea::kSafeBrowsingInterstitial,
+-                  product_specific_data);
+ }
+ 
+ void TrustSafetySentimentService::InteractedWithDownloadWarningUI(
+     DownloadItemWarningData::WarningSurface surface,
+     DownloadItemWarningData::WarningAction action) {
+   std::map<std::string, bool> product_specific_data;
+-  product_specific_data["Enhanced protection enabled"] =
+-      safe_browsing::IsEnhancedProtectionEnabled(*profile_->GetPrefs());
+   product_specific_data["Is mainpage UI"] = false;
+   product_specific_data["Is downloads page UI"] = false;
+   product_specific_data["Is download prompt UI"] = false;

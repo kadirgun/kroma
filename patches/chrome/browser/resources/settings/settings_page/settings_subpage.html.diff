@@ -1,0 +1,13 @@
+diff --git a/chrome/browser/resources/settings/settings_page/settings_subpage.html b/chrome/browser/resources/settings/settings_page/settings_subpage.html
+index 5a9a295369..4bad372d0e 100644
+--- a/chrome/browser/resources/settings/settings_page/settings_subpage.html
++++ b/chrome/browser/resources/settings/settings_page/settings_subpage.html
+@@ -94,7 +94,7 @@
+       </template>
+       <h1 class="cr-title-text">[[pageTitle]]</h1>
+       <slot name="subpage-title-extra"></slot>
+-      <template is="dom-if" if="[[learnMoreUrl]]">
++      <template is="dom-if" if="[[false]]">
+         <cr-icon-button iron-icon="cr:help-outline" suppress-rtl-flip
+             aria-label="[[getLearnMoreAriaLabel_(pageTitle)]]"
+             aria-description="$i18n{opensInNewTab}" on-click="onHelpClick_">

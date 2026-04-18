@@ -1,0 +1,18 @@
+diff --git a/third_party/crashpad/crashpad/doc/support/crashpad_doxygen.css b/third_party/crashpad/crashpad/doc/support/crashpad_doxygen.css
+index 13ce3854ca..5cbb9f22dc 100644
+--- a/third_party/crashpad/crashpad/doc/support/crashpad_doxygen.css
++++ b/third_party/crashpad/crashpad/doc/support/crashpad_doxygen.css
+@@ -12,11 +12,11 @@
+  * See the License for the specific language governing permissions and
+  * limitations under the License. */
+ 
+-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+-@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
++@import "chrome://resources/css/roboto.css";
+ 
+ :root {
+   --font-family-normal: 'Noto Sans',
++    'Roboto',
+     'Lucida Grande',
+     'Lucida Sans Unicode',
+     Helvetica,

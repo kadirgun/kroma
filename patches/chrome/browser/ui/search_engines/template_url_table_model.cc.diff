@@ -1,0 +1,72 @@
+diff --git a/chrome/browser/ui/search_engines/template_url_table_model.cc b/chrome/browser/ui/search_engines/template_url_table_model.cc
+index 14b8ba881f..00c1e3c56c 100644
+--- a/chrome/browser/ui/search_engines/template_url_table_model.cc
++++ b/chrome/browser/ui/search_engines/template_url_table_model.cc
+@@ -117,22 +117,10 @@ void TemplateURLTableModel::Reload() {
+       extension_entries;
+   // Keywords that can be made the default first.
+   for (TemplateURL* template_url : urls) {
+-    // Skip @gemini if feature disabled.
+-    if (template_url->starter_pack_id() ==
+-            template_url_starter_pack_data::kGemini &&
+-        !OmniboxFieldTrial::IsStarterPackExpansionEnabled()) {
+-      continue;
+-    }
+-    // Skip @page if feature disabled.
+-    if (template_url->starter_pack_id() ==
+-            template_url_starter_pack_data::kPage &&
+-        !omnibox_feature_configs::ContextualSearch::Get().starter_pack_page) {
+-      continue;
+-    }
+-    // Skip @aimode if feature disabled.
+-    if (template_url->starter_pack_id() ==
+-            template_url_starter_pack_data::kAiMode &&
+-        !ai_mode_enabled_) {
++    // Disable all Google AI starter pack options
++    if (template_url->starter_pack_id() == template_url_starter_pack_data::kGemini ||
++        template_url->starter_pack_id() == template_url_starter_pack_data::kAiMode ||
++        template_url->starter_pack_id() == template_url_starter_pack_data::kPage) {
+       continue;
+     }
+ 
+@@ -211,21 +199,25 @@ void TemplateURLTableModel::Remove(size_t index) {
+ void TemplateURLTableModel::Add(size_t index,
+                                 const std::u16string& short_name,
+                                 const std::u16string& keyword,
+-                                const std::string& url) {
++                                const std::string& url,
++                                const std::string& suggestions_url) {
+   DCHECK(index <= RowCount());
+   DCHECK(!url.empty());
+   TemplateURLData data;
+   data.SetShortName(short_name);
+   data.SetKeyword(keyword);
+   data.SetURL(url);
++  data.suggestions_url = suggestions_url;
+   data.is_active = TemplateURLData::ActiveStatus::kTrue;
+   template_url_service_->Add(std::make_unique<TemplateURL>(data));
+ }
+ 
+-void TemplateURLTableModel::ModifyTemplateURL(size_t index,
+-                                              const std::u16string& title,
+-                                              const std::u16string& keyword,
+-                                              const std::string& url) {
++void TemplateURLTableModel::ModifyTemplateURL(
++    size_t index,
++    const std::u16string& title,
++    const std::u16string& keyword,
++    const std::string& url,
++    const std::string& suggestions_url) {
+   DCHECK(index <= RowCount());
+   DCHECK(!url.empty());
+   TemplateURL* template_url = GetTemplateURL(index);
+@@ -234,7 +226,8 @@ void TemplateURLTableModel::ModifyTemplateURL(size_t index,
+   DCHECK(template_url_service_->GetDefaultSearchProvider() != template_url ||
+          template_url->SupportsReplacement(
+              template_url_service_->search_terms_data()));
+-  template_url_service_->ResetTemplateURL(template_url, title, keyword, url);
++  template_url_service_->ResetTemplateURL(template_url, title, keyword, url,
++                                          suggestions_url);
+ }
+ 
+ TemplateURL* TemplateURLTableModel::GetTemplateURL(size_t index) {

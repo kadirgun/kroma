@@ -1,0 +1,12 @@
+diff --git a/components/safe_browsing/content/browser/triggers/trigger_manager.cc b/components/safe_browsing/content/browser/triggers/trigger_manager.cc
+index dc0ae76bc0..067afff49a 100644
+--- a/components/safe_browsing/content/browser/triggers/trigger_manager.cc
++++ b/components/safe_browsing/content/browser/triggers/trigger_manager.cc
+@@ -14,7 +14,6 @@
+ #include "components/safe_browsing/content/browser/threat_details.h"
+ #include "components/safe_browsing/content/browser/web_contents_key.h"
+ #include "components/safe_browsing/core/common/features.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ #include "components/security_interstitials/core/unsafe_resource.h"
+ #include "content/public/browser/browser_context.h"
+ #include "content/public/browser/browser_thread.h"

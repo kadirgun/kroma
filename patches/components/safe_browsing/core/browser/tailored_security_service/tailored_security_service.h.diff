@@ -1,0 +1,22 @@
+diff --git a/components/safe_browsing/core/browser/tailored_security_service/tailored_security_service.h b/components/safe_browsing/core/browser/tailored_security_service/tailored_security_service.h
+index ad5032ae91..2dc3d0af75 100644
+--- a/components/safe_browsing/core/browser/tailored_security_service/tailored_security_service.h
++++ b/components/safe_browsing/core/browser/tailored_security_service/tailored_security_service.h
+@@ -23,7 +23,6 @@
+ #include "base/values.h"
+ #include "components/keyed_service/core/keyed_service.h"
+ #include "components/prefs/pref_change_registrar.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ #include "net/traffic_annotation/network_traffic_annotation.h"
+ #include "url/gurl.h"
+ 
+@@ -181,9 +180,6 @@ class TailoredSecurityService : public KeyedService {
+                            RetryLogicTimestampUpdateCallbackRecordsStartTime);
+   friend class TailoredSecurityTabHelperTest;
+ 
+-  // Saves the supplied `TailoredSecurityRetryState` to preferences.
+-  void SaveRetryState(TailoredSecurityRetryState state);
+-
+   // Stores pointer to `IdentityManager` instance. It must outlive the
+   // `TailoredSecurityService` and can be null during tests.
+   raw_ptr<signin::IdentityManager> identity_manager_;

@@ -1,0 +1,17 @@
+diff --git a/chrome/browser/extensions/chrome_content_browser_client_extensions_part.cc b/chrome/browser/extensions/chrome_content_browser_client_extensions_part.cc
+index 604df6f9dc..7d5978d357 100644
+--- a/chrome/browser/extensions/chrome_content_browser_client_extensions_part.cc
++++ b/chrome/browser/extensions/chrome_content_browser_client_extensions_part.cc
+@@ -677,12 +677,6 @@ std::vector<url::Origin> ChromeContentBrowserClientExtensionsPart::
+     GetOriginsRequiringDedicatedProcess() {
+   std::vector<url::Origin> list;
+ 
+-  // Require a dedicated process for the webstore origin.  See
+-  // https://crbug.com/939108.
+-  list.push_back(url::Origin::Create(extension_urls::GetWebstoreLaunchURL()));
+-  list.push_back(
+-      url::Origin::Create(extension_urls::GetNewWebstoreLaunchURL()));
+-
+   return list;
+ }
+ 

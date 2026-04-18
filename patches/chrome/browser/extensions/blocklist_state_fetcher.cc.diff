@@ -1,0 +1,27 @@
+diff --git a/chrome/browser/extensions/blocklist_state_fetcher.cc b/chrome/browser/extensions/blocklist_state_fetcher.cc
+index 5ed639f4bc..a32510e794 100644
+--- a/chrome/browser/extensions/blocklist_state_fetcher.cc
++++ b/chrome/browser/extensions/blocklist_state_fetcher.cc
+@@ -75,8 +75,7 @@ void BlocklistStateFetcher::SendRequest(const std::string& id) {
+   std::string request_str;
+   request.SerializeToString(&request_str);
+ 
+-  GURL request_url = GURL(safe_browsing::GetReportUrl(
+-      *safe_browsing_config_, "clientreport/crx-list-info"));
++  GURL request_url = GURL();
+   net::NetworkTrafficAnnotationTag traffic_annotation =
+       net::DefineNetworkTrafficAnnotation("extension_blacklist", R"(
+         semantics {
+@@ -131,12 +130,6 @@ void BlocklistStateFetcher::SendRequest(const std::string& id) {
+                      base::Unretained(this), fetcher));
+ }
+ 
+-void BlocklistStateFetcher::SetSafeBrowsingConfig(
+-    const safe_browsing::V4ProtocolConfig& config) {
+-  safe_browsing_config_ =
+-      std::make_unique<safe_browsing::V4ProtocolConfig>(config);
+-}
+-
+ void BlocklistStateFetcher::OnURLLoaderComplete(
+     network::SimpleURLLoader* url_loader,
+     std::unique_ptr<std::string> response_body) {

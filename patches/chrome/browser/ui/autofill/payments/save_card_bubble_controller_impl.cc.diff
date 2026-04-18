@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/ui/autofill/payments/save_card_bubble_controller_impl.cc b/chrome/browser/ui/autofill/payments/save_card_bubble_controller_impl.cc
+index da2a6e92ed..2c26f5cb37 100644
+--- a/chrome/browser/ui/autofill/payments/save_card_bubble_controller_impl.cc
++++ b/chrome/browser/ui/autofill/payments/save_card_bubble_controller_impl.cc
+@@ -47,7 +47,6 @@
+ #include "components/autofill/core/common/autofill_features.h"
+ #include "components/autofill/core/common/autofill_payments_features.h"
+ #include "components/signin/public/base/signin_buildflags.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/identity_manager/identity_manager.h"
+ #include "components/strings/grit/components_strings.h"
+ #include "components/sync/service/sync_service.h"

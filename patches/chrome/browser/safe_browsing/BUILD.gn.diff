@@ -1,0 +1,59 @@
+diff --git a/chrome/browser/safe_browsing/BUILD.gn b/chrome/browser/safe_browsing/BUILD.gn
+index 03725f2370..1aed1b1b8c 100644
+--- a/chrome/browser/safe_browsing/BUILD.gn
++++ b/chrome/browser/safe_browsing/BUILD.gn
+@@ -7,6 +7,8 @@ import("//components/safe_browsing/buildflags.gni")
+ import("//extensions/buildflags/buildflags.gni")
+ 
+ static_library("safe_browsing") {
++  sources = [ "safe_browsing_dummy.cc" ]
++  if (false) {
+   sources = [
+     "chrome_controller_client.cc",
+     "chrome_controller_client.h",
+@@ -80,11 +82,9 @@ static_library("safe_browsing") {
+     "//services/metrics/public/cpp:ukm_builders",
+     "//services/preferences/public/cpp",
+   ]
+-
+-  if (enable_extensions) {
+-    deps += [ "//chrome/browser/ui/web_applications" ]
+   }
+ 
++
+   # Note: is_android is not equivalent to safe_browsing_mode == 2.
+   # Sources and dependencies added to this block must not depend on anything
+   # requiring safe_browsing_mode != 0.
+@@ -103,15 +103,8 @@ static_library("safe_browsing") {
+     allow_circular_includes_from += [ "//chrome/browser/ash/file_manager" ]
+   }
+ 
+-  if (is_win || is_mac || is_linux || is_chromeos) {
+-    deps += [
+-      "//chrome/browser/ui/browser_window",
+-      "//chrome/browser/ui/toasts",
+-      "//chrome/browser/ui/toasts/api:toasts",
+-    ]
+-  }
+ 
+-  if (safe_browsing_mode != 0) {
++  if (false) {
+     # "Safe Browsing Basic" files used for safe browsing in full mode
+     # (safe_browsing=1) and mobile (=2)
+     sources += [
+@@ -612,6 +605,7 @@ static_library("advanced_protection") {
+ }
+ 
+ source_set("metrics_collector") {
++  if (false) {
+   sources = [
+     "safe_browsing_metrics_collector_factory.cc",
+     "safe_browsing_metrics_collector_factory.h",
+@@ -631,6 +625,7 @@ source_set("metrics_collector") {
+     "//components/safe_browsing/core/common:safe_browsing_prefs",
+     "//content/public/browser",
+   ]
++  }
+ }
+ 
+ source_set("unit_tests") {

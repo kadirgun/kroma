@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/ui/webui/BUILD.gn b/chrome/browser/ui/webui/BUILD.gn
+index 1cda7d0cd6..7d3bae91f2 100644
+--- a/chrome/browser/ui/webui/BUILD.gn
++++ b/chrome/browser/ui/webui/BUILD.gn
+@@ -59,7 +59,6 @@ source_set("configs") {
+       "//chrome/browser/ui/webui/access_code_cast",
+       "//chrome/browser/ui/webui/actor_internals",
+       "//chrome/browser/ui/webui/app_service_internals",
+-      "//chrome/browser/ui/webui/autofill_ml_internals",
+       "//chrome/browser/ui/webui/color_pipeline_internals",
+       "//chrome/browser/ui/webui/infobar_internals",
+       "//chrome/browser/ui/webui/new_tab_footer",

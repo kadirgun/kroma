@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/extensions/api/identity/identity_apitest.cc b/chrome/browser/extensions/api/identity/identity_apitest.cc
+index d10565af7c..128151d174 100644
+--- a/chrome/browser/extensions/api/identity/identity_apitest.cc
++++ b/chrome/browser/extensions/api/identity/identity_apitest.cc
+@@ -74,7 +74,6 @@
+ #include "components/signin/public/base/consent_level.h"
+ #include "components/signin/public/base/list_accounts_test_utils.h"
+ #include "components/signin/public/base/signin_metrics.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/base/signin_switches.h"
+ #include "components/signin/public/identity_manager/accounts_mutator.h"
+ #include "components/signin/public/identity_manager/identity_manager.h"

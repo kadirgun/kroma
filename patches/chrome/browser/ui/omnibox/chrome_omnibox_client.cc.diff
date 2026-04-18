@@ -1,0 +1,17 @@
+diff --git a/chrome/browser/ui/omnibox/chrome_omnibox_client.cc b/chrome/browser/ui/omnibox/chrome_omnibox_client.cc
+index e99e89cce2..6593167a1d 100644
+--- a/chrome/browser/ui/omnibox/chrome_omnibox_client.cc
++++ b/chrome/browser/ui/omnibox/chrome_omnibox_client.cc
+@@ -795,12 +795,6 @@ void ChromeOmniboxClient::OnAutocompleteAccept(
+   extensions::MaybeShowExtensionControlledSearchNotification(
+       location_bar_->GetWebContents(), match_type);
+ 
+-  if (AutocompleteMatch::IsSearchType(match_type)) {
+-    if (auto* telemetry_service =
+-            safe_browsing::ExtensionTelemetryService::Get(profile_)) {
+-      telemetry_service->OnOmniboxSearch(match);
+-    }
+-  }
+ #endif
+ }
+ 

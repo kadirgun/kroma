@@ -1,0 +1,41 @@
+diff --git a/components/safe_browsing/core/browser/db/v4_local_database_manager.cc b/components/safe_browsing/core/browser/db/v4_local_database_manager.cc
+index b30bc99b8a..e719dd132f 100644
+--- a/components/safe_browsing/core/browser/db/v4_local_database_manager.cc
++++ b/components/safe_browsing/core/browser/db/v4_local_database_manager.cc
+@@ -298,10 +298,9 @@ const V4LocalDatabaseManager*
+ scoped_refptr<V4LocalDatabaseManager> V4LocalDatabaseManager::Create(
+     const base::FilePath& base_path,
+     scoped_refptr<base::SequencedTaskRunner> ui_task_runner,
+-    scoped_refptr<base::SequencedTaskRunner> io_task_runner,
+-    ExtendedReportingLevelCallback extended_reporting_level_callback) {
++    scoped_refptr<base::SequencedTaskRunner> io_task_runner) {
+   return base::WrapRefCounted(new V4LocalDatabaseManager(
+-      base_path, extended_reporting_level_callback, std::move(ui_task_runner),
++      base_path, std::move(ui_task_runner),
+       std::move(io_task_runner), nullptr));
+ }
+ 
+@@ -324,13 +323,11 @@ void V4LocalDatabaseManager::CollectDatabaseManagerInfo(
+ 
+ V4LocalDatabaseManager::V4LocalDatabaseManager(
+     const base::FilePath& base_path,
+-    ExtendedReportingLevelCallback extended_reporting_level_callback,
+     scoped_refptr<base::SequencedTaskRunner> ui_task_runner,
+     scoped_refptr<base::SequencedTaskRunner> io_task_runner,
+     scoped_refptr<base::SequencedTaskRunner> task_runner_for_tests)
+     : SafeBrowsingDatabaseManager(std::move(ui_task_runner)),
+       base_path_(base_path),
+-      extended_reporting_level_callback_(extended_reporting_level_callback),
+       list_infos_(GetListInfos()),
+       task_runner_(task_runner_for_tests
+                        ? task_runner_for_tests
+@@ -1190,8 +1187,7 @@ void V4LocalDatabaseManager::SetupUpdateProtocolManager(
+                           weak_factory_.GetWeakPtr());
+ 
+   v4_update_protocol_manager_ = std::make_unique<V4UpdateProtocolManager>(
+-      url_loader_factory, config, update_callback,
+-      extended_reporting_level_callback_);
++      url_loader_factory, config, update_callback);
+ }
+ 
+ void V4LocalDatabaseManager::UpdateRequestCompleted(

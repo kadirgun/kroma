@@ -1,0 +1,88 @@
+diff --git a/content/browser/attribution_reporting/attribution_suitable_context.cc b/content/browser/attribution_reporting/attribution_suitable_context.cc
+index 12f0902326..6bb03ce5f5 100644
+--- a/content/browser/attribution_reporting/attribution_suitable_context.cc
++++ b/content/browser/attribution_reporting/attribution_suitable_context.cc
+@@ -44,82 +44,13 @@ bool UkmSourceIdAllowed(RenderFrameHostImpl* rfh) {
+ // static
+ std::optional<AttributionSuitableContext> AttributionSuitableContext::Create(
+     NavigationHandle* navigation_handle) {
+-  RenderFrameHostImpl* rfh = static_cast<RenderFrameHostImpl*>(
+-      navigation_handle->GetRenderFrameHost());
+-  std::optional<AttributionSuitableContext> context = Create(rfh);
+-  // Override the UKM source ID from the associated ongoing navigation handle as
+-  // `AttributionHost::GetPageUkmSourceId()` is not updated until the navigation
+-  // finishes.
+-  if (context && UkmSourceIdAllowed(rfh)) {
+-    context->ukm_source_id_ = navigation_handle->GetNextPageUkmSourceId();
+-  }
+-  return context;
++  return std::nullopt;
+ }
+ 
+ // static
+ std::optional<AttributionSuitableContext> AttributionSuitableContext::Create(
+     RenderFrameHostImpl* initiator_frame) {
+-  if (!initiator_frame) {
+     return std::nullopt;
+-  }
+-
+-  if (!base::FeatureList::IsEnabled(
+-          attribution_reporting::features::kConversionMeasurement)) {
+-    return std::nullopt;
+-  }
+-
+-  if (!initiator_frame->IsFeatureEnabled(
+-          network::mojom::PermissionsPolicyFeature::kAttributionReporting)) {
+-    return std::nullopt;
+-  }
+-  RenderFrameHostImpl* initiator_root_frame =
+-      initiator_frame->GetOutermostMainFrame();
+-  CHECK(initiator_root_frame);
+-
+-  // We need a suitable origin here because we need to be able to eventually
+-  // store it as either the source or destination origin. Using
+-  // `is_web_secure_context` only would allow opaque origins to pass through,
+-  // but they cannot be handled by the storage layer.
+-  std::optional<attribution_reporting::SuitableOrigin>
+-      initiator_root_frame_origin = SuitableOrigin::Create(
+-          initiator_root_frame->GetLastCommittedOrigin());
+-  if (!initiator_root_frame_origin.has_value()) {
+-    return std::nullopt;
+-  }
+-  // If the `initiator_frame` is a subframe, it's origin's security isn't
+-  // covered by the SuitableOrigin check above, we therefore validate that it's
+-  // origin is secure using `is_web_secure_context`.
+-  if (initiator_frame != initiator_root_frame &&
+-      !initiator_frame->policy_container_host()
+-           ->policies()
+-           .is_web_secure_context) {
+-    return std::nullopt;
+-  }
+-
+-  auto* web_contents = WebContents::FromRenderFrameHost(initiator_frame);
+-  if (!web_contents) {
+-    return std::nullopt;
+-  }
+-  auto* manager = AttributionManager::FromWebContents(web_contents);
+-  CHECK(manager);
+-
+-  auto* attribution_host = AttributionHost::FromWebContents(web_contents);
+-  CHECK(attribution_host);
+-
+-  AttributionDataHostManager* data_host_manager = manager->GetDataHostManager();
+-  CHECK(data_host_manager);
+-
+-  return AttributionSuitableContext(
+-      /*context_origin=*/std::move(initiator_root_frame_origin.value()),
+-      initiator_frame->IsNestedWithinFencedFrame(),
+-      initiator_root_frame->GetGlobalId(), initiator_frame->navigation_id(),
+-      attribution_host->GetMostRecentNavigationInputEvent(),
+-      AttributionOsLevelManager::GetAttributionReportingOsRegistrars(
+-          web_contents),
+-      UkmSourceIdAllowed(initiator_root_frame)
+-          ? attribution_host->GetPageUkmSourceId()
+-          : ukm::kInvalidSourceId,
+-      data_host_manager->AsWeakPtr());
+ }
+ 
+ // static

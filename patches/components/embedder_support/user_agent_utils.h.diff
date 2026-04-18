@@ -1,0 +1,21 @@
+diff --git a/components/embedder_support/user_agent_utils.h b/components/embedder_support/user_agent_utils.h
+index 1c15de21af..5357ac9719 100644
+--- a/components/embedder_support/user_agent_utils.h
++++ b/components/embedder_support/user_agent_utils.h
+@@ -41,6 +41,16 @@ std::string GetProductAndVersion(
+ // when it is valid, or std::nullopt if it is not valid.
+ std::optional<std::string> GetUserAgentFromCommandLine();
+ 
++// Returns a user agent version string passed via the kUserAgentVersion 
++// command-line argument if it is valid. Returns nullopt otherwise.
++std::optional<std::string> GetUserAgentVersionFromCommandLine();
++
++// Returns version number, respecting command line override if present.
++std::string GetVersionNumber();
++
++// Returns major version number, respecting command line override if present.  
++std::string GetMajorVersionNumber();
++
+ // Returns the full or "reduced" user agent string, depending on the following:
+ // 1) UserAgentReduction enterprise policy.
+ // 2) Reduce User-Agent reduction phase features.

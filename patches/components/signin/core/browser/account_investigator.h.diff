@@ -1,0 +1,13 @@
+diff --git a/components/signin/core/browser/account_investigator.h b/components/signin/core/browser/account_investigator.h
+index e7200658e3..701ab23350 100644
+--- a/components/signin/core/browser/account_investigator.h
++++ b/components/signin/core/browser/account_investigator.h
+@@ -119,8 +119,6 @@ class AccountInvestigator : public KeyedService,
+   raw_ptr<PrefService> pref_service_;
+   raw_ptr<signin::IdentityManager> identity_manager_;
+ 
+-  // Handles invoking our periodic logic at the right time.
+-  signin::PersistentRepeatingTimer timer_;
+ 
+   // If the GaiaCookieManagerService hasn't already cached the cookie data, it
+   // will not be able to return enough information for us to always perform

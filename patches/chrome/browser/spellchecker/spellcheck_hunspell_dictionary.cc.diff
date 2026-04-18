@@ -1,0 +1,20 @@
+diff --git a/chrome/browser/spellchecker/spellcheck_hunspell_dictionary.cc b/chrome/browser/spellchecker/spellcheck_hunspell_dictionary.cc
+index 9b081d7aa8..c9b10286a6 100644
+--- a/chrome/browser/spellchecker/spellcheck_hunspell_dictionary.cc
++++ b/chrome/browser/spellchecker/spellcheck_hunspell_dictionary.cc
+@@ -277,13 +277,14 @@ GURL SpellcheckHunspellDictionary::GetDictionaryURL() {
+   DCHECK(!bdict_file.empty());
+ 
+   static const char kDownloadServerUrl[] =
+-      "https://redirector.gvt1.com/edgedl/chrome/dict/";
++      "trk:173:https://redirector.gvt1.com/edgedl/chrome/dict/";
+ 
+   return GURL(std::string(kDownloadServerUrl) +
+               base::ToLowerASCII(bdict_file));
+ }
+ 
+ void SpellcheckHunspellDictionary::DownloadDictionary(GURL url) {
++  return;
+   DCHECK_CURRENTLY_ON(BrowserThread::UI);
+   DCHECK(browser_context_);
+ 

@@ -1,0 +1,14 @@
+diff --git a/base/allocator/partition_allocator/src/partition_alloc/compressed_pointer.h b/base/allocator/partition_allocator/src/partition_alloc/compressed_pointer.h
+index 04d4c2ced4..2ebfd52ba9 100644
+--- a/base/allocator/partition_allocator/src/partition_alloc/compressed_pointer.h
++++ b/base/allocator/partition_allocator/src/partition_alloc/compressed_pointer.h
+@@ -21,9 +21,6 @@
+ 
+ #if PA_BUILDFLAG(ENABLE_POINTER_COMPRESSION)
+ 
+-#if !PA_BUILDFLAG(GLUE_CORE_POOLS)
+-#error "Pointer compression only works with glued pools"
+-#endif
+ #if PA_CONFIG(DYNAMICALLY_SELECT_POOL_SIZE)
+ #error "Pointer compression currently supports constant pool size"
+ #endif

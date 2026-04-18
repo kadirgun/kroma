@@ -1,0 +1,25 @@
+diff --git a/chrome/browser/ui/webui/settings/search_engines_handler.h b/chrome/browser/ui/webui/settings/search_engines_handler.h
+index 09fd68c6cc..68b7267c5b 100644
+--- a/chrome/browser/ui/webui/settings/search_engines_handler.h
++++ b/chrome/browser/ui/webui/settings/search_engines_handler.h
+@@ -41,7 +41,8 @@ class SearchEnginesHandler : public SettingsPageUIHandler,
+   void OnEditedKeyword(TemplateURL* template_url,
+                        const std::u16string& title,
+                        const std::u16string& keyword,
+-                       const std::string& url) override;
++                       const std::string& url,
++                       const std::string& suggestions_url) override;
+ 
+   // SettingsPageUIHandler implementation.
+   void RegisterMessages() override;
+@@ -80,8 +81,8 @@ class SearchEnginesHandler : public SettingsPageUIHandler,
+   // to WebUI. Called from WebUI.
+   void HandleValidateSearchEngineInput(const base::Value::List& args);
+ 
+-  // Checks whether the given user input field (searchEngine, keyword, queryUrl)
+-  // is populated with a valid value.
++  // Checks whether the given user input field (searchEngine, keyword, queryUrl,
++  // suggestionsUrl) is populated with a valid value.
+   bool CheckFieldValidity(const std::string& field_name,
+                           const std::string& field_value);
+ 

@@ -1,0 +1,46 @@
+diff --git a/chrome/browser/ui/views/profiles/profile_menu_view.cc b/chrome/browser/ui/views/profiles/profile_menu_view.cc
+index f2f489fe86..1c79693ec7 100644
+--- a/chrome/browser/ui/views/profiles/profile_menu_view.cc
++++ b/chrome/browser/ui/views/profiles/profile_menu_view.cc
+@@ -78,7 +78,6 @@
+ #include "components/signin/core/browser/signin_error_controller.h"
+ #include "components/signin/public/base/consent_level.h"
+ #include "components/signin/public/base/signin_metrics.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/base/signin_switches.h"
+ #include "components/signin/public/identity_manager/account_info.h"
+ #include "components/signin/public/identity_manager/primary_account_mutator.h"
+@@ -683,22 +682,6 @@ ProfileMenuView::GetIdentitySectionParams(const ProfileAttributesEntry& entry) {
+       signin_metrics::AccessPoint::kAvatarBubbleSignIn;
+   switch (signin_util::GetSignedInState(identity_manager)) {
+     case signin_util::SignedInState::kSignedOut:
+-      if (profile().GetPrefs()->GetBoolean(prefs::kSigninAllowed)) {
+-        button_type = ActionableItem::kSigninButton;
+-        access_point =
+-            signin_metrics::AccessPoint::kAvatarBubbleSignInWithSyncPromo;
+-        params.subtitle = l10n_util::GetStringUTF16(
+-            base::FeatureList::IsEnabled(
+-                syncer::kReplaceSyncPromosWithSignInPromos)
+-                ? IDS_PROFILE_MENU_SIGNIN_PROMO_DESCRIPTION_WITH_BOOKMARKS
+-                : IDS_PROFILE_MENU_SIGNIN_PROMO_DESCRIPTION);
+-        params.button_text =
+-            l10n_util::GetStringUTF16(IDS_PROFILE_MENU_SIGNIN_PROMO_BUTTON);
+-        signin_metrics::LogSignInOffered(
+-            explicit_signin_access_point_.value_or(access_point),
+-            signin_metrics::PromoAction::
+-                PROMO_ACTION_NEW_ACCOUNT_NO_EXISTING_ACCOUNT);
+-      }
+       break;
+     case signin_util::SignedInState::kWebOnlySignedIn: {
+       access_point =
+@@ -887,9 +870,7 @@ void ProfileMenuView::MaybeBuildChromeAccountSettingsButtonWithSync() {
+   // Show the settings button when signed in to Chrome or to the web, or if
+   // signin is disallowed.
+   const bool should_show_settings_button =
+-      !identity_manager->GetExtendedAccountInfoForAccountsWithRefreshToken()
+-           .empty() ||
+-      !profile().GetPrefs()->GetBoolean(prefs::kSigninAllowed);
++      false;
+   if (!should_show_settings_button) {
+     return;
+   }

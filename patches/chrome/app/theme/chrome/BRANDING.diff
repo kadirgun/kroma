@@ -1,0 +1,16 @@
+diff --git a/chrome/app/theme/chrome/BRANDING b/chrome/app/theme/chrome/BRANDING
+new file mode 100644
+index 0000000..766f1ba
+--- /dev/null
++++ b/chrome/app/theme/chrome/BRANDING
+@@ -0,0 +1,10 @@
++COMPANY_FULLNAME=Google LLC
++COMPANY_SHORTNAME=Google
++PRODUCT_FULLNAME=Google Chrome
++PRODUCT_SHORTNAME=Chrome
++PRODUCT_INSTALLER_FULLNAME=Google Chrome Installer
++PRODUCT_INSTALLER_SHORTNAME=Google Chrome Installer
++COPYRIGHT=Copyright @LASTCHANGE_YEAR@ Google LLC. All rights reserved.
++MAC_BUNDLE_ID=com.google.Chrome
++MAC_CREATOR_CODE=GChr
++MAC_TEAM_ID=

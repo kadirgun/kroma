@@ -1,0 +1,78 @@
+diff --git a/chrome/browser/browser_process_impl.cc b/chrome/browser/browser_process_impl.cc
+index 6dd1a3b346..0a0f805f92 100644
+--- a/chrome/browser/browser_process_impl.cc
++++ b/chrome/browser/browser_process_impl.cc
+@@ -22,6 +22,7 @@
+ #include "base/functional/callback.h"
+ #include "base/functional/callback_helpers.h"
+ #include "base/location.h"
++#include "base/logging.h"
+ #include "base/memory/ptr_util.h"
+ #include "base/metrics/histogram_functions.h"
+ #include "base/metrics/histogram_macros.h"
+@@ -29,6 +30,7 @@
+ #include "base/notreached.h"
+ #include "base/path_service.h"
+ #include "base/run_loop.h"
++#include "base/strings/string_number_conversions.h"
+ #include "base/synchronization/waitable_event.h"
+ #include "base/task/sequenced_task_runner.h"
+ #include "base/task/single_thread_task_runner.h"
+@@ -115,6 +117,7 @@
+ #include "components/metrics/metrics_service.h"
+ #include "components/metrics_services_manager/metrics_services_manager.h"
+ #include "components/metrics_services_manager/metrics_services_manager_client.h"
++#include "components/network_session_configurator/common/network_switches.h"
+ #include "components/network_time/network_time_tracker.h"
+ #include "components/os_crypt/async/browser/os_crypt_async.h"
+ #include "components/permissions/permissions_client.h"
+@@ -149,6 +152,7 @@
+ #include "extensions/common/constants.h"
+ #include "media/media_buildflags.h"
+ #include "mojo/public/cpp/bindings/pending_receiver.h"
++#include "net/socket/client_socket_pool_manager.h"
+ #include "printing/buildflags/buildflags.h"
+ #include "services/network/public/cpp/features.h"
+ #include "services/network/public/cpp/network_switches.h"
+@@ -243,12 +247,10 @@
+ #if BUILDFLAG(IS_CHROMEOS)
+ #include "chrome/browser/chromeos/extensions/telemetry/chromeos_telemetry_extensions_browser_api_provider.h"
+ #include "chrome/browser/hid/hid_pinned_notification.h"
+-#include "chrome/browser/screen_ai/screen_ai_downloader_chromeos.h"
+ #include "chrome/browser/usb/usb_pinned_notification.h"
+ #include "components/crash/core/app/crashpad.h"
+ #elif !BUILDFLAG(IS_ANDROID)
+ #include "chrome/browser/hid/hid_status_icon.h"
+-#include "chrome/browser/screen_ai/screen_ai_downloader_non_chromeos.h"
+ #include "chrome/browser/usb/usb_status_icon.h"
+ #include "components/enterprise/browser/controller/chrome_browser_cloud_management_controller.h"
+ #endif
+@@ -419,6 +421,18 @@ void BrowserProcessImpl::Init() {
+   pref_change_registrar_.Add(metrics::prefs::kMetricsReportingEnabled,
+                              base::BindRepeating(&ApplyMetricsReportingPolicy));
+ 
++  int max_connections_per_host = 0;
++  auto switch_value = base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(
++      switches::kMaxConnectionsPerHost);
++  if (!switch_value.empty() && !base::StringToInt(switch_value, &max_connections_per_host)) {
++    LOG(DFATAL) << "--" << switches::kMaxConnectionsPerHost
++      << " expected integer; got (\"" << switch_value << "\" instead)";
++  }
++  if (max_connections_per_host != 0) {
++    net::ClientSocketPoolManager::set_max_sockets_per_group(
++        net::HttpNetworkSession::NORMAL_SOCKET_POOL, max_connections_per_host);
++  }
++
+   DCHECK(!webrtc_event_log_manager_);
+   webrtc_event_log_manager_ = WebRtcEventLogManager::CreateSingletonInstance();
+ 
+@@ -1381,9 +1395,6 @@ void BrowserProcessImpl::PreMainMessageLoopRun() {
+   soda_installer_impl_ = std::make_unique<speech::SodaInstallerImplChromeOS>();
+ #endif  // BUILDFLAG(IS_CHROMEOS)
+ 
+-#if !BUILDFLAG(IS_ANDROID)
+-  screen_ai_download_ = screen_ai::ScreenAIInstallState::Create();
+-#endif
+ 
+   base::FilePath user_data_dir;
+   bool result = base::PathService::Get(chrome::DIR_USER_DATA, &user_data_dir);

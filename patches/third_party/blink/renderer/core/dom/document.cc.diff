@@ -1,0 +1,34 @@
+diff --git a/third_party/blink/renderer/core/dom/document.cc b/third_party/blink/renderer/core/dom/document.cc
+index f8383e9829..6cff7b3778 100644
+--- a/third_party/blink/renderer/core/dom/document.cc
++++ b/third_party/blink/renderer/core/dom/document.cc
+@@ -2262,7 +2262,8 @@ bool Document::IsPageVisible() const {
+   // visibility.
+   if (load_event_progress_ >= kUnloadVisibilityChangeInProgress)
+     return false;
+-  return GetFrame()->GetPage()->IsPageVisible();
++
++  return true;
+ }
+ 
+ bool Document::IsPrefetchOnly() const {
+@@ -2310,10 +2311,15 @@ void Document::DidChangeVisibilityState() {
+     // tab and update the visibility state.
+     return;
+   }
+-  DispatchEvent(*Event::CreateBubble(event_type_names::kVisibilitychange));
+-  // Also send out the deprecated version until it can be removed.
+-  DispatchEvent(
+-      *Event::CreateBubble(event_type_names::kWebkitvisibilitychange));
++  // NOTE: visibilitychange events are intentionally disabled so that
++  // web content cannot detect page visibility changes. This prevents sites
++  // from reacting to the page losing focus/visibility.
++  // If you need to re-enable these events, restore the DispatchEvent calls
++  // below.
++  // DispatchEvent(*Event::CreateBubble(event_type_names::kVisibilitychange));
++  // // // Also send out the deprecated version until it can be removed.
++  // DispatchEvent(
++  //     *Event::CreateBubble(event_type_names::kWebkitvisibilitychange));
+ 
+   if (IsPageVisible())
+     GetDocumentAnimations().MarkAnimationsCompositorPending();

@@ -1,0 +1,15 @@
+diff --git a/chrome/browser/enterprise/connectors/analysis/files_request_handler.h b/chrome/browser/enterprise/connectors/analysis/files_request_handler.h
+index ac5cf22c8c..a4e1097543 100644
+--- a/chrome/browser/enterprise/connectors/analysis/files_request_handler.h
++++ b/chrome/browser/enterprise/connectors/analysis/files_request_handler.h
+@@ -113,10 +113,6 @@ class FilesRequestHandler : public RequestHandlerBase {
+       enterprise_connectors::ContentAnalysisResponse response);
+ 
+  private:
+-  // Prepares an upload request for the file at `path`.  If the file
+-  // cannot be uploaded it will have a failure verdict added to `result_`.
+-  safe_browsing::FileAnalysisRequest* PrepareFileRequest(size_t index);
+-
+   // Called when the file info for `path` has been fetched. Also begins the
+   // upload process.
+   void OnGotFileInfo(

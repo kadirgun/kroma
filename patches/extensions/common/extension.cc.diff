@@ -1,0 +1,18 @@
+diff --git a/extensions/common/extension.cc b/extensions/common/extension.cc
+index a32422172a..4497ec1d12 100644
+--- a/extensions/common/extension.cc
++++ b/extensions/common/extension.cc
+@@ -101,13 +101,6 @@ bool IsManifestSupported(int manifest_version,
+   // Supported versions are always safe.
+   if (manifest_version >= kMinimumSupportedManifestVersion &&
+       manifest_version <= kMaximumSupportedManifestVersion) {
+-    // Emit a warning for unpacked extensions on Manifest V2 warning that
+-    // MV2 is deprecated.
+-    if (type == Manifest::TYPE_EXTENSION && manifest_version == 2 &&
+-        Manifest::IsUnpackedLocation(location) &&
+-        !g_silence_deprecated_manifest_version_warnings) {
+-      *warning = errors::kManifestV2IsDeprecatedWarning;
+-    }
+     return true;
+   }
+ 

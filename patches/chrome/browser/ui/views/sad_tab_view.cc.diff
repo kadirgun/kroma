@@ -1,0 +1,37 @@
+diff --git a/chrome/browser/ui/views/sad_tab_view.cc b/chrome/browser/ui/views/sad_tab_view.cc
+index c219988c9c..0feb748b2d 100644
+--- a/chrome/browser/ui/views/sad_tab_view.cc
++++ b/chrome/browser/ui/views/sad_tab_view.cc
+@@ -159,9 +159,6 @@ SadTabView::SadTabView(content::WebContents* web_contents, SadTabKind kind)
+   // There is currently no good way to handle kEnd alignment for a single
+   // element.
+   actions_container->SetLayoutManagerUseConstrainedSpace(false);
+-
+-  EnableHelpLink(actions_container);
+-
+   action_button_ =
+       actions_container->AddChildView(std::make_unique<views::MdTextButton>(
+           base::BindRepeating(&SadTabView::PerformAction,
+@@ -262,22 +259,6 @@ void SadTabView::AttachToWebView() {
+   }
+ }
+ 
+-void SadTabView::EnableHelpLink(views::FlexLayoutView* actions_container) {
+-#if BUILDFLAG(IS_CHROMEOS)
+-  // Do not show the help link in the kiosk session to prevent escape from a
+-  // kiosk app.
+-  if (chromeos::IsKioskSession()) {
+-    return;
+-  }
+-#endif
+-  auto* help_link =
+-      actions_container->AddChildView(std::make_unique<views::Link>(
+-          l10n_util::GetStringUTF16(GetHelpLinkTitle())));
+-  help_link->SetCallback(base::BindRepeating(
+-      &SadTab::PerformAction, base::Unretained(this), Action::HELP_LINK));
+-  help_link->SetProperty(views::kTableVertAlignKey,
+-                         views::LayoutAlignment::kCenter);
+-}
+ 
+ void SadTabView::OnBoundsChanged(const gfx::Rect& previous_bounds) {
+   // Specify the maximum message and title width explicitly.

@@ -1,0 +1,135 @@
+diff --git a/third_party/blink/renderer/core/canvas_interventions/canvas_interventions_helper.cc b/third_party/blink/renderer/core/canvas_interventions/canvas_interventions_helper.cc
+index a193c000a7..ee45820125 100644
+--- a/third_party/blink/renderer/core/canvas_interventions/canvas_interventions_helper.cc
++++ b/third_party/blink/renderer/core/canvas_interventions/canvas_interventions_helper.cc
+@@ -47,9 +47,23 @@ namespace {
+ //      an accelerated 2d context
+ //   2) the CanvasInterventions RuntimeEnabledFeature is enabled
+ bool ShouldApplyNoise(HighEntropyCanvasOpType canvas_operations,
+-                      ExecutionContext* execution_context) {
++                      ExecutionContext* execution_context,
++                      base::span<uint8_t> pixels_rgba,
++                      bool is_texture_backed = false) {
++
+   CanvasNoiseReason noise_reason = CanvasNoiseReason::kAllConditionsMet;
+-  if (canvas_operations == HighEntropyCanvasOpType::kNone) {
++  auto* helper = CanvasInterventionsHelper::From(execution_context);
++  if (!helper->IsLikelyHighEntropy(execution_context, pixels_rgba, 3.0)) {
++    noise_reason |= CanvasNoiseReason::kNoTrigger;
++  }
++
++  // If there were no recorded high-entropy operations on the canvas, this is
++  // normally treated as no trigger. However, for texture-backed snapshots
++  // (likely coming from WebGL/accelerated contexts) operation bits may not be
++  // recorded; in that case skip this particular check and rely on other
++  // heuristics (e.g. IsLikelyHighEntropy).
++  if (!is_texture_backed &&
++      canvas_operations == HighEntropyCanvasOpType::kNone) {
+     noise_reason |= CanvasNoiseReason::kNoTrigger;
+   }
+   if (!execution_context) {
+@@ -87,12 +101,6 @@ bool CanvasInterventionsHelper::MaybeNoiseSnapshot(
+   base::TimeTicks start_time = base::TimeTicks::Now();
+   CHECK(snapshot);
+ 
+-  HighEntropyCanvasOpType high_entropy_canvas_op_types =
+-      snapshot->HighEntropyCanvasOpTypes();
+-  if (!ShouldApplyNoise(high_entropy_canvas_op_types, execution_context)) {
+-    return false;
+-  }
+-
+   // Use kUnpremul_SkAlphaType as alpha type as we are changing the pixel values
+   // of all channels, including the alpha channel.
+   auto info = SkImageInfo::Make(
+@@ -117,6 +125,16 @@ bool CanvasInterventionsHelper::MaybeNoiseSnapshot(
+   base::span<uint8_t> modify_pixels =
+       gfx::SkPixmapToWritableSpan(pixmap_to_noise);
+ 
++  HighEntropyCanvasOpType high_entropy_canvas_op_types =
++      snapshot->HighEntropyCanvasOpTypes();
++  // Now that we have the pixel buffer, call the full ShouldApplyNoise which
++  // depends on the pixel contents.
++  bool is_texture_backed = snapshot->IsTextureBacked();
++  if (!ShouldApplyNoise(high_entropy_canvas_op_types, execution_context,
++                       modify_pixels, is_texture_backed)) {
++    return false;
++  }
++
+   // Guaranteed to have a value, as per |ShouldApplyNoise|.
+   auto token_hash = NoiseHash(execution_context->CanvasNoiseToken().value());
+   NoisePixels(token_hash, modify_pixels, pixmap_to_noise.width(),
+@@ -157,6 +175,74 @@ bool CanvasInterventionsHelper::MaybeNoiseSnapshot(
+   return true;
+ }
+ 
++bool CanvasInterventionsHelper::IsLikelyHighEntropy(
++    ExecutionContext* execution_context,
++    base::span<uint8_t> pixels_rgba,
++    double entropy_threshold) {
++  // pixels_rgba is expected to be a contiguous RGBA byte buffer. If empty,
++  // return false.
++  if (pixels_rgba.empty())
++    return false;
++
++  // Derive pixel count from buffer length. Expect 4 bytes per pixel (RGBA).
++  const size_t total_bytes = pixels_rgba.size();
++  if (total_bytes % 4 != 0)
++    return false;  // malformed buffer
++
++  const size_t total_pixels = total_bytes / 4;
++
++  // We'll compute a simple luminance histogram over all pixels (no sampling
++  // limit). Use 256 bins for luminance.
++  std::array<uint32_t, 256> hist{};
++  hist.fill(0);
++
++  size_t distinct_bins = 0;
++
++  // Interpret the incoming `entropy_threshold` as the minimum number of
++  // distinct bins required. Use ceil to handle fractional thresholds
++  // conservatively (e.g. 2.1 -> require 3 bins).
++  size_t threshold_count = 0;
++  if (entropy_threshold > 0)
++    threshold_count = static_cast<size_t>(std::ceil(entropy_threshold));
++
++  // Fast path: treat buffer as 32-bit words to quickly detect fully-white
++  // pixels (0xFFFFFFFF). This avoids luma computation for those common cases.
++  // Be careful with alignment / aliasing; use memcpy to avoid UB on platforms
++  // that disallow unaligned reads.
++  for (size_t p = 0, byte_index = 0; p < total_pixels; ++p, byte_index += 4) {
++    uint32_t word = 0;
++    memcpy(&word, &pixels_rgba[byte_index], sizeof(word));
++    if (word == 0xFFFFFFFFu) {
++      // Pure white pixel (including alpha=255) — skip.
++      continue;
++    }
++
++    uint8_t r = pixels_rgba[byte_index];
++    uint8_t g = pixels_rgba[byte_index + 1];
++    uint8_t b = pixels_rgba[byte_index + 2];
++    // Compute luma-like value (rec. 601) and quantize to 0-255.
++    uint32_t luma = static_cast<uint32_t>((299 * r + 587 * g + 114 * b) /
++                                         1000);
++    if (hist[luma] == 0) {
++      ++distinct_bins;
++      hist[luma] = 1;
++      if (threshold_count != 0 && distinct_bins >= threshold_count)
++        return true;
++    }
++  }
++
++  // Record a lightweight metric for number of distinct luminance bins seen
++  // (we already tracked `distinct_bins` while scanning above) and return the
++  // comparison against the previously computed `threshold_count`.
++  if (execution_context) {
++    UMA_HISTOGRAM_COUNTS_100(
++        "FingerprintingProtection.CanvasNoise.DistinctLumaBins",
++        static_cast<int>(distinct_bins));
++  }
++
++  return distinct_bins >= threshold_count;
++}
++
+ // static
+ CanvasInterventionsHelper* CanvasInterventionsHelper::From(
+     ExecutionContext* context) {

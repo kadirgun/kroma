@@ -1,0 +1,21 @@
+diff --git a/components/signin/public/base/signin_prefs.cc b/components/signin/public/base/signin_prefs.cc
+index e34cb37f59..ac95d7c719 100644
+--- a/components/signin/public/base/signin_prefs.cc
++++ b/components/signin/public/base/signin_prefs.cc
+@@ -13,7 +13,6 @@
+ #include "components/prefs/pref_registry_simple.h"
+ #include "components/prefs/pref_service.h"
+ #include "components/prefs/scoped_user_pref_update.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/base/signin_switches.h"
+ #include "google_apis/gaia/gaia_id.h"
+ 
+@@ -120,8 +119,6 @@ SigninPrefs::~SigninPrefs() = default;
+ 
+ void SigninPrefs::RegisterProfilePrefs(PrefRegistrySimple* registry) {
+   registry->RegisterDictionaryPref(kSigninAccountPrefs);
+-  registry->RegisterIntegerPref(prefs::kHistorySyncSuccessiveDeclineCount, 0);
+-  registry->RegisterInt64Pref(prefs::kHistorySyncLastDeclinedTimestamp, 0);
+ }
+ 
+ bool SigninPrefs::HasAccountPrefs(const GaiaId& gaia_id) const {

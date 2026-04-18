@@ -1,0 +1,15 @@
+diff --git a/content/shell/BUILD.gn b/content/shell/BUILD.gn
+index 3b80357aff..a6a0aa70d8 100644
+--- a/content/shell/BUILD.gn
++++ b/content/shell/BUILD.gn
+@@ -835,10 +835,6 @@ if (is_apple) {
+       deps = [ "//third_party/icu:icudata" ]
+     }
+ 
+-    if (is_mac) {
+-      sources += [ "//ui/gl/resources/angle-metal/gpu_shader_cache.bin" ]
+-    }
+-
+     if (v8_use_external_startup_data) {
+       public_deps += [ "//v8" ]
+       if (use_v8_context_snapshot) {

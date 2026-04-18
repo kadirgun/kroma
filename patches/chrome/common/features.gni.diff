@@ -1,0 +1,13 @@
+diff --git a/chrome/common/features.gni b/chrome/common/features.gni
+index bea4568da7..ee4c80b012 100644
+--- a/chrome/common/features.gni
++++ b/chrome/common/features.gni
+@@ -46,7 +46,7 @@ declare_args() {
+   enable_chrome_notifications = is_mac || is_win || is_linux || is_fuchsia
+ 
+   # Enables inclusion of glic in the build.
+-  enable_glic = is_mac || is_win || is_linux
++  enable_glic = false
+ 
+   # Hangout services is an extension that adds extra features to Hangouts.
+   # It is enableable separately to facilitate testing.

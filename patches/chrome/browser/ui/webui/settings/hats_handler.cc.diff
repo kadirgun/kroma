@@ -1,0 +1,79 @@
+diff --git a/chrome/browser/ui/webui/settings/hats_handler.cc b/chrome/browser/ui/webui/settings/hats_handler.cc
+index bfb66548ae..70e6cd186a 100644
+--- a/chrome/browser/ui/webui/settings/hats_handler.cc
++++ b/chrome/browser/ui/webui/settings/hats_handler.cc
+@@ -64,56 +64,6 @@ void HatsHandler::RegisterMessages() {
+  */
+ void HatsHandler::HandleSecurityPageHatsRequest(const base::Value::List& args) {
+   AllowJavascript();
+-
+-  // There are 3 argument in the input list.
+-  // The first one is the SecurityPageInteraction that triggered the survey.
+-  // The second one is the safe browsing setting the user was on.
+-  // The third one is the total amount of time a user spent on the security page
+-  // in focus.
+-  CHECK_EQ(3U, args.size());
+-
+-  Profile* profile = Profile::FromWebUI(web_ui());
+-
+-  // Enterprise users consideration.
+-  // If the admin disabled the survey, the survey will not be requested.
+-  if (!safe_browsing::IsSafeBrowsingSurveysEnabled(*profile->GetPrefs())) {
+-    return;
+-  }
+-
+-  // Request HaTS survey.
+-  HatsService* hats_service = HatsServiceFactory::GetForProfile(
+-      profile, /* create_if_necessary = */ true);
+-
+-  // The HaTS service may not be available for the profile, for example if it
+-  // is a guest profile.
+-  if (!hats_service) {
+-    return;
+-  }
+-
+-  // Do not send the survey if the user didn't stay on the page long enough.
+-  if (args[2].GetDouble() <
+-      features::kHappinessTrackingSurveysForSecurityPageTime.Get()
+-          .InMilliseconds()) {
+-    return;
+-  }
+-
+-  auto interaction = static_cast<SecurityPageInteraction>(args[0].GetInt());
+-  if (features::kHappinessTrackingSurveysForSecurityPageRequireInteraction
+-          .Get() &&
+-      interaction == SecurityPageInteraction::NO_INTERACTION) {
+-    return;
+-  }
+-
+-  // Generate the Product Specific bits data from |profile| and |args|.
+-  SurveyStringData product_specific_string_data =
+-      GetSecurityPageProductSpecificStringData(profile, args);
+-
+-  hats_service->LaunchSurvey(
+-      kHatsSurveyTriggerSettingsSecurity,
+-      /*success_callback*/ base::DoNothing(),
+-      /*failure_callback*/ base::DoNothing(),
+-      /*product_specific_bits_data=*/{},
+-      /*product_specific_string_data=*/product_specific_string_data);
+ }
+ 
+ /**
+@@ -180,17 +130,7 @@ SurveyStringData HatsHandler::GetSecurityPageProductSpecificStringData(
+     }
+   }
+ 
+-  bool safe_browsing_enabled =
+-      profile->GetPrefs()->GetBoolean(prefs::kSafeBrowsingEnabled);
+-  bool safe_browsing_enhanced_enabled =
+-      profile->GetPrefs()->GetBoolean(prefs::kSafeBrowsingEnhanced);
+-  if (safe_browsing_enhanced_enabled) {
+-    safe_browsing_setting_current = "enhanced_protection";
+-  } else if (safe_browsing_enabled) {
+-    safe_browsing_setting_current = "standard_protection";
+-  } else {
+     safe_browsing_setting_current = "no_protection";
+-  }
+ 
+   std::string client_channel =
+       std::string(version_info::GetChannelString(chrome::GetChannel()));

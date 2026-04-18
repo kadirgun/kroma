@@ -1,0 +1,13 @@
+diff --git a/chrome/browser/ui/views/tab_contents/chrome_web_contents_view_delegate_views.cc b/chrome/browser/ui/views/tab_contents/chrome_web_contents_view_delegate_views.cc
+index d46f3ec0ee..2221dfbd4b 100644
+--- a/chrome/browser/ui/views/tab_contents/chrome_web_contents_view_delegate_views.cc
++++ b/chrome/browser/ui/views/tab_contents/chrome_web_contents_view_delegate_views.cc
+@@ -111,7 +111,7 @@ void ChromeWebContentsViewDelegateViews::ExecuteCommandForTesting(
+ void ChromeWebContentsViewDelegateViews::OnPerformingDrop(
+     const content::DropData& drop_data,
+     DropCompletionCallback callback) {
+-  HandleOnPerformingDrop(web_contents_, drop_data, std::move(callback));
++  if (!callback.is_null()) std::move(callback).Run(std::move(drop_data));
+ }
+ 
+ std::unique_ptr<content::WebContentsViewDelegate> CreateWebContentsViewDelegate(

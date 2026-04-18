@@ -1,0 +1,36 @@
+diff --git a/chrome/browser/ui/webui/signin/managed_user_profile_notice_handler.cc b/chrome/browser/ui/webui/signin/managed_user_profile_notice_handler.cc
+index 569f5c0eaa..9efbd42c54 100644
+--- a/chrome/browser/ui/webui/signin/managed_user_profile_notice_handler.cc
++++ b/chrome/browser/ui/webui/signin/managed_user_profile_notice_handler.cc
+@@ -33,7 +33,6 @@
+ #include "chrome/grit/generated_resources.h"
+ #include "components/policy/core/browser/signin/profile_separation_policies.h"
+ #include "components/prefs/pref_service.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/identity_manager/account_info.h"
+ #include "components/signin/public/identity_manager/signin_constants.h"
+ #include "components/strings/grit/components_strings.h"
+@@ -469,23 +468,6 @@ base::Value::Dict ManagedUserProfileNoticeHandler::GetProfileInfoValue() {
+       dict.Set("email", base::UTF16ToUTF8(email_));
+       dict.Set("accountName", account_info.full_name);
+ 
+-#if !BUILDFLAG(IS_CHROMEOS)
+-      // We apply the checkLinkDataCheckboxByDefault to true value only if the
+-      // link data checkbox is visible and the policy
+-      // ProfileSeparationDataMigrationSettings is set to its OPTOUT value (2)
+-      // or the legacy policy EnterpriseProfileCreationKeepBrowsingData is set
+-      // to True.
+-      bool profile_separation_data_migration_settings_optout =
+-          Profile::FromWebUI(web_ui())->GetPrefs()->GetInteger(
+-              prefs::kProfileSeparationDataMigrationSettings) == 2;
+-      bool check_link_Data_checkbox_by_default_from_legacy_policy =
+-          g_browser_process->local_state()->GetBoolean(
+-              prefs::kEnterpriseProfileCreationKeepBrowsingData);
+-      dict.Set("checkLinkDataCheckboxByDefault",
+-               show_link_data_option_ &&
+-                   (profile_separation_data_migration_settings_optout ||
+-                    check_link_Data_checkbox_by_default_from_legacy_policy));
+-#endif
+       break;
+   }
+ 

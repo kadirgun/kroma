@@ -1,0 +1,24 @@
+diff --git a/chrome/browser/extensions/api/developer_private/extension_info_generator.cc b/chrome/browser/extensions/api/developer_private/extension_info_generator.cc
+index b3c2a407a5..8d1ba65e1f 100644
+--- a/chrome/browser/extensions/api/developer_private/extension_info_generator.cc
++++ b/chrome/browser/extensions/api/developer_private/extension_info_generator.cc
+@@ -867,19 +867,6 @@ void ExtensionInfoGenerator::FillExtensionInfo(const Extension& extension,
+         toolbar_actions_model->IsActionPinned(extension.id());
+   }
+ 
+-  // MV2 deprecation.
+-  ManifestV2ExperimentManager* mv2_experiment_manager =
+-      ManifestV2ExperimentManager::Get(profile);
+-  CHECK(mv2_experiment_manager);
+-  info.is_affected_by_mv2_deprecation =
+-      mv2_experiment_manager->IsExtensionAffected(extension);
+-  info.did_acknowledge_mv2_deprecation_notice =
+-      mv2_experiment_manager->DidUserAcknowledgeNotice(extension.id());
+-  if (info.web_store_url.length() > 0) {
+-    info.recommendations_url =
+-        extension_urls::GetNewWebstoreItemRecommendationsUrl(extension.id())
+-            .spec();
+-  }
+ 
+   // Whether the extension can be uploaded as an account extension.
+   // `CanUploadAsAccountExtension` should already check for the feature flag

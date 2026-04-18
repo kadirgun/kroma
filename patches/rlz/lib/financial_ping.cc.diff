@@ -1,0 +1,13 @@
+diff --git a/rlz/lib/financial_ping.cc b/rlz/lib/financial_ping.cc
+index fee3cb41e2..abbb91554b 100644
+--- a/rlz/lib/financial_ping.cc
++++ b/rlz/lib/financial_ping.cc
+@@ -311,7 +311,7 @@ FinancialPing::PingResponse FinancialPing::PingServer(const char* request,
+   response->clear();
+ 
+   std::string url =
+-      base::StringPrintf("https://%s%s", kFinancialServer, request);
++      base::StringPrintf("https://%s%s", "about:blank", request);
+ 
+   // Use a waitable event to cause this function to block, to match the
+   // wininet implementation.

@@ -1,0 +1,73 @@
+diff --git a/chrome/browser/ui/signin/dice_migration_service.cc b/chrome/browser/ui/signin/dice_migration_service.cc
+index 6e53204320..6d88978fdc 100644
+--- a/chrome/browser/ui/signin/dice_migration_service.cc
++++ b/chrome/browser/ui/signin/dice_migration_service.cc
+@@ -27,7 +27,6 @@
+ #include "chrome/grit/theme_resources.h"
+ #include "components/pref_registry/pref_registry_syncable.h"
+ #include "components/prefs/pref_service.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/base/signin_switches.h"
+ #include "components/signin/public/identity_manager/account_managed_status_finder.h"
+ #include "components/signin/public/identity_manager/account_managed_status_finder_outcome.h"
+@@ -130,36 +129,7 @@ void SetBannerImage(ui::DialogModel::Builder& builder,
+ }
+ 
+ bool MaybeMigrateUser(Profile* profile) {
+-  if (!IsUserEligibleForDiceMigration(profile)) {
+     return false;
+-  }
+-  PrefService* prefs = profile->GetPrefs();
+-  CHECK(prefs);
+-
+-  // Backup the prefs.
+-  prefs->SetDict(
+-      kDiceMigrationBackup,
+-      base::Value::Dict()
+-          .SetByDottedPath(prefs::kExplicitBrowserSignin,
+-                           prefs->GetBoolean(prefs::kExplicitBrowserSignin))
+-          .SetByDottedPath(
+-              prefs::kPrefsThemesSearchEnginesAccountStorageEnabled,
+-              prefs->GetBoolean(
+-                  prefs::kPrefsThemesSearchEnginesAccountStorageEnabled)));
+-
+-  // TODO(crbug.com/399838468): Consider calling
+-  // `PrimaryAccountManager::ComputeExplicitBrowserSignin` upon explicit signin
+-  // pref change.
+-  prefs->SetBoolean(prefs::kPrefsThemesSearchEnginesAccountStorageEnabled,
+-                    true);
+-
+-  prefs->SetBoolean(prefs::kExplicitBrowserSignin, true);
+-
+-  // Mark the migration pref as successful.
+-  prefs->SetBoolean(kDiceMigrationMigrated, true);
+-  // Reset the restoration pref.
+-  prefs->SetBoolean(kDiceMigrationRestoredFromBackup, false);
+-  return true;
+ }
+ 
+ bool MaybeShowToast(Browser* browser) {
+@@ -313,23 +283,7 @@ void DiceMigrationService::RevertDiceMigration(PrefService* prefs) {
+   }
+ 
+   const bool restored_from_backup = [prefs]() -> bool {
+-    const base::Value* backup = prefs->GetUserPrefValue(kDiceMigrationBackup);
+-    if (!backup || !backup->is_dict()) {
+       return false;
+-    }
+-    const std::optional<bool> prefs_account_storage_enabled =
+-        backup->GetDict().FindBoolByDottedPath(
+-            prefs::kPrefsThemesSearchEnginesAccountStorageEnabled);
+-    const std::optional<bool> explicit_browser_signin =
+-        backup->GetDict().FindBoolByDottedPath(prefs::kExplicitBrowserSignin);
+-    if (!explicit_browser_signin.has_value() ||
+-        !prefs_account_storage_enabled.has_value()) {
+-      return false;
+-    }
+-    prefs->SetBoolean(prefs::kPrefsThemesSearchEnginesAccountStorageEnabled,
+-                      *prefs_account_storage_enabled);
+-    prefs->SetBoolean(prefs::kExplicitBrowserSignin, *explicit_browser_signin);
+-    return true;
+   }();
+ 
+   prefs->SetBoolean(kDiceMigrationRestoredFromBackup, restored_from_backup);

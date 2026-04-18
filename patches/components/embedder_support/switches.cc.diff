@@ -1,0 +1,12 @@
+diff --git a/components/embedder_support/switches.cc b/components/embedder_support/switches.cc
+index f6845d728c..e1f87e1525 100644
+--- a/components/embedder_support/switches.cc
++++ b/components/embedder_support/switches.cc
+@@ -39,4 +39,7 @@ const char kUseMobileUserAgent[] = "use-mobile-user-agent";
+ // A string used to override the default user agent with a custom one.
+ const char kUserAgent[] = "user-agent";
+ 
++// A string used to override the default user agent version with a custom one.
++const char kUserAgentVersion[] = "user-agent-version";
++
+ }  // namespace embedder_support

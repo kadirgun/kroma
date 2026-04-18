@@ -1,0 +1,81 @@
+diff --git a/chrome/browser/ui/views/toolbar/app_menu.cc b/chrome/browser/ui/views/toolbar/app_menu.cc
+index 817eeb7d7f..0e6a2c310b 100644
+--- a/chrome/browser/ui/views/toolbar/app_menu.cc
++++ b/chrome/browser/ui/views/toolbar/app_menu.cc
+@@ -61,7 +61,6 @@
+ #include "chrome/grit/theme_resources.h"
+ #include "components/prefs/pref_service.h"
+ #include "components/saved_tab_groups/public/features.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/identity_manager/account_info.h"
+ #include "components/zoom/page_zoom.h"
+ #include "components/zoom/zoom_controller.h"
+@@ -386,68 +385,6 @@ void AddSignedInChipToProfileMenuItem(
+     const int horizontal_padding,
+     std::vector<base::CallbackListSubscription>&
+         profile_menu_subscription_list) {
+-  if (!profile->GetPrefs()->GetBoolean(prefs::kSigninAllowed) ||
+-      profile->IsIncognitoProfile()) {
+-    return;
+-  }
+-  constexpr int profile_chip_corner_radii = 100;
+-  raw_ptr<views::Label> profile_chip_label;
+-  const MenuConfig& config = MenuConfig::instance();
+-
+-  // We need to have the label of the profile chip within a
+-  // BoxLayoutView and inside border insets because MenuItemView will
+-  // layout the child items to the full height of the menu item in
+-  // MenuItemView::Layout().
+-  auto profile_chip =
+-      views::Builder<views::BoxLayoutView>()
+-          .SetInsideBorderInsets(
+-              gfx::Insets::VH(config.item_vertical_margin, 0))
+-          .AddChildren(
+-              views::Builder<views::Label>()
+-                  .SetText(GetSigninStatusChipString(profile))
+-                  .CopyAddressTo(&profile_chip_label)
+-                  .SetBackground(views::CreateRoundedRectBackground(
+-                      item->IsSelected()
+-                          ? ui::kColorAppMenuProfileRowChipHovered
+-                          : ui::kColorAppMenuProfileRowChipBackground,
+-                      profile_chip_corner_radii))
+-                  // Add additional horizontal padding. Vertical
+-                  // padding depends on menu margins to get alignment
+-                  // with other items in the menu.
+-                  .SetBorder(views::CreateEmptyBorder(gfx::Insets::VH(
+-                      0, views::LayoutProvider::Get()
+-                             ->GetInsetsMetric(views::INSETS_LABEL_BUTTON)
+-                             .left()))))
+-          .Build();
+-
+-  // MenuItemView has specific layout logic for child views which does not work
+-  // very well with more custom menu items. We use this view to add the correct
+-  // spacing between the profile chip and the edge of the menu.
+-  auto profile_chip_edge_spacing_view =
+-      views::Builder<views::View>()
+-          .SetPreferredSize(gfx::Size(horizontal_padding, 0))
+-          .Build();
+-  profile_menu_subscription_list.push_back(
+-      item->AddSelectedChangedCallback(base::BindRepeating(
+-          [](MenuItemView* menu_item_view, View* child_view,
+-             int corner_radius) {
+-            child_view->SetBackground(views::CreateRoundedRectBackground(
+-                menu_item_view->IsSelected()
+-                    ? ui::kColorAppMenuProfileRowChipHovered
+-                    : ui::kColorAppMenuProfileRowChipBackground,
+-                corner_radius));
+-          },
+-          item, profile_chip_label, profile_chip_corner_radii)));
+-  item->AddChildView(std::move(profile_chip));
+-  item->AddChildView(std::move(profile_chip_edge_spacing_view));
+-  item->SetHighlightWhenSelectedWithChildViews(true);
+-  // MenuItemView only delegates accessible names when its title is empty with a
+-  // single container view. The Profile MenuItemView has a title and multiple
+-  // views. As a result, the accessible name must be manually computed to
+-  // account for the profile chip.
+-  item->GetViewAccessibility().SetName(
+-      views::MenuItemView::GetAccessibleNameForMenuItem(
+-          item->title(), GetSigninStatusChipString(profile), false));
+ }
+ 
+ // AppMenuView is a view that can contain label buttons.

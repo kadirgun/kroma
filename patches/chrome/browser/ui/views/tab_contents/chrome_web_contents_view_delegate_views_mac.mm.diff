@@ -1,0 +1,13 @@
+diff --git a/chrome/browser/ui/views/tab_contents/chrome_web_contents_view_delegate_views_mac.mm b/chrome/browser/ui/views/tab_contents/chrome_web_contents_view_delegate_views_mac.mm
+index 13ce1cf5f4..b13c481ad9 100644
+--- a/chrome/browser/ui/views/tab_contents/chrome_web_contents_view_delegate_views_mac.mm
++++ b/chrome/browser/ui/views/tab_contents/chrome_web_contents_view_delegate_views_mac.mm
+@@ -103,7 +103,7 @@ bool ChromeWebContentsViewDelegateViewsMac::TakeFocus(bool reverse) {
+ void ChromeWebContentsViewDelegateViewsMac::OnPerformingDrop(
+     const content::DropData& drop_data,
+     DropCompletionCallback callback) {
+-  HandleOnPerformingDrop(web_contents_, drop_data, std::move(callback));
++  if (!callback.is_null()) std::move(callback).Run(std::move(drop_data));
+ }
+ 
+ std::unique_ptr<RenderViewContextMenuBase>

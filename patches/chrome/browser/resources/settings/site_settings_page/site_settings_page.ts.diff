@@ -1,0 +1,13 @@
+diff --git a/chrome/browser/resources/settings/site_settings_page/site_settings_page.ts b/chrome/browser/resources/settings/site_settings_page/site_settings_page.ts
+index ac099cd649..6422e0e413 100644
+--- a/chrome/browser/resources/settings/site_settings_page/site_settings_page.ts
++++ b/chrome/browser/resources/settings/site_settings_page/site_settings_page.ts
+@@ -59,7 +59,7 @@ function getCategoryItemMap(): Map<ContentSettingsTypes, CategoryListItem> {
+       enabledLabel: 'siteSettingsAdsAllowed',
+       disabledLabel: 'siteSettingsAdsBlocked',
+       shouldShow: () =>
+-          loadTimeData.getBoolean('enableSafeBrowsingSubresourceFilter'),
++          false,
+     },
+     {
+       route: routes.SITE_SETTINGS_AUTO_VERIFY,

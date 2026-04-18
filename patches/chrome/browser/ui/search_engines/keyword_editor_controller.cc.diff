@@ -1,0 +1,56 @@
+diff --git a/chrome/browser/ui/search_engines/keyword_editor_controller.cc b/chrome/browser/ui/search_engines/keyword_editor_controller.cc
+index 1b12a4a43f..7915304742 100644
+--- a/chrome/browser/ui/search_engines/keyword_editor_controller.cc
++++ b/chrome/browser/ui/search_engines/keyword_editor_controller.cc
+@@ -27,23 +27,27 @@ KeywordEditorController::KeywordEditorController(Profile* profile)
+ 
+ KeywordEditorController::~KeywordEditorController() = default;
+ 
+-int KeywordEditorController::AddTemplateURL(const std::u16string& title,
+-                                            const std::u16string& keyword,
+-                                            const std::string& url) {
++int KeywordEditorController::AddTemplateURL(
++    const std::u16string& title,
++    const std::u16string& keyword,
++    const std::string& url,
++    const std::string& suggestions_url) {
+   DCHECK(!url.empty());
+ 
+   base::RecordAction(UserMetricsAction("KeywordEditor_AddKeyword"));
+ 
+   const int new_index = table_model_->last_other_engine_index();
+-  table_model_->Add(new_index, title, keyword, url);
++  table_model_->Add(new_index, title, keyword, url, suggestions_url);
+ 
+   return new_index;
+ }
+ 
+-void KeywordEditorController::ModifyTemplateURL(TemplateURL* template_url,
+-                                                const std::u16string& title,
+-                                                const std::u16string& keyword,
+-                                                const std::string& url) {
++void KeywordEditorController::ModifyTemplateURL(
++    TemplateURL* template_url,
++    const std::u16string& title,
++    const std::u16string& keyword,
++    const std::string& url,
++    const std::string& suggestions_url) {
+   DCHECK(!url.empty());
+   const std::optional<size_t> index =
+       table_model_->IndexOfTemplateURL(template_url);
+@@ -55,11 +59,13 @@ void KeywordEditorController::ModifyTemplateURL(TemplateURL* template_url,
+ 
+   // Don't do anything if the entry didn't change.
+   if ((template_url->short_name() == title) &&
+-      (template_url->keyword() == keyword) && (template_url->url() == url)) {
++      (template_url->keyword() == keyword) &&
++      (template_url->url() == url) &&
++      (template_url->suggestions_url() == suggestions_url)) {
+     return;
+   }
+ 
+-  table_model_->ModifyTemplateURL(index.value(), title, keyword, url);
++  table_model_->ModifyTemplateURL(index.value(), title, keyword, url, suggestions_url);
+ 
+   base::RecordAction(UserMetricsAction("KeywordEditor_ModifiedKeyword"));
+ }

@@ -1,0 +1,44 @@
+diff --git a/chrome/browser/webshare/share_service_impl.cc b/chrome/browser/webshare/share_service_impl.cc
+index 96bbd16b98..fe81d14c38 100644
+--- a/chrome/browser/webshare/share_service_impl.cc
++++ b/chrome/browser/webshare/share_service_impl.cc
+@@ -17,7 +17,9 @@
+ #include "chrome/browser/browser_process.h"
+ #include "chrome/browser/safe_browsing/safe_browsing_service.h"
+ #include "chrome/common/chrome_features.h"
++#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
+ #include "components/safe_browsing/content/common/file_type_policies.h"
++#endif
+ #include "components/safe_browsing/core/browser/db/database_manager.h"
+ #include "content/public/browser/web_contents.h"
+ #include "mojo/public/cpp/bindings/self_owned_receiver.h"
+@@ -210,11 +212,13 @@ void ShareServiceImpl::Share(const std::string& title,
+ 
+     // Check if at least one file is marked by the download protection service
+     // to send a ping to check this file type.
++#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
+     if (!should_check_url &&
+         safe_browsing::FileTypePolicies::GetInstance()->IsCheckedBinaryFile(
+             path)) {
+       should_check_url = true;
+     }
++#endif // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
+ 
+     // In the case where the original blob handle was to a native file (of
+     // unknown size), the serialized data does not contain an accurate file
+@@ -224,6 +228,7 @@ void ShareServiceImpl::Share(const std::string& title,
+   }
+ 
+   DCHECK(!safe_browsing_request_);
++#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
+   if (should_check_url && g_browser_process->safe_browsing_service()) {
+     safe_browsing_request_.emplace(
+         g_browser_process->safe_browsing_service()->database_manager(),
+@@ -233,6 +238,7 @@ void ShareServiceImpl::Share(const std::string& title,
+                        std::move(files), std::move(callback)));
+     return;
+   }
++#endif // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
+ 
+   OnSafeBrowsingResultReceived(title, text, share_url, std::move(files),
+                                std::move(callback),

@@ -1,0 +1,21 @@
+diff --git a/chrome/browser/ui/views/tabs/tab_strip.cc b/chrome/browser/ui/views/tabs/tab_strip.cc
+index c9ff621538..e9f007e134 100644
+--- a/chrome/browser/ui/views/tabs/tab_strip.cc
++++ b/chrome/browser/ui/views/tabs/tab_strip.cc
+@@ -2269,8 +2269,6 @@ void TabStrip::NewTabButtonPressed(const ui::Event& event) {
+ 
+     const ui::MouseEvent& mouse = static_cast<const ui::MouseEvent&>(event);
+     if (mouse.IsOnlyMiddleMouseButton()) {
+-      if (ui::Clipboard::IsSupportedClipboardBuffer(
+-              ui::ClipboardBuffer::kSelection)) {
+         ui::Clipboard* clipboard = ui::Clipboard::GetForCurrentThread();
+         CHECK(clipboard)
+             << "Clipboard instance is not available, cannot proceed with "
+@@ -2281,7 +2279,6 @@ void TabStrip::NewTabButtonPressed(const ui::Event& event) {
+         if (!clipboard_text.empty()) {
+           controller_->CreateNewTabWithLocation(clipboard_text);
+         }
+-      }
+       return;
+     }
+   }

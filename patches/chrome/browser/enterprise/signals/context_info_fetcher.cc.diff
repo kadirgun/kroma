@@ -1,0 +1,25 @@
+diff --git a/chrome/browser/enterprise/signals/context_info_fetcher.cc b/chrome/browser/enterprise/signals/context_info_fetcher.cc
+index 049f809ecd..418912cb81 100644
+--- a/chrome/browser/enterprise/signals/context_info_fetcher.cc
++++ b/chrome/browser/enterprise/signals/context_info_fetcher.cc
+@@ -21,6 +21,7 @@
+ #include "components/device_signals/core/browser/browser_utils.h"
+ #include "components/enterprise/browser/identifiers/profile_id_service.h"
+ #include "components/policy/content/policy_blocklist_service.h"
++#include "components/prefs/pref_service.h"
+ #include "components/version_info/version_info.h"
+ #include "device_management_backend.pb.h"
+ 
+@@ -123,12 +124,6 @@ void ContextInfoFetcher::Fetch(ContextInfoCallback callback) {
+       device_signals::GetChromeRemoteDesktopAppBlocked(
+           PolicyBlocklistFactory::GetForBrowserContext(browser_context_));
+ 
+-  Profile* profile = Profile::FromBrowserContext(browser_context_);
+-  info.safe_browsing_protection_level =
+-      device_signals::GetSafeBrowsingProtectionLevel(profile->GetPrefs());
+-  info.password_protection_warning_trigger =
+-      device_signals::GetPasswordProtectionWarningTrigger(profile->GetPrefs());
+-  info.enterprise_profile_id = GetEnterpriseProfileId(profile);
+ 
+ #if BUILDFLAG(IS_WIN)
+   base::ThreadPool::CreateCOMSTATaskRunner({base::MayBlock()})

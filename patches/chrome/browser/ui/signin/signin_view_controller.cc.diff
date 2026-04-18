@@ -1,0 +1,38 @@
+diff --git a/chrome/browser/ui/signin/signin_view_controller.cc b/chrome/browser/ui/signin/signin_view_controller.cc
+index 6fa560a71b..f8d0846696 100644
+--- a/chrome/browser/ui/signin/signin_view_controller.cc
++++ b/chrome/browser/ui/signin/signin_view_controller.cc
+@@ -32,7 +32,6 @@
+ #include "components/signin/public/base/consent_level.h"
+ #include "components/signin/public/base/signin_buildflags.h"
+ #include "components/signin/public/base/signin_metrics.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/base/signin_prefs.h"
+ #include "components/signin/public/base/signin_switches.h"
+ #include "components/signin/public/identity_manager/account_info.h"
+@@ -355,15 +354,6 @@ void SigninViewController::SignoutOrReauthWithPrompt(
+           &SigninViewController::SignoutOrReauthWithPromptWithUnsyncedDataTypes,
+           weak_ptr_factory_.GetWeakPtr(), reauth_access_point,
+           profile_signout_source, token_signout_source);
+-  // Fetch the unsynced datatypes, as this is required to decide whether the
+-  // confirmation prompt is needed.
+-  if (sync_service &&
+-      profile_->GetPrefs()->GetBoolean(prefs::kExplicitBrowserSignin)) {
+-    sync_service->GetTypesWithUnsyncedData(
+-        syncer::TypesRequiringUnsyncedDataCheckOnSignout(),
+-        std::move(signout_prompt_with_datatypes));
+-    return;
+-  }
+   // Dice users don't see the prompt, pass empty datatypes.
+   std::move(signout_prompt_with_datatypes)
+       .Run(absl::flat_hash_map<syncer::DataType, size_t>());
+@@ -726,9 +716,7 @@ void SigninViewController::SignoutOrReauthWithPromptWithUnsyncedDataTypes(
+   bool sign_out_immediately = unsynced_datatypes.empty() && needs_reauth;
+ 
+   // Do not show the dialog to users with implicit signin.
+-  if (!profile_->GetPrefs()->GetBoolean(prefs::kExplicitBrowserSignin)) {
+     sign_out_immediately = true;
+-  }
+ 
+   if (ShowAccountExtensionsOnSignout(GetProfile())) {
+     sign_out_immediately = false;

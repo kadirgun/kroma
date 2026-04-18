@@ -1,0 +1,55 @@
+diff --git a/chrome/test/BUILD.gn b/chrome/test/BUILD.gn
+index 4f8edf322e..c316328639 100644
+--- a/chrome/test/BUILD.gn
++++ b/chrome/test/BUILD.gn
+@@ -2405,9 +2405,6 @@ if (!is_android) {
+       "//chrome/browser/resource_coordinator:tab_manager_features",
+       "//chrome/browser/safe_browsing:advanced_protection",
+       "//chrome/browser/safe_browsing:verdict_cache_manager_factory",
+-      "//chrome/browser/screen_ai:screen_ai_install_state",
+-      "//chrome/browser/screen_ai:screen_ai_service_router_factory",
+-      "//chrome/browser/screen_ai/public:test_support",
+       "//chrome/browser/search",
+       "//chrome/browser/search_engines",
+       "//chrome/browser/segmentation_platform:test_utils",
+@@ -2710,7 +2707,6 @@ if (!is_android) {
+       "//components/resources",
+       "//components/safe_browsing:buildflags",
+       "//components/safe_browsing/content/browser",
+-      "//components/safe_browsing/content/browser:client_side_detection_images_cache",
+       "//components/safe_browsing/content/browser:safe_browsing_service",
+       "//components/safe_browsing/content/browser/password_protection",
+       "//components/safe_browsing/content/browser/password_protection:test_support",
+@@ -2847,8 +2843,6 @@ if (!is_android) {
+       "//services/preferences/public/cpp",
+       "//services/preferences/public/cpp/tracked",
+       "//services/preferences/tracked:features",
+-      "//services/screen_ai/public/cpp:utilities",
+-      "//services/screen_ai/public/mojom",
+       "//services/service_manager/public/cpp",
+       "//services/strings",
+       "//services/test/echo/public/mojom",
+@@ -7180,7 +7174,6 @@ test("unit_tests") {
+     "//components/resources",
+     "//components/safe_browsing:buildflags",
+     "//components/safe_browsing/content/browser",
+-    "//components/safe_browsing/content/browser:client_side_detection_images_cache",
+     "//components/safe_browsing/content/browser/notification_content_detection",
+     "//components/safe_browsing/content/browser/notification_content_detection:notifications_global_cache_list",
+     "//components/safe_browsing/content/browser/notification_content_detection:test_utils",
+@@ -8504,7 +8497,6 @@ test("unit_tests") {
+     #
+     # TODO(crbug.com/417513088): Maybe merge with the non-android `deps` declaration above?
+     deps += [
+-      "../browser/screen_ai:screen_ai_install_state",
+       "//chrome:packed_resources_integrity_header",
+       "//chrome/browser/apps:icon_standardizer",
+       "//chrome/browser/apps/app_service",
+@@ -8537,7 +8529,6 @@ test("unit_tests") {
+       "//chrome/browser/profile_resetter:fake_profile_resetter",
+       "//chrome/browser/resource_coordinator:tab_manager_features",
+       "//chrome/browser/resources/new_tab_page_instant:resources_grit",
+-      "//chrome/browser/screen_ai:unit_tests",
+       "//chrome/browser/search/background",
+       "//chrome/browser/search/background:constants",
+       "//chrome/browser/search_engine_choice:unit_tests",

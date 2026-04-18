@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/new_tab_page/one_google_bar/one_google_bar_loader_impl.cc b/chrome/browser/new_tab_page/one_google_bar/one_google_bar_loader_impl.cc
+index a7e4262370..2b4f7d3b62 100644
+--- a/chrome/browser/new_tab_page/one_google_bar/one_google_bar_loader_impl.cc
++++ b/chrome/browser/new_tab_page/one_google_bar/one_google_bar_loader_impl.cc
+@@ -302,6 +302,7 @@ OneGoogleBarLoaderImpl::OneGoogleBarLoaderImpl(
+ OneGoogleBarLoaderImpl::~OneGoogleBarLoaderImpl() = default;
+ 
+ void OneGoogleBarLoaderImpl::Load(OneGoogleCallback callback) {
++  return;
+   callbacks_.push_back(std::move(callback));
+ 
+   // Note: If there is an ongoing request, abandon it. It's possible that

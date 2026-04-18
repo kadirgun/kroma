@@ -1,0 +1,12 @@
+diff --git a/components/safe_browsing/content/browser/ui_manager_unittest.cc b/components/safe_browsing/content/browser/ui_manager_unittest.cc
+index f61716cbe9..361fe84114 100644
+--- a/components/safe_browsing/content/browser/ui_manager_unittest.cc
++++ b/components/safe_browsing/content/browser/ui_manager_unittest.cc
+@@ -17,7 +17,6 @@
+ #include "components/safe_browsing/content/browser/safe_browsing_controller_client.h"
+ #include "components/safe_browsing/core/browser/db/util.h"
+ #include "components/safe_browsing/core/browser/db/v4_protocol_manager_util.h"
+-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+ #include "components/security_interstitials/content/security_interstitial_controller_client.h"
+ #include "components/security_interstitials/content/settings_page_helper.h"
+ #include "components/security_interstitials/core/base_safe_browsing_error_ui.h"

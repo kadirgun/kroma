@@ -1,0 +1,15 @@
+diff --git a/ui/views/win/hwnd_message_handler.h b/ui/views/win/hwnd_message_handler.h
+index c8aff1d0e5..b9b32f7543 100644
+--- a/ui/views/win/hwnd_message_handler.h
++++ b/ui/views/win/hwnd_message_handler.h
+@@ -823,6 +823,10 @@ class VIEWS_EXPORT HWNDMessageHandler : public gfx::WindowImpl,
+   // fullscreen window which lost activation. Defaults to false.
+   bool background_fullscreen_hack_;
+ 
++  // Set to true once the window has actually become visible on screen.
++  // Used to ensure the window opens inactive on its first real show.
++  int has_become_visible_ = 0;
++
+   // True if the window should have no border and its contents should be
+   // partially or fully transparent.
+   bool is_translucent_ = false;

@@ -1,0 +1,23 @@
+diff --git a/chrome/browser/profiles/profile_attributes_storage.cc b/chrome/browser/profiles/profile_attributes_storage.cc
+index 68f506541a..0cf1c0aed8 100644
+--- a/chrome/browser/profiles/profile_attributes_storage.cc
++++ b/chrome/browser/profiles/profile_attributes_storage.cc
+@@ -43,7 +43,6 @@
+ #include "components/prefs/scoped_user_pref_update.h"
+ #include "components/profile_metrics/state.h"
+ #include "components/signin/public/base/persistent_repeating_timer.h"
+-#include "components/signin/public/base/signin_pref_names.h"
+ #include "components/signin/public/base/signin_switches.h"
+ #include "components/signin/public/identity_manager/account_managed_status_finder.h"
+ #include "content/public/browser/browser_task_traits.h"
+@@ -392,9 +391,7 @@ void ProfileAttributesStorage::AddProfile(ProfileAttributesInitParams params) {
+                    params.profile_name,
+                    /*include_check_for_legacy_profile_name*/ false))
+           // Assume newly created profiles use a default avatar.
+-          .Set(ProfileAttributesEntry::kIsUsingDefaultAvatarKey, true)
+-          .Set(prefs::kSignedInWithCredentialProvider,
+-               params.is_signed_in_with_credential_provider);
++          .Set(ProfileAttributesEntry::kIsUsingDefaultAvatarKey, true);
+ 
+   if (params.account_id.HasAccountIdKey()) {
+     info.Set(ProfileAttributesEntry::kAccountIdKey,

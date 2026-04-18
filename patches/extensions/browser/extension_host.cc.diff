@@ -1,0 +1,16 @@
+diff --git a/extensions/browser/extension_host.cc b/extensions/browser/extension_host.cc
+index 8f381dbe67..6e3babdb28 100644
+--- a/extensions/browser/extension_host.cc
++++ b/extensions/browser/extension_host.cc
+@@ -168,11 +168,6 @@ ExtensionHost::ExtensionHost(const Extension* extension,
+   ExtensionWebContentsObserver::GetForWebContents(host_contents())->
+       dispatcher()->set_delegate(this);
+ 
+-  // Create password reuse detection manager when new extension web contents are
+-  // created.
+-  ExtensionsBrowserClient::Get()
+-      ->GetSafeBrowsingDelegate()
+-      ->CreatePasswordReuseDetectionManager(host_contents_.get());
+ 
+   ExtensionHostRegistry::Get(browser_context_)->ExtensionHostCreated(this);
+ }
