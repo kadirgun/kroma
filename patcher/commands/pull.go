@@ -78,28 +78,26 @@ var Pull = cli.Command{
 }
 
 func getPatchesFromPath(path string) ([]*models.Patch, error) {
+	log.Debugf("Getting patches from path: %s", path)
+
+	// Check if path is a file or directory
 	info, err := os.Stat(path)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Debugf("Getting patches from path: %s", path)
-
-	args := []string{"status", "--short", "--untracked-files=all"}
+	var dir string
 	if info.IsDir() {
-		args = append(args, ".")
+		dir = path
 	} else {
-		args = append(args, filepath.Base(path))
+		dir = filepath.Dir(path)
 	}
 
+	args := []string{"status", "--short", "--untracked-files=all", "."}
 	cmd := exec.Command("git", args...)
 	log.Debugf("Running command: git %s", strings.Join(args, " "))
 
-	if info.IsDir() {
-		cmd.Dir = path
-	} else {
-		cmd.Dir = filepath.Dir(path)
-	}
+	cmd.Dir = dir
 
 	output, err := cmd.Output()
 	if err != nil {
@@ -135,7 +133,19 @@ func getPatchesFromPaths(paths []string) ([]*models.Patch, error) {
 
 	for _, path := range paths {
 		submoduleDir := filepath.Join(store.Config.BasePath, store.Config.Repo, path)
-		submodulePatches, err := getPatchesFromPath(submoduleDir)
+		
+		// If path is a file, get the directory containing it
+		info, err := os.Stat(submoduleDir)
+		if err != nil {
+			return nil, err
+		}
+		
+		dir := submoduleDir
+		if !info.IsDir() {
+			dir = filepath.Dir(submoduleDir)
+		}
+		
+		submodulePatches, err := getPatchesFromPath(dir)
 		if err != nil {
 			return nil, err
 		}
