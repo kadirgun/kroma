@@ -10,80 +10,68 @@ user-invocable: true
 
 # Apply Patches Workflow
 
-## When to activate
+## When to use
 
-Activate this skill when the user:
-
-- Runs **`patcher push`** and encounters **"Rejected hunk"** errors
-- Needs to **resolve patch conflicts** in `.rej` files
-- Wants to **extract changes** from modified files into `.diff` patches
-- Needs to **systematically apply** all patches and handle failures
+Use this skill when a Chromium patch cannot be applied cleanly with **`patcher push`** and a `.rej` file is generated.
 
 ## Workflow
 
-### Step 1: Push patches to apply them
+### 1. Run `patcher push`
 
 ```bash
-cd /path/to/kroma
 patcher push
 ```
 
-If all patches apply successfully, you're done.
+If the command succeeds, no further action is needed.
 
-### Step 2: Detect and inspect rejected hunks
+### 2. Inspect the `.rej` file
 
-If you see **"Rejected hunk"** error with a filename (e.g., `chrome/browser/chrome_content_browser_client.cc`):
+If patcher push returns "Rejected hunk" error:
 
-1. Look for the corresponding `.rej` file in the same directory:
+1. Read the `.rej` file to understand what changes failed
+2. Create a todo list with each change that needs to be made to the target file
+3. Apply each change to the target file using the edit tool
 
-   ```bash
-   # Example: if push failed on chrome/browser/chrome_content_browser_client.cc
-   # the .rej file will be at the same path with .rej extension
-   chromium/src/chrome/browser/chrome_content_browser_client.cc.rej
-   ```
+### 3. Edit the target file manually
 
-2. Read the `.rej` file to understand what changes failed:
-   - The `.rej` file shows the exact hunks that patch couldn't apply
-   - Each hunk shows the expected context and the attempted change
-   - Context mismatch is the most common cause
+- Apply the same changes from the rejected patch to the target file
+- Use the editor and patch context to preserve nearby code
+- Do not use `git checkout` to revert the file
 
-### Step 3: Resolve the conflict
+### 4. Remove the `.rej` file
 
-1. Open the source file (`chromium/src/chrome/browser/chrome_content_browser_client.cc`)
-2. Find the location where the hunk should go (context in `.rej` file is your guide)
-3. Manually apply the changes from the `.rej` file
-4. Save the file
-
-### Step 4: Pull the patch again to mark it as applied
-
-After resolving conflicts:
+After the manual edits are complete:
 
 ```bash
-patcher pull chrome/browser/chrome_content_browser_client.cc
+Remove-Item "path/to/target.rej" -Force
 ```
 
-This generates or updates `.diff` files in the `patches/` directory.
+### 5. Pull the patched file
 
-Ensure:
-
-- You're running commands from the `kroma/` root directory
-- The `chromium/src/` submodule exists and is checked out
-- File paths in patches are relative to `chromium/src/`
-
-## Examples
-
-**Example**
+Pull the repaired patch file back into the patches directory, which will create a new patch file with the applied changes:
 
 ```bash
-# Push fails with "Rejected hunk" for chrome_content_browser_client.cc
+patcher pull path/to/target
+```
+
+## Rules to follow
+
+- Never use `git checkout` to reset files during patch resolution
+- Edit the target file manually based on `.rej` contents
+- Delete the `.rej` file only after edits are finished
+- Keep a todo list for each change if multiple hunks failed
+- Note that patch file paths are relative to `chromium/src/`
+
+## Example
+
+```bash
+# Attempt to push the patch
 patcher push
 
-# Find the .rej file
-cat chromium/src/chrome/browser/chrome_content_browser_client.cc.rej
+# If a reject occurs, inspect the .rej file and fix the target file
+# Remove the reject file once edits are done
+Remove-Item "chromium/src/chrome/browser/BUILD.gn.rej" -Force
 
-# Edit the target file to match context, then delete the .rej file
-rm chromium/src/chrome/browser/chrome_content_browser_client.cc.rej
-
-# Pull the patch to update .diff files
-patcher pull chrome/browser/chrome_content_browser_client.cc
+# Then pull the repaired patch file back in
+patcher pull chrome/browser/BUILD.gn
 ```
