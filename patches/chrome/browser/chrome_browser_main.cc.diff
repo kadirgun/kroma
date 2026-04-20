@@ -1,16 +1,16 @@
 diff --git a/chrome/browser/chrome_browser_main.cc b/chrome/browser/chrome_browser_main.cc
-index 4a527b7625..044a8c2696 100644
+index b4160da8ba3764f3d0233f6c8228e3978df4f1dd..dc57128cfde923a8b46760d4c1cafcda9a3763b1 100644
 --- a/chrome/browser/chrome_browser_main.cc
 +++ b/chrome/browser/chrome_browser_main.cc
-@@ -47,6 +47,7 @@
+@@ -53,6 +53,7 @@
  #include "chrome/browser/metrics/expired_histograms_array.h"
  #include "chrome/browser/metrics/shutdown_watcher_helper.h"
  #include "chrome/browser/net/system_network_context_manager.h"
 +#include "chrome/browser/net/secure_dns_config.h"
+ #include "chrome/browser/performance_manager/public/chrome_browser_main_extra_parts_performance_manager.h"
+ #include "chrome/browser/performance_monitor/chrome_browser_main_extra_parts_performance_monitor.h"
  #include "chrome/browser/policy/chrome_browser_policy_connector.h"
- #include "chrome/browser/profiles/profile.h"
- #include "chrome/browser/profiles/profile_manager.h"
-@@ -949,6 +950,32 @@ int ChromeBrowserMainParts::PreCreateThreadsImpl() {
+@@ -1200,6 +1201,32 @@ int ChromeBrowserMainParts::PreCreateThreadsImpl() {
  
    PrefService* local_state = browser_process_->local_state();
  
