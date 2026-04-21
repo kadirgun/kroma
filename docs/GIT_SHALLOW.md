@@ -2,10 +2,13 @@
 
 ```bash
 cd chromium/src
-git config --local fetch.depth 1
-git config --local fetch.recursesubmodules off
-git config --local fetch.prune true
-git config --local push.recursesubmodules off
+git config fetch.depth 1
+git config fetch.recursesubmodules off
+git config fetch.prune true
+git config push.recursesubmodules off
+git config gc.auto 0
+git config gc.autopacklimit 0
+git config gc.autodetach false
 ```
 
 ## If .git Bloats
