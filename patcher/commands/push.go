@@ -12,10 +12,23 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
+type PushCommandOptions struct {
+	AllowDirty bool
+}
+
+var pushCommandOptions PushCommandOptions
+
 var Push = cli.Command{
 	Name:  "push",
 	Usage: "Push patches to a source",
-	Flags: []cli.Flag{},
+	Flags: []cli.Flag{
+		&cli.BoolFlag{
+			Name:        "allow-dirty",
+			Usage:       "Allow pushing patches with dirty target files. Use with caution, as this may lead to conflicts and data loss.",
+			Value:       false,
+			Destination: &pushCommandOptions.AllowDirty,
+		},
+	},
 	Action: func(ctx context.Context, c *cli.Command) error {
 		return filepath.Walk(store.Config.GetPatchesDir(), func(path string, info fs.FileInfo, err error) error {
 			if info.IsDir() {
@@ -37,7 +50,7 @@ var Push = cli.Command{
 				return nil
 			}
 
-			if patch.IsDirty() {
+			if patch.IsDirty() && !pushCommandOptions.AllowDirty {
 				return fmt.Errorf("%s is dirty, review and pull the latest changes before pushing", patch.TargetPath)
 			}
 

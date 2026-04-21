@@ -48,3 +48,5 @@ cc_wrapper = "sccache"
 branding_file_path="//chrome/app/theme/chromium/BRANDING"
 
 # Toolchain is auto-detected via build/win_toolchain.json (DEPOT_TOOLS_WIN_TOOLCHAIN=1)
+
+kroma_enabled = true

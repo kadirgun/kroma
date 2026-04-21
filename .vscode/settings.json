@@ -1,6 +1,3 @@
 {
-  "git.autofetch": false,
-  "files.associations": {
-    "*.gn": "shellscript"
-  }
+  "git.autofetch": false
 }
