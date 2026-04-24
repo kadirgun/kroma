@@ -1,0 +1,15 @@
+diff --git a/base/version_info/version_info.h b/base/version_info/version_info.h
+index 1f54eef6f4b0ac1080ff8295978c2e4c98845131..6b5ad515854f81906b8eb2e09f34b3767568d29c 100644
+--- a/base/version_info/version_info.h
++++ b/base/version_info/version_info.h
+@@ -26,9 +26,7 @@ constexpr std::string_view GetProductName() {
+ }
+ 
+ // Returns the version number, e.g. "6.0.490.1".
+-constexpr std::string_view GetVersionNumber() {
+-  return PRODUCT_VERSION;
+-}
++std::string_view GetVersionNumber();
+ 
+ // Returns the major component (aka the milestone) of the version as an int,
+ // e.g. 6 when the version is "6.0.490.1".

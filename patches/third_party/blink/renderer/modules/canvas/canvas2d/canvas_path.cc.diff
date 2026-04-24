@@ -1,0 +1,50 @@
+diff --git a/third_party/blink/renderer/modules/canvas/canvas2d/canvas_path.cc b/third_party/blink/renderer/modules/canvas/canvas2d/canvas_path.cc
+index 8c8b5f5cb096aa14d69ed2671e655e7d24a66e37..f62bcd45a24e5566017a5359fccc97748edb0213 100644
+--- a/third_party/blink/renderer/modules/canvas/canvas2d/canvas_path.cc
++++ b/third_party/blink/renderer/modules/canvas/canvas2d/canvas_path.cc
+@@ -44,6 +44,7 @@
+ #include "base/check_op.h"
+ #include "base/compiler_specific.h"
+ #include "base/numerics/safe_conversions.h"
++#include "third_party/blink/renderer/core/kroma_canvas/kroma_noise_helper.h"
+ #include "third_party/blink/renderer/bindings/core/v8/v8_dom_point_init.h"
+ #include "third_party/blink/renderer/bindings/core/v8/v8_union_dompointinit_unrestricteddouble.h"
+ #include "third_party/blink/renderer/core/execution_context/execution_context.h"  // IWYU pragma: keep (https://github.com/clangd/clangd/issues/2044)
+@@ -452,6 +453,16 @@ void CanvasPath::arc(double double_x,
+     return;
+   }
+ 
++  uint64_t token_value = GetCanvasNoiseTokenValue();
++  if (token_value != 0 && radius >= 5.0f) {
++    x = KromaNoiseFloat(token_value, 200u, x);
++    y = KromaNoiseFloat(token_value, 201u, y);
++    radius = KromaNoiseFloat(token_value, 202u, radius);
++    if (radius < 0) {
++      radius = 0;
++    }
++  }
++
+   UpdatePathFromLineOrArcIfNecessaryForMutation();
+ 
+   if (!radius || start_angle == end_angle) [[unlikely]] {
+@@ -518,6 +529,20 @@ void CanvasPath::ellipse(double double_x,
+     return;
+   }
+ 
++  uint64_t token_value = GetCanvasNoiseTokenValue();
++  if (token_value != 0 && radius_x >= 5.0f && radius_y >= 5.0f) {
++    x = KromaNoiseFloat(token_value, 300u, x);
++    y = KromaNoiseFloat(token_value, 301u, y);
++    radius_x = KromaNoiseFloat(token_value, 302u, radius_x);
++    radius_y = KromaNoiseFloat(token_value, 303u, radius_y);
++    if (radius_x < 0) {
++      radius_x = 0;
++    }
++    if (radius_y < 0) {
++      radius_y = 0;
++    }
++  }
++
+   UpdatePathFromLineOrArcIfNecessaryForMutation();
+ 
+   CanonicalizeAngle(&start_angle, &end_angle);

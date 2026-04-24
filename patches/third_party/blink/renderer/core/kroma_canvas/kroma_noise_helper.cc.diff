@@ -1,9 +1,9 @@
 diff --git a/third_party/blink/renderer/core/kroma_canvas/kroma_noise_helper.cc b/third_party/blink/renderer/core/kroma_canvas/kroma_noise_helper.cc
 new file mode 100644
-index 0000000..bb7f0ca
+index 0000000..130d659
 --- /dev/null
 +++ b/third_party/blink/renderer/core/kroma_canvas/kroma_noise_helper.cc
-@@ -0,0 +1,215 @@
+@@ -0,0 +1,241 @@
 +// Copyright 2025 The Chromium Authors
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -27,6 +27,8 @@ index 0000000..bb7f0ca
 +
 +namespace {
 +
++constexpr int kGeometryNoiseBucketCount = 17;
++constexpr double kGeometryNoiseStep = 0.0625;
 +constexpr uint8_t kMaxClosePixelDelta = 10u;
 +constexpr uint8_t kMaxNoisePerChannel = 1u;
 +constexpr uint8_t kChannelsPerPixel = 4u;
@@ -117,6 +119,20 @@ index 0000000..bb7f0ca
 +                    base::span<uint8_t> to_pixel) {
 +  base::SpanWriter writer(base::as_writable_bytes(to_pixel));
 +  writer.Write(from_pixel.first<kChannelsPerPixel>());
++}
++
++template <typename T>
++T ApplyGeometryNoise(uint64_t token_value, uint64_t salt, T value) {
++  if (token_value == 0) {
++    return value;
++  }
++
++  KromaNoiseHash hash{KromaNoiseToken(token_value)};
++  hash.Update(salt);
++  const int noise_bucket =
++      hash.GetValueBelow(kGeometryNoiseBucketCount) -
++      (kGeometryNoiseBucketCount / 2);
++  return value + static_cast<T>(noise_bucket * kGeometryNoiseStep);
 +}
 +
 +}  // namespace
@@ -216,6 +232,16 @@ index 0000000..bb7f0ca
 +    // Previous can be overwritten (new current). Current is the now previous.
 +    std::swap(unnoised_previous_row, unnoised_current_row);
 +  }
++}
++
++double KromaNoiseDouble(uint64_t token_value,
++                        uint64_t salt,
++                        double value) {
++  return ApplyGeometryNoise(token_value, salt, value);
++}
++
++float KromaNoiseFloat(uint64_t token_value, uint64_t salt, float value) {
++  return ApplyGeometryNoise(token_value, salt, value);
 +}
 +
 +}  // namespace blink

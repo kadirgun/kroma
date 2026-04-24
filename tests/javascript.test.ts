@@ -14,7 +14,7 @@ describe("javascript tests", async () => {
 
   it("should set user agent version", async () => {
     const userAgent = await page.evaluate(() => navigator.userAgent);
-    expect(userAgent).toContain("Chrome/99.0.4844.51");
+    expect(userAgent).toContain("Chrome/99.0.0.0");
 
     const highEntropyValues = await page.evaluate(async () => {
       // @ts-ignore

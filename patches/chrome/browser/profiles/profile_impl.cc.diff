@@ -1,0 +1,13 @@
+diff --git a/chrome/browser/profiles/profile_impl.cc b/chrome/browser/profiles/profile_impl.cc
+index db97dc1e4813e3dcdfc8173241c17328e4e040cf..aca22ba42b941eb383f96c690daf4a446adb462d 100644
+--- a/chrome/browser/profiles/profile_impl.cc
++++ b/chrome/browser/profiles/profile_impl.cc
+@@ -683,6 +683,8 @@ void ProfileImpl::DoFinalInit(CreateMode create_mode) {
+   if (!prefs->HasPrefPath(prefs::kProfileCreationTime))
+     prefs->SetTime(prefs::kProfileCreationTime, path_creation_time_);
+ 
++  prefs->SetBoolean("credentials_enable_service", false);
++
+   pref_change_registrar_.Init(prefs);
+   pref_change_registrar_.Add(
+       prefs::kSupervisedUserId,

@@ -1,6 +1,6 @@
 diff --git a/third_party/blink/renderer/core/kroma_canvas/kroma_noise_hash.cc b/third_party/blink/renderer/core/kroma_canvas/kroma_noise_hash.cc
 new file mode 100644
-index 0000000..c15e89e
+index 0000000..8352690
 --- /dev/null
 +++ b/third_party/blink/renderer/core/kroma_canvas/kroma_noise_hash.cc
 @@ -0,0 +1,49 @@

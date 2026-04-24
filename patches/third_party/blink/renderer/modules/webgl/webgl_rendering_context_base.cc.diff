@@ -1,5 +1,5 @@
 diff --git a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
-index e6f8fef21367b8ed924a23d67c3b9752e7105cbc..a94cc21ed701c2da73c91e640756fe5ab254474f 100644
+index e6f8fef21367b8ed924a23d67c3b9752e7105cbc..8afc21a1aa24420416cf79b06ff4329ca8a0aa25 100644
 --- a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
 +++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
 @@ -32,6 +32,7 @@
@@ -18,7 +18,57 @@ index e6f8fef21367b8ed924a23d67c3b9752e7105cbc..a94cc21ed701c2da73c91e640756fe5a
  #include "third_party/blink/renderer/core/html/html_image_element.h"
  #include "third_party/blink/renderer/core/html/media/html_video_element.h"
  #include "third_party/blink/renderer/core/imagebitmap/image_bitmap.h"
-@@ -3881,6 +3883,12 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+@@ -1856,7 +1858,12 @@ WebGLRenderingContextBase::PaintRenderingResultsToSnapshot(
+   if (Host()->LowLatencyEnabled() &&
+       GetDrawingBuffer()->SupportsNoCopyExportForLowLatency()) {
+     auto resource = ExportLowLatencyCanvasResource(source_buffer);
+-    return resource ? resource->Bitmap() : nullptr;
++    scoped_refptr<StaticBitmapImage> snapshot = resource ? resource->Bitmap()
++                                                         : nullptr;
++    if (snapshot) {
++      CanvasInterventionsHelper::MaybeNoiseSnapshot(snapshot);
++    }
++    return snapshot;
+   }
+ 
+   bool cleared_content = ClearIfComposited(kClearCallerOther) != kSkipped;
+@@ -1879,7 +1886,11 @@ WebGLRenderingContextBase::PaintRenderingResultsToSnapshot(
+   if (!must_paint_to_canvas_ && !cleared_content) {
+     if (resource_provider_.get()) {
+       // `resource_provider_` already has the current contents.
+-      return resource_provider_->Snapshot();
++      scoped_refptr<StaticBitmapImage> snapshot = resource_provider_->Snapshot();
++      if (snapshot) {
++        CanvasInterventionsHelper::MaybeNoiseSnapshot(snapshot);
++      }
++      return snapshot;
+     }
+     if (cached_snapshot_) {
+       // `cached_snapshot__` already has the current contents.
+@@ -1900,6 +1911,9 @@ WebGLRenderingContextBase::PaintRenderingResultsToSnapshot(
+       cached_snapshot_ = CopyRenderingResultsToUnacceleratedStaticBitmapImage(
+           source_buffer, viz::SharedImageFormat::N32Format(),
+           kPremul_SkAlphaType, kTopLeft_GrSurfaceOrigin);
++      if (cached_snapshot_) {
++        CanvasInterventionsHelper::MaybeNoiseSnapshot(cached_snapshot_);
++      }
+     }
+ 
+     if (cached_snapshot_) {
+@@ -1932,7 +1946,11 @@ WebGLRenderingContextBase::PaintRenderingResultsToSnapshot(
+ 
+   // We successfully painted the canvas' contents.
+   must_paint_to_canvas_ = false;
+-  return resource_provider->Snapshot();
++  scoped_refptr<StaticBitmapImage> snapshot = resource_provider->Snapshot();
++  if (snapshot) {
++    CanvasInterventionsHelper::MaybeNoiseSnapshot(snapshot);
++  }
++  return snapshot;
+ }
+ 
+ scoped_refptr<CanvasResource>
+@@ -3881,6 +3899,12 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
      case GL_RENDERBUFFER_BINDING:
        return WebGLAny(script_state, renderbuffer_binding_.Get());
      case GL_RENDERER:
@@ -31,7 +81,7 @@ index e6f8fef21367b8ed924a23d67c3b9752e7105cbc..a94cc21ed701c2da73c91e640756fe5a
        return WebGLAny(script_state, String("WebKit WebGL"));
      case GL_SAMPLE_ALPHA_TO_COVERAGE:
        return GetBooleanParameter(script_state, pname);
-@@ -3959,6 +3967,12 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+@@ -3959,6 +3983,12 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
      case GC3D_UNPACK_COLORSPACE_CONVERSION_WEBGL:
        return WebGLAny(script_state, unpack_colorspace_conversion_);
      case GL_VENDOR:
@@ -44,7 +94,7 @@ index e6f8fef21367b8ed924a23d67c3b9752e7105cbc..a94cc21ed701c2da73c91e640756fe5a
        return WebGLAny(script_state, String("WebKit"));
      case GL_VERSION:
        return WebGLAny(
-@@ -3977,6 +3991,12 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+@@ -3977,6 +4007,12 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
        return ScriptValue::CreateNull(script_state->GetIsolate());
      case WebGLDebugRendererInfo::kUnmaskedRendererWebgl:
        if (ExtensionEnabled(kWebGLDebugRendererInfoName)) {
@@ -57,7 +107,7 @@ index e6f8fef21367b8ed924a23d67c3b9752e7105cbc..a94cc21ed701c2da73c91e640756fe5a
          return WebGLAny(script_state,
                          String(ContextGL()->GetString(GL_RENDERER)));
        }
-@@ -3986,6 +4006,12 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+@@ -3986,6 +4022,12 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
        return ScriptValue::CreateNull(script_state->GetIsolate());
      case WebGLDebugRendererInfo::kUnmaskedVendorWebgl:
        if (ExtensionEnabled(kWebGLDebugRendererInfoName)) {
@@ -70,7 +120,7 @@ index e6f8fef21367b8ed924a23d67c3b9752e7105cbc..a94cc21ed701c2da73c91e640756fe5a
          return WebGLAny(script_state,
                          String(ContextGL()->GetString(GL_VENDOR)));
        }
-@@ -5133,6 +5159,13 @@ void WebGLRenderingContextBase::ReadPixelsHelper(GLint x,
+@@ -5133,6 +5175,12 @@ void WebGLRenderingContextBase::ReadPixelsHelper(GLint x,
      }
      ContextGL()->ReadPixels(x, y, width, height, format, type, data);
    }
@@ -78,8 +128,7 @@ index e6f8fef21367b8ed924a23d67c3b9752e7105cbc..a94cc21ed701c2da73c91e640756fe5a
 +  // Apply noise to prevent fingerprinting via readPixels
 +  if (format == GL_RGBA && type == GL_UNSIGNED_BYTE && data && width > 0 &&
 +      height > 0) {
-+    CanvasInterventionsHelper::MaybeNoiseReadPixels(
-+        GetExecutionContext(), data, width, height);
++    CanvasInterventionsHelper::MaybeNoiseReadPixels(data, width, height);
 +  }
  }
  
