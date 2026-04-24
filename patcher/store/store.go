@@ -8,9 +8,10 @@ import (
 )
 
 type AppConfig struct {
-	BasePath   string
-	Submodules []string `json:"submodules"`
-	Repo       string   `json:"repo"`
+	BasePath       string
+	Submodules     []string `json:"submodules"`
+	Repo           string   `json:"repo"`
+	IgnorePatterns []string `json:"ignorePatterns"`
 }
 
 func (c *AppConfig) GetPatchesDir() string {

@@ -113,6 +113,11 @@ func getPatchesFromPath(path string) ([]*models.Patch, error) {
 
 		fileName := strings.TrimSpace(line[3:])
 
+		if shouldIgnore(fileName) {
+			log.Debugf("Ignoring file %s due to match pattern", fileName)
+			continue
+		}
+
 		targetPath := filepath.Join(cmd.Dir, fileName)
 		patch, err := models.NewPatchFromTarget(targetPath)
 		if err != nil {
@@ -133,18 +138,18 @@ func getPatchesFromPaths(paths []string) ([]*models.Patch, error) {
 
 	for _, path := range paths {
 		submoduleDir := filepath.Join(store.Config.BasePath, store.Config.Repo, path)
-		
+
 		// If path is a file, get the directory containing it
 		info, err := os.Stat(submoduleDir)
 		if err != nil {
 			return nil, err
 		}
-		
+
 		dir := submoduleDir
 		if !info.IsDir() {
 			dir = filepath.Dir(submoduleDir)
 		}
-		
+
 		submodulePatches, err := getPatchesFromPath(dir)
 		if err != nil {
 			return nil, err
@@ -169,4 +174,14 @@ func saveDiffs(patches []*models.Patch) (int, error) {
 	}
 
 	return savedCount, nil
+}
+
+func shouldIgnore(fileName string) bool {
+	for _, pattern := range store.Config.IgnorePatterns {
+		matched, err := filepath.Match(pattern, fileName)
+		if err == nil && matched {
+			return true
+		}
+	}
+	return false
 }
