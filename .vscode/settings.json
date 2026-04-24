@@ -1,3 +1,13 @@
 {
-  "git.autofetch": false
+  "git.autofetch": false,
+  "files.watcherExclude": {
+    ".git/objects/**": true,
+    ".git/subtree-cache/**": true,
+    ".hg/store/**": true,
+    "*/.git/objects/**": true,
+    "*/.git/subtree-cache/**": true,
+    "*/.hg/store/**": true,
+    "**/node_modules/**": true,
+    "**/chromium/**": true
+  }
 }

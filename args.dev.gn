@@ -10,10 +10,8 @@ v8_symbol_level=0
 
 enable_vr = false
 enable_background_mode = false
-enable_bound_session_credentials = true
 enable_openscreen_protocol = false
 
-build_with_tflite_lib=true
 clang_use_chrome_plugins=false
 disable_fieldtrial_testing_config=true
 enable_hangout_services_extension=false
@@ -45,8 +43,4 @@ dcheck_always_on=false
 enable_rust=true
 enable_mse_mpeg2ts_stream_parser=true
 cc_wrapper = "sccache"
-branding_file_path="//chrome/app/theme/chromium/BRANDING"
-
-# Toolchain is auto-detected via build/win_toolchain.json (DEPOT_TOOLS_WIN_TOOLCHAIN=1)
-
-kroma_enabled = true
+branding_file_path="//chrome/app/theme/chrome/BRANDING"
