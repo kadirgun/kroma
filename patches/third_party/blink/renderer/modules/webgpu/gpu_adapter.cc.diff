@@ -1,16 +1,16 @@
 diff --git a/third_party/blink/renderer/modules/webgpu/gpu_adapter.cc b/third_party/blink/renderer/modules/webgpu/gpu_adapter.cc
-index 6039644e2d..cc534a5566 100644
+index 4bb4d3599ecb888045e3f1aae6b7b0dac52249a6..e97821ab708ce139a7fd847c3b82b5749cb75c32 100644
 --- a/third_party/blink/renderer/modules/webgpu/gpu_adapter.cc
 +++ b/third_party/blink/renderer/modules/webgpu/gpu_adapter.cc
-@@ -23,6 +23,7 @@
- #include "third_party/blink/renderer/modules/webgpu/gpu_supported_limits.h"
+@@ -24,6 +24,7 @@
  #include "third_party/blink/renderer/modules/webgpu/string_utils.h"
+ #include "third_party/blink/renderer/platform/graphics/gpu/webgpu_callback.h"
  #include "third_party/blink/renderer/platform/heap/garbage_collected.h"
 +#include "base/command_line.h"
+ #include "third_party/blink/renderer/platform/runtime_enabled_features.h"
  
  namespace blink {
- 
-@@ -117,6 +118,15 @@ GPUAdapter::GPUAdapter(
+@@ -119,6 +120,15 @@ GPUAdapter::GPUAdapter(
    GetHandle().GetLimits(limits.GetLinked());
    limits_ = MakeGarbageCollected<GPUSupportedLimits>(limits);
  
@@ -26,7 +26,7 @@ index 6039644e2d..cc534a5566 100644
    info_ = CreateAdapterInfoForAdapter();
  }
  
-@@ -124,14 +134,17 @@ GPUAdapterInfo* GPUAdapter::CreateAdapterInfoForAdapter() {
+@@ -126,14 +136,17 @@ GPUAdapterInfo* GPUAdapter::CreateAdapterInfoForAdapter() {
    bool is_fallback_adapter = adapter_type_ == wgpu::AdapterType::CPU;
  
    GPUAdapterInfo* info;
@@ -49,7 +49,7 @@ index 6039644e2d..cc534a5566 100644
  
      // SAFETY: Required from caller
      const auto memory_heaps_span =
-@@ -141,9 +154,10 @@ GPUAdapterInfo* GPUAdapter::CreateAdapterInfoForAdapter() {
+@@ -143,9 +156,10 @@ GPUAdapterInfo* GPUAdapter::CreateAdapterInfoForAdapter() {
        info->AppendMemoryHeapInfo(MakeGarbageCollected<GPUMemoryHeapInfo>(m));
      }
    } else {

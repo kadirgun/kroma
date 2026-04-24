@@ -1,0 +1,24 @@
+diff --git a/third_party/blink/renderer/core/html/canvas/html_canvas_element.cc b/third_party/blink/renderer/core/html/canvas/html_canvas_element.cc
+index 34e8e709326f520d341a2404eeae0f516287806e..253462dd38f7f0686edd2b78f2001e7ea45918a6 100644
+--- a/third_party/blink/renderer/core/html/canvas/html_canvas_element.cc
++++ b/third_party/blink/renderer/core/html/canvas/html_canvas_element.cc
+@@ -58,6 +58,7 @@
+ #include "third_party/blink/renderer/bindings/core/v8/script_controller.h"
+ #include "third_party/blink/renderer/bindings/core/v8/v8_image_bitmap_options.h"
+ #include "third_party/blink/renderer/bindings/core/v8/v8_image_encode_options.h"
++#include "third_party/blink/renderer/core/kroma_canvas/canvas_interventions_helper.h"
+ #include "third_party/blink/renderer/core/css/css_font_selector.h"
+ #include "third_party/blink/renderer/core/css/style_change_reason.h"
+ #include "third_party/blink/renderer/core/css/style_engine.h"
+@@ -1314,6 +1315,11 @@ String HTMLCanvasElement::ToDataURLInternal(
+ 
+   scoped_refptr<StaticBitmapImage> image_bitmap = Snapshot(source_buffer);
+   if (image_bitmap) {
++    // Apply noise if canvas has recorded operations (Kroma fingerprinting protection)
++    if (context_ && context_->HasOperations()) {
++      CanvasInterventionsHelper::MaybeNoiseSnapshot(GetExecutionContext(),
++                                                   image_bitmap);
++    }
+     std::unique_ptr<ImageDataBuffer> data_buffer =
+         ImageDataBuffer::Create(image_bitmap);
+     if (!data_buffer)

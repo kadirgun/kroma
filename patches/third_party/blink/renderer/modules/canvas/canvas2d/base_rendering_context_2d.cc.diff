@@ -1,0 +1,79 @@
+diff --git a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
+index 3006cad0fbf9b8c171d585a3c46492783c26878c..be373a07c7945ff3d60fd769b8e215793d80dd28 100644
+--- a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
++++ b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
+@@ -39,6 +39,7 @@
+ #include "third_party/blink/renderer/bindings/modules/v8/v8_canvas_font_variant_caps.h"
+ #include "third_party/blink/renderer/bindings/modules/v8/v8_canvas_text_rendering.h"
+ #include "third_party/blink/renderer/bindings/modules/v8/v8_gpu_texture_format.h"
++#include "third_party/blink/renderer/core/kroma_canvas/canvas_interventions_helper.h"
+ #include "third_party/blink/renderer/core/css/properties/computed_style_utils.h"
+ #include "third_party/blink/renderer/core/css/style_change_reason.h"
+ #include "third_party/blink/renderer/core/dom/events/event.h"
+@@ -478,6 +479,11 @@ ImageData* BaseRenderingContext2D::getImageDataInternal(
+ 
+   scoped_refptr<StaticBitmapImage> snapshot = GetImage();
+ 
++  if (snapshot && kroma_tracker_.HasOperations()) {
++    CanvasInterventionsHelper::MaybeNoiseSnapshot(GetTopExecutionContext(),
++                                                  snapshot);
++  }
++
+   // Determine if the array should be zero initialized, or if it will be
+   // completely overwritten.
+   validate_and_create_params.zero_initialize = false;
+@@ -532,6 +538,7 @@ void BaseRenderingContext2D::putImageData(ImageData* data,
+                                           int dx,
+                                           int dy,
+                                           ExceptionState& exception_state) {
++  kroma_tracker_.RecordPutImageData();
+   putImageData(data, dx, dy, 0, 0, data->width(), data->height(),
+                exception_state);
+ }
+@@ -762,7 +769,13 @@ BaseRenderingContext2D::PaintRenderingResultsToSnapshot(
+ 
+   CanvasResourceProvider* provider = GetResourceProvider();
+   provider->FlushCanvas();
+-  return provider->Snapshot();
++  scoped_refptr<StaticBitmapImage> snapshot = provider->Snapshot();
++
++  if (snapshot && kroma_tracker_.HasOperations()) {
++    CanvasInterventionsHelper::MaybeNoiseSnapshot(GetTopExecutionContext(),
++                                                 snapshot);
++  }
++  return snapshot;
+ }
+ 
+ bool BaseRenderingContext2D::IsResourceProviderValid() {
+@@ -881,6 +894,7 @@ void BaseRenderingContext2D::setDirection(const V8CanvasDirection direction) {
+ }
+ 
+ void BaseRenderingContext2D::fillText(const String& text, double x, double y) {
++  kroma_tracker_.RecordFillText();
+   CanvasRenderingContext2DState& state = GetState();
+   DrawTextInternal(text, x, y, CanvasRenderingContext2DState::kFillPaintType,
+                    state.GetTextAlign(), state.GetTextBaseline(), 0,
+@@ -891,6 +905,7 @@ void BaseRenderingContext2D::fillText(const String& text,
+                                       double x,
+                                       double y,
+                                       double max_width) {
++  kroma_tracker_.RecordFillText();
+   CanvasRenderingContext2DState& state = GetState();
+   DrawTextInternal(text, x, y, CanvasRenderingContext2DState::kFillPaintType,
+                    state.GetTextAlign(), state.GetTextBaseline(), 0,
+@@ -937,6 +952,7 @@ void BaseRenderingContext2D::fillTextCluster(
+ void BaseRenderingContext2D::strokeText(const String& text,
+                                         double x,
+                                         double y) {
++  kroma_tracker_.RecordStrokeText();
+   CanvasRenderingContext2DState& state = GetState();
+   DrawTextInternal(text, x, y, CanvasRenderingContext2DState::kStrokePaintType,
+                    state.GetTextAlign(), state.GetTextBaseline(), 0,
+@@ -947,6 +963,7 @@ void BaseRenderingContext2D::strokeText(const String& text,
+                                         double x,
+                                         double y,
+                                         double max_width) {
++  kroma_tracker_.RecordStrokeText();
+   CanvasRenderingContext2DState& state = GetState();
+   DrawTextInternal(text, x, y, CanvasRenderingContext2DState::kStrokePaintType,
+                    state.GetTextAlign(), state.GetTextBaseline(), 0,

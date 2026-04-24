@@ -1,8 +1,8 @@
 diff --git a/chrome/browser/chrome_content_browser_client.cc b/chrome/browser/chrome_content_browser_client.cc
-index b8acad0008..a4ecad7689 100644
+index 25458578a830674aac9f57e55257c5f2fb2314ec..baa7970440c4555f973475dbd76d35c4946c5e2a 100644
 --- a/chrome/browser/chrome_content_browser_client.cc
 +++ b/chrome/browser/chrome_content_browser_client.cc
-@@ -324,6 +323,7 @@
+@@ -330,6 +330,7 @@
  #include "content/public/browser/internal_webui_config.h"
  #include "content/public/browser/isolated_web_apps_policy.h"
  #include "content/public/browser/legacy_tech_cookie_issue_details.h"
@@ -10,7 +10,7 @@ index b8acad0008..a4ecad7689 100644
  #include "content/public/browser/navigation_handle.h"
  #include "content/public/browser/network_service_instance.h"
  #include "content/public/browser/overlay_window.h"
-@@ -2892,6 +2874,57 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
+@@ -2829,6 +2830,63 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
    command_line->AppendSwitchASCII(ash::switches::kHomedir, homedir.value());
  #endif
  
@@ -65,20 +65,12 @@ index b8acad0008..a4ecad7689 100644
 +        browser_command_line.GetSwitchValueASCII("cpu-cores"));
 +  }
 +
++  if (browser_command_line.HasSwitch("device-memory-gb")) {
++    command_line->AppendSwitchASCII(
++        "device-memory-gb",
++        browser_command_line.GetSwitchValueASCII("device-memory-gb"));
++  }
++
    if (process_type == switches::kRendererProcess) {
      content::RenderProcessHost* process =
          content::RenderProcessHost::FromID(child_process_id);
-@@ -8955,6 +8986,13 @@ ChromeContentBrowserClient::GetClipboardTypesIfPolicyApplied(
- bool ChromeContentBrowserClient::ShouldEnableCanvasNoise(
-     content::BrowserContext* browser_context,
-     const GURL& url) {
-+  // If the browser was launched with --canvas-noise, treat canvas noise as
-+  // explicitly enabled so that tests/manual runs that pass the switch get a
-+  // deterministic token and the feature is applied regardless of other
-+  // feature params or profile state.
-+  const base::CommandLine* cmd = base::CommandLine::ForCurrentProcess();
-+  if (cmd && cmd->HasSwitch("canvas-noise"))
-+    return true;
-   Profile* profile = Profile::FromBrowserContext(browser_context);
-   bool feature_enable = fingerprinting_protection_interventions::features::
-       IsCanvasInterventionsEnabledForIncognitoState(

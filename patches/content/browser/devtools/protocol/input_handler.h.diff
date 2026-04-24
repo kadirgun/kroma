@@ -1,0 +1,27 @@
+diff --git a/content/browser/devtools/protocol/input_handler.h b/content/browser/devtools/protocol/input_handler.h
+index 4c25a8c1c26c32fdc91915e0395acb26ec597adb..7963917334ba85a8da4a63ca089184cf0cba2fd5 100644
+--- a/content/browser/devtools/protocol/input_handler.h
++++ b/content/browser/devtools/protocol/input_handler.h
+@@ -125,6 +125,9 @@ class InputHandler : public DevToolsDomainHandler, public Input::Backend {
+       std::optional<std::string> pointer_type,
+       std::unique_ptr<DispatchMouseEventCallback> callback) override;
+ 
++  DispatchResponse ScheduleMouseEvents(
++      std::unique_ptr<protocol::Array<protocol::Input::dispatchMouseEventParameters>> events) override;
++
+   void DispatchDragEvent(
+       const std::string& event_type,
+       double x,
+@@ -187,6 +190,12 @@ class InputHandler : public DevToolsDomainHandler, public Input::Backend {
+       std::optional<std::string> gesture_source_type,
+       std::unique_ptr<SynthesizeTapGestureCallback> callback) override;
+ 
++  void DispatchScheduledMouseEvents(
++      std::unique_ptr<protocol::Array<protocol::Input::dispatchMouseEventParameters>> events);
++
++  void HandleScheduledMouseEvent(
++      std::unique_ptr<blink::WebMouseEvent> event);
++
+  private:
+   class InputInjector;
+   class DragController {

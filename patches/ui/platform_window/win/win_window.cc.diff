@@ -1,9 +1,9 @@
 diff --git a/ui/platform_window/win/win_window.cc b/ui/platform_window/win/win_window.cc
-index 62a4d5bd3a..197059b3a6 100644
+index 1c6b85b8ba45d76e36397603c6ffcd52aa88b633..5832ed7ac82e6b84b748a5e8b15c96860ef4b2ae 100644
 --- a/ui/platform_window/win/win_window.cc
 +++ b/ui/platform_window/win/win_window.cc
-@@ -69,7 +69,7 @@ void WinWindow::Destroy() {
- }
+@@ -98,7 +98,7 @@ void WinWindow::OnCaretBoundsChanged(const TextInputClient* client) {}
+ void WinWindow::OnTextInputStateChanged(const TextInputClient* client) {}
  
  void WinWindow::Show(bool inactive) {
 -  ShowWindow(hwnd(), inactive ? SW_SHOWNOACTIVATE : SW_SHOWNORMAL);

@@ -1,0 +1,101 @@
+diff --git a/content/browser/devtools/protocol/input_handler.cc b/content/browser/devtools/protocol/input_handler.cc
+index 0e9590badb188c4b8866289f78affc9baaa0fc07..d9606b10860e9bbdf73ac7e9696888f0b6f136d7 100644
+--- a/content/browser/devtools/protocol/input_handler.cc
++++ b/content/browser/devtools/protocol/input_handler.cc
+@@ -104,6 +104,10 @@ int GetEventModifiers(int modifiers,
+     result |= blink::WebInputEvent::kMetaKey;
+   if (modifiers & 8)
+     result |= blink::WebInputEvent::kShiftKey;
++  if (modifiers & 16)
++    result |= blink::WebInputEvent::kAltGrKey;
++  if (modifiers & 32)
++    result |= blink::WebInputEvent::kNumLockOn;
+ 
+   if (location & 1)
+     result |= blink::WebInputEvent::kIsLeft;
+@@ -1389,6 +1393,85 @@ void InputHandler::HandleMouseEvent(
+   }
+ }
+ 
++DispatchResponse InputHandler::ScheduleMouseEvents(
++    std::unique_ptr<protocol::Array<protocol::Input::dispatchMouseEventParameters>> events) {
++  if (!events || events->empty()) {
++    return DispatchResponse::Success();
++  }
++
++  if (events->size() > 1000) {
++    return DispatchResponse::InvalidParams(
++        "Maximum 1000 events allowed per scheduleMouseEvents call");
++  }
++
++  if (!host_ || !host_->GetRenderWidgetHost()) {
++    return DispatchResponse::InternalError();
++  }
++
++  base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
++      FROM_HERE,
++      base::BindOnce(&InputHandler::DispatchScheduledMouseEvents,
++                     weak_factory_.GetWeakPtr(), std::move(events)),
++      base::TimeDelta());
++  return DispatchResponse::Success();
++}
++
++namespace {
++
++class SimpleDispatchMouseEventCallback : public InputHandler::DispatchMouseEventCallback {
++ public:
++  SimpleDispatchMouseEventCallback() = default;
++  void sendSuccess() override {}
++  void sendFailure(const DispatchResponse& response) override {}
++  void fallThrough() override {}
++};
++
++}  // namespace
++
++void InputHandler::DispatchScheduledMouseEvents(
++    std::unique_ptr<protocol::Array<protocol::Input::dispatchMouseEventParameters>> events) {
++  if (!events || events->empty()) {
++    return;
++  }
++
++  // Get start time from first event timestamp
++  double first_timestamp = (*events)[0]->GetTimestamp(0.0);
++  
++  for (size_t i = 0; i < events->size(); ++i) {
++    protocol::Input::dispatchMouseEventParameters* param = (*events)[i].get();
++    
++    // Get timestamp for this specific event
++    double event_timestamp = param->GetTimestamp(0.0);
++    
++    base::expected<std::unique_ptr<blink::WebMouseEvent>, protocol::Response>
++        maybe_event = CreateWebMouseEvent(
++            param->GetType(), param->GetX(), param->GetY(), ScaleFactor(),
++            param->GetModifiers(), event_timestamp, param->GetButton(), param->GetButtons(),
++            param->GetClickCount(), param->GetForce(), param->GetTangentialPressure(),
++            param->GetTiltX(), param->GetTiltY(), param->GetTwist(), param->GetDeltaX(), param->GetDeltaY(),
++            param->GetPointerType());
++    if (!maybe_event.has_value()) {
++      continue;
++    }
++    
++    // Calculate delay based on timestamp relative to first event (timestamps in ms)
++    base::TimeDelta delay = base::Milliseconds(static_cast<int64_t>(event_timestamp - first_timestamp));
++    
++    std::unique_ptr<blink::WebMouseEvent> event = std::move(maybe_event).value();
++    base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
++        FROM_HERE,
++        base::BindOnce(&InputHandler::HandleScheduledMouseEvent,
++                       weak_factory_.GetWeakPtr(), std::move(event)),
++        delay);
++  }
++}
++
++void InputHandler::HandleScheduledMouseEvent(
++    std::unique_ptr<blink::WebMouseEvent> event) {
++  HandleMouseEvent(std::move(event),
++                   std::make_unique<SimpleDispatchMouseEventCallback>());
++}
++
+ void InputHandler::DispatchDragEvent(
+     const std::string& event_type,
+     double x,

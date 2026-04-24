@@ -1,8 +1,8 @@
 diff --git a/third_party/blink/renderer/core/dom/document.cc b/third_party/blink/renderer/core/dom/document.cc
-index f8383e9829..6cff7b3778 100644
+index 18df9cce23d777e890a81e76c9866974c2fa6985..c123ee54126583c1fdd508ea428489c78aa0b3f8 100644
 --- a/third_party/blink/renderer/core/dom/document.cc
 +++ b/third_party/blink/renderer/core/dom/document.cc
-@@ -2262,7 +2262,8 @@ bool Document::IsPageVisible() const {
+@@ -2224,7 +2224,8 @@ bool Document::IsPageVisible() const {
    // visibility.
    if (load_event_progress_ >= kUnloadVisibilityChangeInProgress)
      return false;
@@ -12,7 +12,7 @@ index f8383e9829..6cff7b3778 100644
  }
  
  bool Document::IsPrefetchOnly() const {
-@@ -2310,10 +2311,15 @@ void Document::DidChangeVisibilityState() {
+@@ -2272,10 +2273,15 @@ void Document::DidChangeVisibilityState() {
      // tab and update the visibility state.
      return;
    }

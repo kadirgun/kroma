@@ -1,8 +1,8 @@
 diff --git a/components/embedder_support/switches.h b/components/embedder_support/switches.h
-index 088dc9271b..63e54e10d2 100644
+index 82680be35c74e1b5bc9c3b8d792b98ebcf82c8c8..57b15df7a4a0c2a659013431f9533da9a880a050 100644
 --- a/components/embedder_support/switches.h
 +++ b/components/embedder_support/switches.h
-@@ -20,8 +20,12 @@ extern const char kOriginTrialDisabledTokens[];
+@@ -18,8 +18,12 @@ extern const char kOriginTrialDisabledTokens[];
  extern const char kOriginTrialPublicKey[];
  extern const char kShortReportingDelay[];
  extern const char kUseMobileUserAgent[];

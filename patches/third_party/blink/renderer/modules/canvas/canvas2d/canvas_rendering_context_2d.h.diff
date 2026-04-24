@@ -1,0 +1,12 @@
+diff --git a/third_party/blink/renderer/modules/canvas/canvas2d/canvas_rendering_context_2d.h b/third_party/blink/renderer/modules/canvas/canvas2d/canvas_rendering_context_2d.h
+index 64a0adc3bef7d5ece19bd9814d676ba9fb9fc990..e5682e248e746fd072b83407ac79ae10c381e7ac 100644
+--- a/third_party/blink/renderer/modules/canvas/canvas2d/canvas_rendering_context_2d.h
++++ b/third_party/blink/renderer/modules/canvas/canvas2d/canvas_rendering_context_2d.h
+@@ -287,6 +287,7 @@ class MODULES_EXPORT CanvasRenderingContext2D final
+   HTMLCanvasElement* HostAsHTMLCanvasElement() const final;
+   UniqueFontSelector* GetFontSelector() const final;
+   void SizeChanged() final;
++  bool HasOperations() const final { return kroma_tracker_.HasOperations(); }
+ 
+   bool WritePixels(const SkImageInfo& orig_info,
+                    const void* pixels,

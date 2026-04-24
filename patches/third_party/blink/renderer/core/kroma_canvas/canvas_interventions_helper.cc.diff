@@ -1,0 +1,98 @@
+diff --git a/third_party/blink/renderer/core/kroma_canvas/canvas_interventions_helper.cc b/third_party/blink/renderer/core/kroma_canvas/canvas_interventions_helper.cc
+new file mode 100644
+index 0000000..7a76d6e
+--- /dev/null
++++ b/third_party/blink/renderer/core/kroma_canvas/canvas_interventions_helper.cc
+@@ -0,0 +1,92 @@
++// Copyright 2025 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#include "third_party/blink/renderer/core/kroma_canvas/canvas_interventions_helper.h"
++
++#include <cstdint>
++
++#include "base/containers/span.h"
++#include "base/memory/scoped_refptr.h"
++#include "third_party/blink/renderer/core/kroma_canvas/noise_token.h"
++#include "third_party/blink/renderer/core/kroma_canvas/kroma_noise_hash.h"
++#include "third_party/blink/renderer/core/kroma_canvas/kroma_noise_helper.h"
++#include "third_party/blink/renderer/platform/graphics/static_bitmap_image.h"
++#include "third_party/blink/renderer/platform/graphics/unaccelerated_static_bitmap_image.h"
++#include "third_party/skia/include/core/SkBitmap.h"
++#include "third_party/skia/include/core/SkImageInfo.h"
++#include "ui/gfx/skia_span_util.h"
++
++namespace blink {
++
++const char CanvasInterventionsHelper::kSupplementName[] =
++    "CanvasInterventionsHelper";
++
++// static
++bool CanvasInterventionsHelper::MaybeNoiseSnapshot(
++    ExecutionContext* execution_context,
++    scoped_refptr<StaticBitmapImage>& snapshot) {
++  CHECK(snapshot);
++
++  uint64_t token_value = GetCanvasNoiseTokenValue();
++  if (token_value == 0) {
++    return false;  // no switch = no noise
++  }
++
++  auto token_hash = KromaNoiseHash(KromaNoiseToken(token_value));
++
++  // Use kUnpremul_SkAlphaType as alpha type as we are changing the pixel values
++  // of all channels, including the alpha channel.
++  auto info = SkImageInfo::Make(
++      snapshot->GetSize().width(), snapshot->GetSize().height(),
++      viz::ToClosestSkColorType(snapshot->GetSharedImageFormat()),
++      kUnpremul_SkAlphaType, snapshot->GetColorSpace().ToSkColorSpace());
++  SkBitmap bm;
++  if (!bm.tryAllocPixels(info)) {
++    return false;
++  }
++
++  // Copy the original pixels from snapshot to the modifiable SkPixmap.
++  auto pixmap_to_noise = bm.pixmap();
++  PaintImage paint_image = snapshot->PaintImageForCurrentFrame();
++  if (!paint_image.readPixels(bm.info(), pixmap_to_noise.writable_addr(),
++                              bm.rowBytes(), 0, 0)) {
++    return false;
++  }
++
++  base::span<uint8_t> modify_pixels =
++      gfx::SkPixmapToWritableSpan(pixmap_to_noise);
++
++  KromaNoisePixels(token_hash, modify_pixels, pixmap_to_noise.width(),
++                   pixmap_to_noise.height());
++
++  auto noised_image = bm.asImage();
++  snapshot = blink::UnacceleratedStaticBitmapImage::Create(
++      std::move(noised_image), snapshot->Orientation());
++
++  return true;
++}
++
++// static
++void CanvasInterventionsHelper::MaybeNoiseReadPixels(
++    ExecutionContext* execution_context,
++    uint8_t* data,
++    int width,
++    int height) {
++  if (!data || width <= 0 || height <= 0) {
++    return;
++  }
++
++  uint64_t token_value = GetCanvasNoiseTokenValue();
++  if (token_value == 0) {
++    return;  // no switch = no noise
++  }
++
++  auto token_hash = KromaNoiseHash(KromaNoiseToken(token_value));
++  base::span<uint8_t> pixels =
++      base::span<uint8_t>(data, static_cast<size_t>(width * height * 4));
++
++  KromaNoisePixels(token_hash, pixels, width, height);
++}
++
++}  // namespace blink

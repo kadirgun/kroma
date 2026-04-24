@@ -1,0 +1,38 @@
+diff --git a/third_party/blink/common/device_memory/approximated_device_memory.cc b/third_party/blink/common/device_memory/approximated_device_memory.cc
+index d67deb2184f1427bf2cae448ace4b1d9d5236ef3..924a19bd5678253efec59474bad6f8d67955ff49 100644
+--- a/third_party/blink/common/device_memory/approximated_device_memory.cc
++++ b/third_party/blink/common/device_memory/approximated_device_memory.cc
+@@ -4,7 +4,11 @@
+ 
+ #include "third_party/blink/public/common/device_memory/approximated_device_memory.h"
+ 
++#include <cstdlib>
++#include <string>
++
+ #include "base/check_op.h"
++#include "base/command_line.h"
+ #include "base/feature_list.h"
+ #include "base/system/sys_info.h"
+ #include "third_party/blink/public/common/features.h"
+@@ -19,6 +23,21 @@ int64_t ApproximatedDeviceMemory::physical_memory_mb_ = 0;
+ void ApproximatedDeviceMemory::Initialize() {
+   if (approximated_device_memory_gb_ > 0.0)
+     return;
++
++  // Check for command line override of device memory.
++  auto* cmd_line = base::CommandLine::ForCurrentProcess();
++  if (cmd_line->HasSwitch("device-memory-gb")) {
++    std::string value = cmd_line->GetSwitchValueASCII("device-memory-gb");
++    char* end_ptr = nullptr;
++    double parsed_value = strtod(value.c_str(), &end_ptr);
++    if (end_ptr != value.c_str() && *end_ptr == '\0' && parsed_value > 0.0 &&
++        parsed_value <= 32.0) {
++      approximated_device_memory_gb_ = static_cast<float>(parsed_value);
++      return;
++    }
++    // Invalid value falls through to normal calculation.
++  }
++
+   DCHECK_EQ(0, physical_memory_mb_);
+   physical_memory_mb_ = ::base::SysInfo::AmountOfPhysicalMemory().InMiB();
+   CalculateAndSetApproximatedDeviceMemory();

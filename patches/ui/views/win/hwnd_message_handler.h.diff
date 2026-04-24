@@ -1,8 +1,8 @@
 diff --git a/ui/views/win/hwnd_message_handler.h b/ui/views/win/hwnd_message_handler.h
-index c8aff1d0e5..b9b32f7543 100644
+index deba19101c4e7c5a9396b40ac86c90584877fc08..1ceead0c4ca712574079a3a19e395ed55e3dddb4 100644
 --- a/ui/views/win/hwnd_message_handler.h
 +++ b/ui/views/win/hwnd_message_handler.h
-@@ -823,6 +823,10 @@ class VIEWS_EXPORT HWNDMessageHandler : public gfx::WindowImpl,
+@@ -838,6 +838,10 @@ class VIEWS_EXPORT HWNDMessageHandler : public gfx::WindowImpl,
    // fullscreen window which lost activation. Defaults to false.
    bool background_fullscreen_hack_;
  

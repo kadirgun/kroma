@@ -1,0 +1,23 @@
+diff --git a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.h b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.h
+index a5deba28a015785da7df3412588b8e98b0b50a8c..62cffe951ef04d0926d4c1f8a29452142d2df2c6 100644
+--- a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.h
++++ b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.h
+@@ -17,6 +17,7 @@
+ #include "third_party/blink/renderer/bindings/modules/v8/v8_canvas_fill_rule.h"
+ #include "third_party/blink/renderer/bindings/modules/v8/v8_image_smoothing_quality.h"
+ #include "third_party/blink/renderer/core/html/canvas/canvas_rendering_context.h"
++#include "third_party/blink/renderer/core/kroma_canvas/kroma_canvas_tracker.h"
+ #include "third_party/blink/renderer/core/typed_arrays/dom_typed_array.h"
+ #include "third_party/blink/renderer/modules/canvas/canvas2d/canvas_2d_recorder_context.h"
+ #include "third_party/blink/renderer/modules/canvas/canvas2d/canvas_path.h"
+@@ -326,6 +327,10 @@ class MODULES_EXPORT BaseRenderingContext2D : public CanvasRenderingContext,
+   Canvas2DColorParams color_params_;
+   bool need_dispatch_context_restored_ = false;
+   base::RepeatingClosure on_restore_failed_callback_for_testing_;
++
++ protected:
++  // Kroma's own canvas operation tracker for fingerprinting protection.
++  KromaCanvasTracker kroma_tracker_;
+ };
+ 
+ }  // namespace blink

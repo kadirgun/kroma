@@ -1,8 +1,8 @@
 diff --git a/components/embedder_support/user_agent_utils.cc b/components/embedder_support/user_agent_utils.cc
-index 8c44d2265b..1de0a9165e 100644
+index 557eadb18229e4adb2f0092593877254e2f1fe7c..ee4cb61851e574d15fd6beb20841c75c3a1514cd 100644
 --- a/components/embedder_support/user_agent_utils.cc
 +++ b/components/embedder_support/user_agent_utils.cc
-@@ -201,10 +201,12 @@ const blink::UserAgentBrandList GetUserAgentBrandList(
+@@ -162,10 +162,12 @@ const blink::UserAgentBrandList GetUserAgentBrandList(
    int major_version_number;
    bool parse_result = base::StringToInt(major_version, &major_version_number);
    DCHECK(parse_result);
@@ -19,7 +19,7 @@ index 8c44d2265b..1de0a9165e 100644
  
    std::string brand_version =
        output_version_type == blink::UserAgentBrandVersionType::kFullVersion
-@@ -222,8 +224,8 @@ const blink::UserAgentBrandList GetUserAgentBrandList(
+@@ -183,8 +185,8 @@ const blink::UserAgentBrandList GetUserAgentBrandList(
  // GetVersionNumber()
  const blink::UserAgentBrandList GetUserAgentBrandMajorVersionListInternal(
      std::optional<blink::UserAgentBrandVersion> additional_brand_version) {
@@ -30,7 +30,7 @@ index 8c44d2265b..1de0a9165e 100644
                                 blink::UserAgentBrandVersionType::kMajorVersion,
                                 additional_brand_version);
  }
-@@ -233,9 +235,15 @@ const blink::UserAgentBrandList GetUserAgentBrandMajorVersionListInternal(
+@@ -204,9 +206,15 @@ bool ShouldSendUserAgentUnifiedPlatform() {
  // TODO(crbug.com/1291612): Consolidate *FullVersionList() methods by using
  // GetVersionNumber()
  const blink::UserAgentBrandList GetUserAgentBrandFullVersionListInternal(
@@ -40,29 +40,29 @@ index 8c44d2265b..1de0a9165e 100644
 +    std::optional<blink::UserAgentBrandVersion> additional_brand_version,
 +    const std::string& custom_version = "") {
 +  std::string version_to_use = custom_version.empty() ? GetVersionNumber() : custom_version;
-+  std::string major_version_to_use = custom_version.empty() ? GetMajorVersionNumber() : 
-+                                     (version_to_use.find('.') != std::string::npos ? 
++  std::string major_version_to_use = custom_version.empty() ? GetMajorVersionNumber() :
++                                     (version_to_use.find('.') != std::string::npos ?
 +                                      version_to_use.substr(0, version_to_use.find('.')) : version_to_use);
-+  
++
 +  return GetUserAgentBrandList(major_version_to_use,
 +                               version_to_use,
                                 blink::UserAgentBrandVersionType::kFullVersion,
                                 additional_brand_version);
  }
-@@ -474,6 +482,12 @@ std::string BuildOSCpuInfo(
+@@ -439,6 +447,12 @@ std::string BuildOSCpuInfo(
+ }  // namespace
  
- std::string GetProductAndVersion(
-     UserAgentReductionEnterprisePolicyState user_agent_reduction) {
+ std::string GetProductAndVersion() {
 +  std::optional<std::string> custom_version = GetUserAgentVersionFromCommandLine();
 +  if (custom_version.has_value()) {
 +    std::string product_name(version_info::GetProductName());
 +    return base::StrCat({product_name, "/", custom_version.value()});
 +  }
 +  
-   return ShouldReduceUserAgentMinorVersion(user_agent_reduction)
-              ? version_info::GetProductNameAndVersionForReducedUserAgent(
-                    blink::features::kUserAgentFrozenBuildVersion.Get())
-@@ -493,6 +507,38 @@ std::optional<std::string> GetUserAgentFromCommandLine() {
+   return base::FeatureList::IsEnabled(
+              blink::features::kReduceUserAgentMinorVersion)
+              ? version_info::GetProductNameAndVersionForReducedUserAgent()
+@@ -458,6 +472,39 @@ std::optional<std::string> GetUserAgentFromCommandLine() {
    return std::nullopt;
  }
  
@@ -98,10 +98,11 @@ index 8c44d2265b..1de0a9165e 100644
 +  return version_info::GetMajorVersionNumber();
 +}
 +
- std::string GetUserAgent(
-     UserAgentReductionEnterprisePolicyState user_agent_reduction) {
++
+ std::string GetUserAgent() {
    std::optional<std::string> custom_ua = GetUserAgentFromCommandLine();
-@@ -700,7 +746,7 @@ blink::UserAgentMetadata GetUserAgentMetadata(const PrefService* pref_service,
+   if (custom_ua.has_value()) {
+@@ -664,7 +711,7 @@ blink::UserAgentMetadata GetUserAgentMetadata(bool only_low_entropy_ch) {
    // High entropy client hints.
    metadata.brand_full_version_list =
        GetUserAgentBrandFullVersionListInternal(std::nullopt);

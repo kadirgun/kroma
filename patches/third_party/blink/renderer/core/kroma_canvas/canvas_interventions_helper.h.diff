@@ -1,0 +1,46 @@
+diff --git a/third_party/blink/renderer/core/kroma_canvas/canvas_interventions_helper.h b/third_party/blink/renderer/core/kroma_canvas/canvas_interventions_helper.h
+new file mode 100644
+index 0000000..cb27f28
+--- /dev/null
++++ b/third_party/blink/renderer/core/kroma_canvas/canvas_interventions_helper.h
+@@ -0,0 +1,40 @@
++// Copyright 2025 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef THIRD_PARTY_BLINK_RENDERER_CORE_KROMA_CANVAS_CANVAS_INTERVENTIONS_HELPER_H_
++#define THIRD_PARTY_BLINK_RENDERER_CORE_KROMA_CANVAS_CANVAS_INTERVENTIONS_HELPER_H_
++
++#include <cstdint>
++
++#include "third_party/blink/renderer/core/core_export.h"
++#include "third_party/blink/renderer/core/execution_context/execution_context.h"
++#include "third_party/blink/renderer/platform/graphics/static_bitmap_image.h"
++#include "third_party/blink/renderer/platform/supplementable.h"
++
++namespace blink {
++
++class CORE_EXPORT CanvasInterventionsHelper
++    : public GarbageCollected<CanvasInterventionsHelper>,
++      public Supplement<ExecutionContext> {
++ public:
++  static const char kSupplementName[];
++
++  // Applies noise to a StaticBitmapImage snapshot for fingerprinting protection.
++  static bool MaybeNoiseSnapshot(ExecutionContext* execution_context,
++                                 scoped_refptr<StaticBitmapImage>& snapshot);
++
++  // Applies noise to raw pixel data from WebGL readPixels.
++  static void MaybeNoiseReadPixels(ExecutionContext* execution_context,
++                                  uint8_t* data,
++                                  int width,
++                                  int height);
++
++  void Trace(Visitor* visitor) const override {
++    Supplement<ExecutionContext>::Trace(visitor);
++  }
++};
++
++}  // namespace blink
++
++#endif  // THIRD_PARTY_BLINK_RENDERER_CORE_KROMA_CANVAS_CANVAS_INTERVENTIONS_HELPER_H_

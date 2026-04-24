@@ -1,0 +1,63 @@
+diff --git a/third_party/blink/public/devtools_protocol/domains/Input.pdl b/third_party/blink/public/devtools_protocol/domains/Input.pdl
+index 815bf7c4147c4dd89ea6e9c7a0440517cb5a4937..24efa0799db6d983a358396b1a284b70604bfeb7 100644
+--- a/third_party/blink/public/devtools_protocol/domains/Input.pdl
++++ b/third_party/blink/public/devtools_protocol/domains/Input.pdl
+@@ -206,6 +206,58 @@ domain Input
+         mouse
+         pen
+ 
++  # Parameters for scheduling mouse events.
++  type dispatchMouseEventParameters extends object
++    properties
++      # Type of the mouse event.
++      enum type
++        mousePressed
++        mouseReleased
++        mouseMoved
++        mouseWheel
++      # X coordinate of the event relative to the main frame's viewport in CSS pixels.
++      number x
++      # Y coordinate of the event relative to the main frame's viewport in CSS pixels.
++      number y
++      # Bit field representing pressed modifier keys. Alt=1, Ctrl=2, Meta/Command=4, Shift=8
++      # (default: 0).
++      optional integer modifiers
++      # Time at which the event occurred.
++      optional TimeSinceEpoch timestamp
++      # Mouse button (default: "none").
++      optional MouseButton button
++      # A number indicating which buttons are pressed on the mouse when a mouse event is triggered.
++      # Left=1, Right=2, Middle=4, Back=8, Forward=16, None=0.
++      optional integer buttons
++      # Number of times the mouse button was clicked (default: 0).
++      optional integer clickCount
++      # The normalized pressure, which has a range of [0,1] (default: 0).
++      experimental optional number force
++      # The normalized tangential pressure, which has a range of [-1,1] (default: 0).
++      experimental optional number tangentialPressure
++      # The plane angle between the Y-Z plane and the plane containing both the stylus axis and the Y axis, in degrees of the range [-90,90], a positive tiltX is to the right (default: 0).
++      optional number tiltX
++      # The plane angle between the X-Z plane and the plane containing both the stylus axis and the X axis, in degrees of the range [-90,90], a positive tiltY is towards the user (default: 0).
++      optional number tiltY
++      # The clockwise rotation of a pen stylus around its own major axis, in degrees in the range [0,359] (default: 0).
++      experimental optional integer twist
++      # X delta in CSS pixels for mouse wheel event (default: 0).
++      optional number deltaX
++      # Y delta in CSS pixels for mouse wheel event (default: 0).
++      optional number deltaY
++      # Pointer type (default: "mouse").
++      optional enum pointerType
++        mouse
++        pen
++
++  # Schedules mouse events to be dispatched in order. Each event is dispatched after the
++  # specified timestamp delay from the previous event. The timestamps should be in
++  # UTC time since January 1, 1970, in seconds.
++  command scheduleMouseEvents
++    parameters
++      # Array of mouse events to dispatch in order.
++      array of dispatchMouseEventParameters events
++
+   # Dispatches a touch event to the page.
+   command dispatchTouchEvent
+     parameters

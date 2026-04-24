@@ -1,0 +1,16 @@
+diff --git a/chrome/browser/extensions/component_loader.cc b/chrome/browser/extensions/component_loader.cc
+index fb31ee586bc6746f3ec33c0512cc0900fc4b8939..ce79611c1bed9613426f60162689ecb91a1bb175 100644
+--- a/chrome/browser/extensions/component_loader.cc
++++ b/chrome/browser/extensions/component_loader.cc
+@@ -603,10 +603,7 @@ void ComponentLoader::AddDefaultComponentExtensionsWithBackgroundPages(
+ #endif  // BUILDFLAG(IS_CHROMEOS)
+   }
+ 
+-// http://crbug.com/41070702
+-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS)
+-  AddNetworkSpeechSynthesisExtension();
+-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS)
++AddNetworkSpeechSynthesisExtension();
+ }
+ 
+ void ComponentLoader::

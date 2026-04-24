@@ -1,0 +1,66 @@
+diff --git a/third_party/blink/renderer/core/kroma_canvas/noise_token.h b/third_party/blink/renderer/core/kroma_canvas/noise_token.h
+new file mode 100644
+index 0000000..5f8b1fa
+--- /dev/null
++++ b/third_party/blink/renderer/core/kroma_canvas/noise_token.h
+@@ -0,0 +1,60 @@
++// Copyright 2025 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef THIRD_PARTY_BLINK_RENDERER_CORE_KROMA_CANVAS_NOISE_TOKEN_H_
++#define THIRD_PARTY_BLINK_RENDERER_CORE_KROMA_CANVAS_NOISE_TOKEN_H_
++
++#include <cstdint>
++#include <compare>
++#include <string>
++
++#include "base/command_line.h"
++#include "base/strings/string_number_conversions.h"
++
++namespace blink {
++
++// A wrapper class for a uint64_t noise token.
++// "KromaNoise" in ASCII as uint64: 0x4b726f4d614e6f69
++class KromaNoiseToken final {
++ public:
++  explicit KromaNoiseToken(uint64_t token) : token_(token) {}
++
++  uint64_t Value() const { return token_; }
++
++  auto operator<=>(const KromaNoiseToken& other) const = default;
++
++ private:
++  uint64_t token_;
++};
++
++// Default constant fallback token when --canvas-noise switch is not provided.
++inline constexpr uint64_t kDefaultNoiseTokenValue = 0x4b726f4d614e6f69;
++
++// Returns the noise token value if --canvas-noise switch is provided.
++// Returns 0 if switch is not present (no noise should be applied).
++inline uint64_t GetCanvasNoiseTokenValue() {
++  static uint64_t cached_value = UINT64_MAX;  // sentinel: not yet checked
++  if (cached_value == UINT64_MAX) {
++    const base::CommandLine* cmd = base::CommandLine::ForCurrentProcess();
++    if (cmd->HasSwitch("canvas-noise")) {
++      std::string val = cmd->GetSwitchValueASCII("canvas-noise");
++      if (!base::HexStringToUInt64(val, &cached_value)) {
++        cached_value = 0;
++      }
++    } else {
++      cached_value = 0;  // no switch = no noise
++    }
++  }
++  return cached_value;
++}
++
++// Returns a KromaNoiseToken for canvas fingerprinting protection.
++// Respects --canvas-noise command-line switch.
++inline KromaNoiseToken KromaNoiseTokenValue() {
++  return KromaNoiseToken(GetCanvasNoiseTokenValue());
++}
++
++}  // namespace blink
++
++#endif  // THIRD_PARTY_BLINK_RENDERER_CORE_KROMA_CANVAS_NOISE_TOKEN_H_

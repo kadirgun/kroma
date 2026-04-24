@@ -1,10 +1,10 @@
 diff --git a/ui/views/win/hwnd_message_handler.cc b/ui/views/win/hwnd_message_handler.cc
-index cd0207176f..2841945b40 100644
+index 6a4f780c6921d901e9f954d1f7ba18c40d8847b9..1ad4eb7435592099b0b2310b57929c9faaf0201f 100644
 --- a/ui/views/win/hwnd_message_handler.cc
 +++ b/ui/views/win/hwnd_message_handler.cc
-@@ -454,7 +454,8 @@ HWNDMessageHandler::HWNDMessageHandler(HWNDMessageHandlerDelegate* delegate,
+@@ -433,7 +433,8 @@ HWNDMessageHandler::HWNDMessageHandler(HWNDMessageHandlerDelegate* delegate,
+       dwm_transition_desired_(false),
        sent_window_size_changing_(false),
-       did_return_uia_object_(false),
        left_button_down_on_caption_(false),
 -      background_fullscreen_hack_(false) {}
 +      background_fullscreen_hack_(false),
@@ -12,7 +12,7 @@ index cd0207176f..2841945b40 100644
  
  HWNDMessageHandler::~HWNDMessageHandler() {
    // Unhook MoveLoopMouseWatcher, to prevent call backs to this after deletion.
-@@ -723,65 +724,62 @@ void HWNDMessageHandler::Show(ui::mojom::WindowShowState show_state,
+@@ -708,65 +709,63 @@ void HWNDMessageHandler::Show(ui::mojom::WindowShowState show_state,
    TRACE_EVENT0("views", "HWNDMessageHandler::Show");
  
    int native_show_state;
@@ -22,7 +22,7 @@ index cd0207176f..2841945b40 100644
 -    placement.length = sizeof(WINDOWPLACEMENT);
 -    placement.showCmd = SW_SHOWMAXIMIZED;
 -    placement.rcNormalPosition = pixel_restore_bounds.ToRECT();
--    SetWindowPlacement(hwnd(), &placement);
+-    ::SetWindowPlacement(hwnd(), &placement);
 -    native_show_state = SW_SHOWMAXIMIZED;
 -  } else {
 -    const bool is_maximized_or_arranged =
@@ -67,8 +67,8 @@ index cd0207176f..2841945b40 100644
 -        native_show_state = SW_SHOWMINIMIZED;
 -        break;
 -      case ui::mojom::WindowShowState::kNormal:
--        if ((GetWindowLong(hwnd(), GWL_EXSTYLE) & WS_EX_TRANSPARENT) ||
--            (GetWindowLong(hwnd(), GWL_EXSTYLE) & WS_EX_NOACTIVATE)) {
+-        if ((::GetWindowLong(hwnd(), GWL_EXSTYLE) & WS_EX_TRANSPARENT) ||
+-            (::GetWindowLong(hwnd(), GWL_EXSTYLE) & WS_EX_NOACTIVATE)) {
 -          native_show_state =
 -              is_maximized_or_arranged ? SW_SHOWNA : SW_SHOWNOACTIVATE;
 -        } else {
@@ -97,7 +97,7 @@ index cd0207176f..2841945b40 100644
 +      native_show_state = delegate_->GetInitialShowState();
 +      break;
 +  }
- 
++
 +  if (has_become_visible_ < 2 && native_show_state == SW_SHOWMAXIMIZED) {
 +    has_become_visible_++;
 +    SetWindowPos(hwnd(), HWND_BOTTOM, 0, 0, 0, 0, 
@@ -114,7 +114,8 @@ index cd0207176f..2841945b40 100644
 +  // ignored (!!#@@#!). Instead, we call ShowWindow again in this case.
 +  if (native_show_state == SW_HIDE) {
 +    native_show_state = SW_SHOWNORMAL;
-     ShowWindow(hwnd(), native_show_state);
+ 
+     ::ShowWindow(hwnd(), native_show_state);
 -    // When launched from certain programs like bash and Windows Live
 -    // Messenger, show_state is set to SW_HIDE, so we need to correct that
 -    // condition. We don't just change show_state to SW_SHOWNORMAL because
@@ -123,12 +124,12 @@ index cd0207176f..2841945b40 100644
 -    // ignored (!!#@@#!). Instead, we call ShowWindow again in this case.
 -    if (native_show_state == SW_HIDE) {
 -      native_show_state = SW_SHOWNORMAL;
--      ShowWindow(hwnd(), native_show_state);
+-      ::ShowWindow(hwnd(), native_show_state);
 -    }
    }
  
    // We need to explicitly activate the window if we've been shown with a state
-@@ -824,6 +822,10 @@ void HWNDMessageHandler::Restore() {
+@@ -816,6 +815,10 @@ void HWNDMessageHandler::Restore() {
  }
  
  void HWNDMessageHandler::Activate() {

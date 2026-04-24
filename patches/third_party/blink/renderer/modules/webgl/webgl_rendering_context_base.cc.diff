@@ -1,26 +1,24 @@
 diff --git a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
-index e9ac82c334..3a900cd5ed 100644
+index e6f8fef21367b8ed924a23d67c3b9752e7105cbc..a94cc21ed701c2da73c91e640756fe5ab254474f 100644
 --- a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
 +++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
-@@ -24,6 +24,9 @@
-  */
- 
- #include "third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.h"
-+#include "third_party/blink/renderer/core/canvas_interventions/noise_helper.h"
-+#include "third_party/blink/renderer/core/canvas_interventions/noise_hash.h"
-+#include "third_party/blink/renderer/core/canvas_interventions/canvas_interventions_helper.h"
- 
- #include <memory>
- #include <utility>
-@@ -32,6 +35,7 @@
+@@ -32,6 +32,7 @@
+ #include "base/byte_size.h"
  #include "base/compiler_specific.h"
- #include "base/containers/contains.h"
  #include "base/feature_list.h"
 +#include "base/command_line.h"
  #include "base/memory/scoped_refptr.h"
  #include "base/metrics/histogram_functions.h"
  #include "base/metrics/histogram_macros.h"
-@@ -4008,6 +4012,12 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+@@ -70,6 +71,7 @@
+ #include "third_party/blink/renderer/core/html/canvas/html_canvas_element.h"
+ #include "third_party/blink/renderer/core/html/canvas/image_data.h"
+ #include "third_party/blink/renderer/core/html/canvas/predefined_color_space.h"
++#include "third_party/blink/renderer/core/kroma_canvas/canvas_interventions_helper.h"
+ #include "third_party/blink/renderer/core/html/html_image_element.h"
+ #include "third_party/blink/renderer/core/html/media/html_video_element.h"
+ #include "third_party/blink/renderer/core/imagebitmap/image_bitmap.h"
+@@ -3881,6 +3883,12 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
      case GL_RENDERBUFFER_BINDING:
        return WebGLAny(script_state, renderbuffer_binding_.Get());
      case GL_RENDERER:
@@ -33,7 +31,7 @@ index e9ac82c334..3a900cd5ed 100644
        return WebGLAny(script_state, String("WebKit WebGL"));
      case GL_SAMPLE_ALPHA_TO_COVERAGE:
        return GetBooleanParameter(script_state, pname);
-@@ -4092,6 +4102,12 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+@@ -3959,6 +3967,12 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
      case GC3D_UNPACK_COLORSPACE_CONVERSION_WEBGL:
        return WebGLAny(script_state, unpack_colorspace_conversion_);
      case GL_VENDOR:
@@ -45,8 +43,8 @@ index e9ac82c334..3a900cd5ed 100644
 +      }
        return WebGLAny(script_state, String("WebKit"));
      case GL_VERSION:
-       if (IdentifiabilityStudySettings::Get()->ShouldSampleType(
-@@ -4115,14 +4131,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+       return WebGLAny(
+@@ -3977,6 +3991,12 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
        return ScriptValue::CreateNull(script_state->GetIsolate());
      case WebGLDebugRendererInfo::kUnmaskedRendererWebgl:
        if (ExtensionEnabled(kWebGLDebugRendererInfoName)) {
@@ -56,19 +54,10 @@ index e9ac82c334..3a900cd5ed 100644
 +                                     ->GetSwitchValueASCII("webgl-renderer");
 +          return WebGLAny(script_state, String(override.c_str()));
 +        }
-         if (IdentifiabilityStudySettings::Get()->ShouldSampleType(
-                 blink::IdentifiableSurface::Type::kWebGLParameter)) {
-           RecordIdentifiableGLParameterDigest(
-               pname, IdentifiabilityBenignStringToken(
-                          String(ContextGL()->GetString(GL_RENDERER))));
-         }
--        return WebGLAny(script_state,
--                        String(ContextGL()->GetString(GL_RENDERER)));
-+        return WebGLAny(script_state, String(ContextGL()->GetString(GL_RENDERER)));
+         return WebGLAny(script_state,
+                         String(ContextGL()->GetString(GL_RENDERER)));
        }
-       SynthesizeGLError(
-           GL_INVALID_ENUM, "getParameter",
-@@ -4130,14 +4151,19 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+@@ -3986,6 +4006,12 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
        return ScriptValue::CreateNull(script_state->GetIsolate());
      case WebGLDebugRendererInfo::kUnmaskedVendorWebgl:
        if (ExtensionEnabled(kWebGLDebugRendererInfoName)) {
@@ -78,84 +67,20 @@ index e9ac82c334..3a900cd5ed 100644
 +                                     ->GetSwitchValueASCII("webgl-vendor");
 +          return WebGLAny(script_state, String(override.c_str()));
 +        }
-         if (IdentifiabilityStudySettings::Get()->ShouldSampleType(
-                 blink::IdentifiableSurface::Type::kWebGLParameter)) {
-           RecordIdentifiableGLParameterDigest(
-               pname, IdentifiabilityBenignStringToken(
-                          String(ContextGL()->GetString(GL_VENDOR))));
-         }
--        return WebGLAny(script_state,
--                        String(ContextGL()->GetString(GL_VENDOR)));
-+        return WebGLAny(script_state, String(ContextGL()->GetString(GL_VENDOR)));
+         return WebGLAny(script_state,
+                         String(ContextGL()->GetString(GL_VENDOR)));
        }
-       SynthesizeGLError(
-           GL_INVALID_ENUM, "getParameter",
-@@ -5297,6 +5323,68 @@ void WebGLRenderingContextBase::ReadPixelsHelper(GLint x,
-                          IdentifiableToken())
-           .Record(ukm_params.ukm_recorder);
+@@ -5133,6 +5159,13 @@ void WebGLRenderingContextBase::ReadPixelsHelper(GLint x,
      }
-+
-+    // Apply canvas readback noise for fingerprinting protection when
-+    // the feature is enabled and the readback is RGBA/UNSIGNED_BYTE.
-+    // The 2D canvas implementation applies NoisePixels on SkBitmap pixels;
-+    // here we apply noise in-place on the raw readback buffer.
-+    if (format == GL_RGBA && type == GL_UNSIGNED_BYTE && data &&
-+        GetExecutionContext()) {
-+      auto* execution_context = GetExecutionContext();
-+      // Only apply when the page has a canvas noise token set.
-+      if (execution_context->CanvasNoiseToken().has_value()) {
-+        size_t pixel_count = static_cast<size_t>(width) *
-+                            static_cast<size_t>(height);
-+        // Compute required bytes and verify against the provided buffer to
-+        // avoid unsafe buffer usage. ValidateReadPixelsFuncParameters should
-+        // have ensured the buffer is large enough, but make the check
-+        // explicit to satisfy static analysis.
-+        size_t needed_bytes = 0;
-+        if (!base::CheckedNumeric<size_t>(pixel_count)
-+                 .AssignIfValid(&needed_bytes) ||
-+            !base::CheckedNumeric<size_t>(needed_bytes)
-+                 .AssignIfValid(&needed_bytes)) {
-+          needed_bytes = pixel_count * 4u;
-+        }
-+        // Multiply by 4 (RGBA8) with overflow protection.
-+        base::CheckedNumeric<size_t> checked_needed = pixel_count;
-+        checked_needed *= 4u;
-+        if (!checked_needed.IsValid())
-+          return;
-+        needed_bytes = checked_needed.ValueOrDie();
-+
-+        size_t available_bytes =
-+            static_cast<size_t>(pixels->byteLength()) -
-+            static_cast<size_t>(offset_in_bytes.ValueOrDie());
-+        // If the provided buffer is unexpectedly too small, bail out safely.
-+        // ValidateReadPixelsFuncParameters should normally prevent this, but
-+        // make the check explicit for static analysis and defense in depth.
-+        if (needed_bytes > available_bytes) {
-+          return;
-+        }
-+        DCHECK_LE(needed_bytes, available_bytes);
-+        // Prefer the safe ByteSpanMaybeShared API which returns a span
-+        // backed by the ArrayBufferView's backing store if present. Use a
-+        // subspan starting at the validated offset so static analysis can
-+        // verify safety.
-+        auto bytes_span = pixels->ByteSpanMaybeShared().subspan(
-+          static_cast<size_t>(offset_in_bytes.ValueOrDie()));
-+        // bytes_span may be larger than needed_bytes; take the prefix we
-+        // actually need using span::first which avoids creating a new span
-+        // from a raw pointer/length pair (silences the static analyzer).
-+        DCHECK_GE(bytes_span.size(), needed_bytes);
-+        auto pixels_span = bytes_span.first(needed_bytes);
-+        // First do a lightweight entropy sample. If the sampled Shannon
-+        // entropy is low, skip applying noise to avoid unnecessary
-+        // perturbation for low-entropy readbacks.
-+        constexpr double kEntropyThreshold = 5.0;  // bits
-+        if (blink::CanvasInterventionsHelper::IsLikelyHighEntropy(
-+          execution_context, pixels_span, kEntropyThreshold)) {
-+          auto token_hash = blink::NoiseHash(execution_context->CanvasNoiseToken().value());
-+          blink::NoisePixels(token_hash, pixels_span, width, height);
-+        }
-+      }
-+    }
+     ContextGL()->ReadPixels(x, y, width, height, format, type, data);
    }
++
++  // Apply noise to prevent fingerprinting via readPixels
++  if (format == GL_RGBA && type == GL_UNSIGNED_BYTE && data && width > 0 &&
++      height > 0) {
++    CanvasInterventionsHelper::MaybeNoiseReadPixels(
++        GetExecutionContext(), data, width, height);
++  }
  }
  
+ void WebGLRenderingContextBase::RenderbufferStorageImpl(

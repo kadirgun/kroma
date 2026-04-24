@@ -1,16 +1,16 @@
 diff --git a/p2p/base/turn_port.cc b/p2p/base/turn_port.cc
-index fe18fa6..ebe8a44 100644
+index 9a22505231877ac3ac9dc00e42ed7cfcd97099a8..1ddb3ccc448e1595d11de829fc84afb0f77318d9 100644
 --- a/p2p/base/turn_port.cc
 +++ b/p2p/base/turn_port.cc
-@@ -58,6 +58,7 @@
+@@ -56,6 +56,7 @@
  #include "rtc_base/ssl_certificate.h"
  #include "rtc_base/string_encode.h"
  #include "rtc_base/strings/string_builder.h"
 +#include "base/command_line.h"
- #include "rtc_base/third_party/sigslot/sigslot.h"
  #include "system_wrappers/include/metrics.h"
  
-@@ -395,6 +396,33 @@ void TurnPort::PrepareAddress() {
+ namespace webrtc {
+@@ -394,6 +395,33 @@ void TurnPort::PrepareAddress() {
        static_cast<int>(server_address_.address.GetIPAddressType()),
        static_cast<int>(IPAddressType::kMaxValue));
  
@@ -44,7 +44,7 @@ index fe18fa6..ebe8a44 100644
    MaybeRequestLocalNetworkAccessPermission(
        server_address_.address,
        [this](LocalNetworkAccessPermissionStatus status) {
-@@ -917,15 +945,37 @@ void TurnPort::OnAllocateSuccess(const SocketAddress& address,
+@@ -945,15 +973,37 @@ void TurnPort::OnAllocateSuccess(const SocketAddress& address,
    SocketAddress related_address = stun_address;
  
    // For relayed candidate, Base is the candidate itself.

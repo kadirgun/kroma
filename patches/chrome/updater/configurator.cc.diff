@@ -1,5 +1,5 @@
 diff --git a/chrome/updater/configurator.cc b/chrome/updater/configurator.cc
-index e4e71efd99..c017011abf 100644
+index 2e7bc821543d4d7a56420f986e83acedab9142bf..792f43a1d8d49eb4a7a8e4c3e15970b5c578870c 100644
 --- a/chrome/updater/configurator.cc
 +++ b/chrome/updater/configurator.cc
 @@ -133,7 +133,7 @@ base::TimeDelta Configurator::UpdateDelay() const {

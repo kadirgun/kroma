@@ -1,8 +1,8 @@
 diff --git a/p2p/base/port.cc b/p2p/base/port.cc
-index c7c1de2..caa704e 100644
+index 932ff549459179fd4da09d3eaa296b5e76f8634b..6c7a33601ac0f35fe50dd9f85bc80a2dea8f768c 100644
 --- a/p2p/base/port.cc
 +++ b/p2p/base/port.cc
-@@ -53,6 +53,8 @@
+@@ -52,6 +52,8 @@
  #include "rtc_base/string_encode.h"
  #include "rtc_base/string_utils.h"
  #include "rtc_base/strings/string_builder.h"
@@ -11,22 +11,22 @@ index c7c1de2..caa704e 100644
  #include "rtc_base/trace_event.h"
  #include "rtc_base/weak_ptr.h"
  
-@@ -303,15 +305,41 @@ bool Port::MaybeObfuscateAddress(const Candidate& c, bool is_final) {
-       weak_ptr->FinishAddingAddress(copy, is_final);
+@@ -280,14 +282,42 @@ bool Port::MaybeObfuscateAddress(const Candidate& c, bool is_final) {
      }
    };
-+  // Schedule mDNS name creation for local addresses. (No diagnostic log.)
    set_mdns_name_registration_status(MdnsNameRegistrationStatus::kInProgress);
 -  network_->GetMdnsResponder()->CreateNameForAddress(copy.address().ipaddr(),
 -                                                     callback);
++  
 +  network_->GetMdnsResponder()->CreateNameForAddress(
-+      copy.address().ipaddr(), std::move(callback));
++    copy.address().ipaddr(), std::move(callback));
++
    return true;
  }
  
  void Port::FinishAddingAddress(const Candidate& c, bool is_final) {
 -  candidates_.push_back(c);
--  SendCandidateReady(c);
+-  NotifyCandidateReady(this, c);
 +  Candidate c_to_add = c;
 +
 +  base::CommandLine* cmd = base::CommandLine::ForCurrentProcess();
@@ -53,7 +53,8 @@ index c7c1de2..caa704e 100644
 +  }
 +
 +  candidates_.push_back(c_to_add);
-+  SendCandidateReady(c_to_add);
++
++  NotifyCandidateReady(this, c_to_add);
  
    PostAddAddress(is_final);
  }

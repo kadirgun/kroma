@@ -1,8 +1,8 @@
 diff --git a/third_party/blink/renderer/core/page/focus_controller.cc b/third_party/blink/renderer/core/page/focus_controller.cc
-index b4df26c322..caf268c864 100644
+index 7c600c022c4a69053a5dd103d573c5aab3544265..9296e7373150b73f1698c26f99e3bb0b9654cec7 100644
 --- a/third_party/blink/renderer/core/page/focus_controller.cc
 +++ b/third_party/blink/renderer/core/page/focus_controller.cc
-@@ -1457,14 +1457,16 @@ void FocusController::SetFocusedFrame(Frame* frame, bool notify_embedder) {
+@@ -1626,14 +1626,16 @@ void FocusController::SetFocusedFrame(Frame* frame, bool notify_embedder) {
    // states of both frames.
    if (old_frame && old_frame->View()) {
      old_frame->Selection().SetFrameIsFocused(false);

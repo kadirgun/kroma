@@ -1,0 +1,28 @@
+diff --git a/third_party/blink/renderer/core/BUILD.gn b/third_party/blink/renderer/core/BUILD.gn
+index 66ed65def5c45d87f2e6357228cfcafdd784ed9a..8d83c20556dd75696bec580a4103c26d0855e271 100644
+--- a/third_party/blink/renderer/core/BUILD.gn
++++ b/third_party/blink/renderer/core/BUILD.gn
+@@ -22,6 +22,7 @@ import("//third_party/blink/renderer/core/animation/build.gni")
+ import("//third_party/blink/renderer/core/animation_frame/build.gni")
+ import("//third_party/blink/renderer/core/annotation/build.gni")
+ import("//third_party/blink/renderer/core/canvas_interventions/build.gni")
++import("//third_party/blink/renderer/core/kroma_canvas/build.gni")
+ import("//third_party/blink/renderer/core/clipboard/build.gni")
+ import("//third_party/blink/renderer/core/content_capture/build.gni")
+ import("//third_party/blink/renderer/core/context_features/build.gni")
+@@ -275,6 +276,7 @@ component("core") {
+   sources += rebase_path(blink_core_sources_canvas_interventions,
+                          "",
+                          "canvas_interventions")
++  sources += rebase_path(blink_core_sources_kroma_canvas, "", "kroma_canvas")
+   sources += rebase_path(blink_core_sources_clipboard, "", "clipboard")
+   sources +=
+       rebase_path(blink_core_sources_content_capture, "", "content_capture")
+@@ -1461,6 +1463,7 @@ source_set("unit_tests") {
+   sources += rebase_path(blink_core_tests_canvas_interventions,
+                          "",
+                          "canvas_interventions")
++  sources += rebase_path(blink_core_tests_kroma_canvas, "", "kroma_canvas")
+   sources += rebase_path(blink_core_tests_clipboard, "", "clipboard")
+   sources +=
+       rebase_path(blink_core_tests_content_capture, "", "content_capture")

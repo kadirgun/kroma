@@ -1,0 +1,21 @@
+diff --git a/third_party/blink/renderer/core/kroma_canvas/build.gni b/third_party/blink/renderer/core/kroma_canvas/build.gni
+new file mode 100644
+index 0000000..b7a5623
+--- /dev/null
++++ b/third_party/blink/renderer/core/kroma_canvas/build.gni
+@@ -0,0 +1,15 @@
++# Copyright 2025 The Chromium Authors
++# Use of this source code is governed by a BSD-style license that can be
++# found in the LICENSE file.
++
++blink_core_sources_kroma_canvas = [
++  "canvas_interventions_helper.cc",
++  "canvas_interventions_helper.h",
++  "kroma_noise_hash.cc",
++  "kroma_noise_hash.h",
++  "kroma_noise_helper.cc",
++  "kroma_noise_helper.h",
++  "noise_token.h",
++]
++
++blink_core_tests_kroma_canvas = []
