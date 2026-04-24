@@ -1,0 +1,25 @@
+diff --git a/base/version_info/version_info.cc b/base/version_info/version_info.cc
+index f42ee4c51ef360c4a2d5ac55a490970220c99b4e..8b3328a78ab1cdd92f85465532ca4691436f6093 100644
+--- a/base/version_info/version_info.cc
++++ b/base/version_info/version_info.cc
+@@ -7,6 +7,7 @@
+ #include <string>
+ 
+ #include "base/no_destructor.h"
++#include "base/command_line.h"
+ #include "base/strings/strcat.h"
+ #include "base/strings/string_number_conversions.h"
+ #include "base/version.h"
+@@ -23,6 +24,12 @@ std::string GetMajorVersionNumber() {
+ }
+ 
+ const base::Version& GetVersion() {
++  base::CommandLine* cmd = base::CommandLine::ForCurrentProcess();
++  if (cmd->HasSwitch("user-agent-version")) {
++    std::string v = cmd->GetSwitchValueASCII("user-agent-version");
++    static const base::NoDestructor<base::Version> custom_version(v);
++    return *custom_version;
++  }
+   static const base::NoDestructor<base::Version> version(GetVersionNumber());
+   return *version;
+ }
