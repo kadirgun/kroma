@@ -1,5 +1,5 @@
 diff --git a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
-index e6f8fef21367b8ed924a23d67c3b9752e7105cbc..3fd585ad8cd8c50a3b9eec27a9408890baee7b17 100644
+index e6f8fef21367b8ed924a23d67c3b9752e7105cbc..3099789b260d02c690b2713390c3a87052398ae2 100644
 --- a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
 +++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
 @@ -32,6 +32,7 @@
@@ -85,31 +85,7 @@ index e6f8fef21367b8ed924a23d67c3b9752e7105cbc..3fd585ad8cd8c50a3b9eec27a9408890
  }
  
  scoped_refptr<CanvasResource>
-@@ -3881,7 +3909,10 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
-     case GL_RENDERBUFFER_BINDING:
-       return WebGLAny(script_state, renderbuffer_binding_.Get());
-     case GL_RENDERER:
--      return WebGLAny(script_state, String("WebKit WebGL"));
-+      return WebGLAny(
-+          script_state,
-+          GetStringWithOptionalCommandLineOverride(
-+              "webgl-renderer", ContextGL()->GetString(GL_RENDERER)));
-     case GL_SAMPLE_ALPHA_TO_COVERAGE:
-       return GetBooleanParameter(script_state, pname);
-     case GL_SAMPLE_BUFFERS:
-@@ -3959,7 +3990,10 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
-     case GC3D_UNPACK_COLORSPACE_CONVERSION_WEBGL:
-       return WebGLAny(script_state, unpack_colorspace_conversion_);
-     case GL_VENDOR:
--      return WebGLAny(script_state, String("WebKit"));
-+      return WebGLAny(
-+          script_state,
-+          GetStringWithOptionalCommandLineOverride(
-+              "webgl-vendor", ContextGL()->GetString(GL_VENDOR)));
-     case GL_VERSION:
-       return WebGLAny(
-           script_state,
-@@ -3977,8 +4011,10 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+@@ -3977,8 +4005,10 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
        return ScriptValue::CreateNull(script_state->GetIsolate());
      case WebGLDebugRendererInfo::kUnmaskedRendererWebgl:
        if (ExtensionEnabled(kWebGLDebugRendererInfoName)) {
@@ -122,7 +98,7 @@ index e6f8fef21367b8ed924a23d67c3b9752e7105cbc..3fd585ad8cd8c50a3b9eec27a9408890
        }
        SynthesizeGLError(
            GL_INVALID_ENUM, "getParameter",
-@@ -3986,8 +4022,10 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+@@ -3986,8 +4016,10 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
        return ScriptValue::CreateNull(script_state->GetIsolate());
      case WebGLDebugRendererInfo::kUnmaskedVendorWebgl:
        if (ExtensionEnabled(kWebGLDebugRendererInfoName)) {
@@ -135,7 +111,7 @@ index e6f8fef21367b8ed924a23d67c3b9752e7105cbc..3fd585ad8cd8c50a3b9eec27a9408890
        }
        SynthesizeGLError(
            GL_INVALID_ENUM, "getParameter",
-@@ -5133,6 +5171,12 @@ void WebGLRenderingContextBase::ReadPixelsHelper(GLint x,
+@@ -5133,6 +5165,12 @@ void WebGLRenderingContextBase::ReadPixelsHelper(GLint x,
      }
      ContextGL()->ReadPixels(x, y, width, height, format, type, data);
    }
