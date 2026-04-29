@@ -1,6 +1,6 @@
 diff --git a/third_party/blink/renderer/core/kroma_canvas/kroma_noise_helper.cc b/third_party/blink/renderer/core/kroma_canvas/kroma_noise_helper.cc
 new file mode 100644
-index 0000000..130d659
+index 0000000..e0f03c0
 --- /dev/null
 +++ b/third_party/blink/renderer/core/kroma_canvas/kroma_noise_helper.cc
 @@ -0,0 +1,241 @@
@@ -182,7 +182,7 @@ index 0000000..130d659
 +  CHECK_EQ(pixels.size(),
 +           static_cast<size_t>(width * height * kChannelsPerPixel));
 +
-+  if (!KromaIsLikelyHighEntropy(pixels, width, height, 5.0)) {
++  if (!KromaIsLikelyHighEntropy(pixels, width, height, 20.0)) {
 +    return;
 +  }
 +

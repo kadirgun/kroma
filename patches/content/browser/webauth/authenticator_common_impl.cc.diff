@@ -1,0 +1,27 @@
+diff --git a/content/browser/webauth/authenticator_common_impl.cc b/content/browser/webauth/authenticator_common_impl.cc
+index c817c1f689bc0e91ce59c2101d2773d9fbf5d54d..ea3c688aa0c33e2bc24e43d033d9ea9dcf4fb848 100644
+--- a/content/browser/webauth/authenticator_common_impl.cc
++++ b/content/browser/webauth/authenticator_common_impl.cc
+@@ -19,6 +19,7 @@
+ #include "base/barrier_callback.h"
+ #include "base/check.h"
+ #include "base/check_op.h"
++#include "base/command_line.h"
+ #include "base/containers/flat_set.h"
+ #include "base/containers/span.h"
+ #include "base/containers/to_vector.h"
+@@ -1062,6 +1063,14 @@ void AuthenticatorCommonImpl::MakeCredential(
+   req_state_->response_callback = std::move(callback);
+   req_state_->hints = options->hints;
+ 
++  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
++          "cancel-webauthn")) {
++    req_state_->error_awaiting_user_acknowledgement =
++        blink::mojom::AuthenticatorStatus::ABORT_ERROR;
++    CancelWithStatus(blink::mojom::AuthenticatorStatus::ABORT_ERROR);
++    return;
++  }
++
+   if (options->is_payment_credential_creation) {
+     req_state_->mode = AuthenticationRequestMode::kPayment;
+   } else if (options->is_conditional) {

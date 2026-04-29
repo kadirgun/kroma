@@ -81,3 +81,7 @@ Input.scheduleMouseEvent ile event listesi gönderiliyor. Eventları gönderdikt
 ### Input.dispatchKeyEvent modifiers AltGraph ve Numlock
 
 AltGraph: 16, NumLock: 32
+
+### WebAuthn auto cancel
+
+--cancel-webauthn bayrağı ile webathn register istekleri otomatik iptal ediliyor

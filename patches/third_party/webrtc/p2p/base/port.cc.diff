@@ -1,5 +1,5 @@
 diff --git a/p2p/base/port.cc b/p2p/base/port.cc
-index 932ff549459179fd4da09d3eaa296b5e76f8634b..6c7a33601ac0f35fe50dd9f85bc80a2dea8f768c 100644
+index 932ff549459179fd4da09d3eaa296b5e76f8634b..2b2fe6c3de44deff37bc0b8e18b07177d7465ecc 100644
 --- a/p2p/base/port.cc
 +++ b/p2p/base/port.cc
 @@ -52,6 +52,8 @@
@@ -17,7 +17,7 @@ index 932ff549459179fd4da09d3eaa296b5e76f8634b..6c7a33601ac0f35fe50dd9f85bc80a2d
    set_mdns_name_registration_status(MdnsNameRegistrationStatus::kInProgress);
 -  network_->GetMdnsResponder()->CreateNameForAddress(copy.address().ipaddr(),
 -                                                     callback);
-+  
++
 +  network_->GetMdnsResponder()->CreateNameForAddress(
 +    copy.address().ipaddr(), std::move(callback));
 +
